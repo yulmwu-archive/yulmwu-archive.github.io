@@ -30,14 +30,9 @@ export const defaultContentPageLayout: PageLayout = {
 		Component.TagList(),
 	],
 	left: [
-		Component.PageTitle(),
-		Component.MobileOnly(Component.Spacer()),
+        Component.Search(),
 		Component.Flex({
 			components: [
-				{
-					Component: Component.Search(),
-					grow: true,
-				},
 				{ Component: Component.Darkmode() },
 				{ Component: Component.ReaderMode() },
 			],
@@ -47,19 +42,23 @@ export const defaultContentPageLayout: PageLayout = {
 }
 
 export const defaultListPageLayout: PageLayout = {
-	beforeBody: [Component.Breadcrumbs(), Component.ArticleTitle(), Component.ContentMeta()],
+	beforeBody: [
+		Component.ConditionalRender({
+			component: Component.Breadcrumbs({ showCurrentPage: false }),
+			condition: (page) => page.fileData.slug !== "index",
+		}),
+		Component.ArticleTitle(),
+		Component.ContentMeta(),
+		Component.TagList(),
+	],
 	left: [
-		Component.PageTitle(),
-		Component.MobileOnly(Component.Spacer()),
+        Component.Search(),
 		Component.Flex({
 			components: [
-				{
-					Component: Component.Search(),
-					grow: true,
-				},
 				{ Component: Component.Darkmode() },
+				{ Component: Component.ReaderMode() },
 			],
 		}),
 	],
-	right: [],
+	right: [Component.DesktopOnly(Component.TableOfContents())],
 }

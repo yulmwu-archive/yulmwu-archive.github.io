@@ -23,8 +23,8 @@ const config: QuartzConfig = {
 			fontOrigin: "googleFonts",
 			cdnCaching: true,
 			typography: {
-				header: "Schibsted Grotesk",
-				body: "Source Sans Pro",
+				header: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 나눔고딕, 'Nanum Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', arial, 돋움, Dotum, Tahoma, Geneva, sans-serif",
+				body: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 나눔고딕, 'Nanum Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', arial, 돋움, Dotum, Tahoma, Geneva, sans-serif",
 				code: "IBM Plex Mono",
 			},
 			colors: {
@@ -67,7 +67,8 @@ const config: QuartzConfig = {
 				keepBackground: false,
 			}),
 			Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
-			Plugin.GitHubFlavoredMarkdown(),
+			Plugin.GitHubFlavoredMarkdown({ enableSmartyPants: false }),
+			Plugin.FlexibleEmphasis(),
 			Plugin.TableOfContents(),
 			Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
 			Plugin.Description(),

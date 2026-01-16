@@ -6,6 +6,9 @@
 	overflow-y: hidden;
 	min-height: 1.4rem;
 	flex: 0 0.5 auto;
+	border-left: 1px solid var(--lightgray);
+	padding-left: 1rem;
+	
 	&:has(button.toc-header.collapsed) {
 		flex: 0 1 1.4rem;
 	}
@@ -18,8 +21,7 @@ button.toc-header {
 	cursor: pointer;
 	padding: 0;
 	color: var(--dark);
-	display: flex;
-	align-items: center;
+	display: none;
 
 	& h3 {
 		font-size: 0.9rem;
@@ -41,20 +43,44 @@ button.toc-header {
 ul.toc-content.overflow {
 	list-style: none;
 	position: relative;
-	margin: 0.5rem 0;
+	margin: 0;
 	padding: 0;
 	max-height: calc(100% - 2rem);
 	overscroll-behavior: contain;
 	list-style: none;
-	font-size: 0.88rem;
+	font-size: 0.8rem;
+	font-weight: 300;
+
+	// Thin scrollbar styling
+	&::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: var(--lightgray);
+		border-radius: 2px;
+	}
+
+	&::-webkit-scrollbar-thumb:hover {
+		background: var(--gray);
+	}
+
+	// Firefox scrollbar
+	scrollbar-width: thin;
+	scrollbar-color: var(--lightgray) transparent;
 
 	& > li {
-		margin: 0.3rem 0;
-		line-height: 1.4;
+		margin: 0.25rem 0;
+		line-height: 1.3;
 
 		& > a {
 			color: var(--dark);
 			opacity: 0.35;
+			font-weight: 300;
 			transition:
 				0.5s ease opacity,
 				0.3s ease color;
@@ -66,7 +92,7 @@ ul.toc-content.overflow {
 
 	@for $i from 0 through 6 {
 		& .depth-#{$i} {
-			padding-left: calc(0.8rem * #{$i});
+			padding-left: calc(0.7rem * #{$i});
 		}
 	}
 }

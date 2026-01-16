@@ -341,10 +341,24 @@ input[type="checkbox"] {
 }
 
 blockquote {
-	margin: 1rem 0;
-	border-left: 3px solid var(--secondary);
-	padding-left: 1rem;
+	margin: 1.5rem 0;
+	border-left: 4px solid var(--secondary);
+	padding: 1rem 1.25rem;
+	background: color-mix(in srgb, var(--secondary) 5%, var(--light));
+	border-radius: 4px;
 	transition: border-color 0.2s ease;
+
+	p {
+		margin: 0.5rem 0;
+
+		&:first-child {
+			margin-top: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 }
 
 h1,
@@ -509,7 +523,7 @@ tbody,
 li,
 p {
 	line-height: 1.75;
-	font-size: 1.02rem;
+	font-size: 1.1rem;
 }
 
 .table-container {
@@ -599,7 +613,8 @@ video {
 }
 
 .spacer {
-	flex: 2 1 auto;
+	// flex: 2 1 auto;
+    margin-bottom: 2px;
 }
 
 div:has(> .overflow) {
