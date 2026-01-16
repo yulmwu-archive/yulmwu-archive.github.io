@@ -14,7 +14,7 @@ export const sharedPageComponents: SharedLayout = {
 }
 
 export const homePageLayout: PageLayout = {
-	beforeBody: [Component.HomePage()],
+	beforeBody: [Component.Search(), Component.HomePage()],
 	left: [],
 	right: [],
 }
@@ -30,21 +30,20 @@ export const defaultContentPageLayout: PageLayout = {
 		Component.TagList(),
 	],
 	left: [
-		Component.PageTitle(),
-		Component.MobileOnly(Component.Spacer()),
-		Component.Flex({
-			components: [
-				{
-					Component: Component.Search(),
-					grow: true,
-				},
-				{ Component: Component.Darkmode() },
-				{ Component: Component.ReaderMode() },
-			],
-		}),
-		Component.Explorer(),
+		// Component.PageTitle(),
+		// Component.MobileOnly(Component.Spacer()),
+		// Component.Flex({
+		// 	components: [
+		// 		{
+		// 			Component: Component.Search(),
+		// 			grow: true,
+		// 		},
+		// 		{ Component: Component.Darkmode() },
+		// 		{ Component: Component.ReaderMode() },
+		// 	],
+		// }),
 	],
-	right: [Component.Graph(), Component.DesktopOnly(Component.TableOfContents()), Component.Backlinks()],
+	right: [Component.DesktopOnly(Component.TableOfContents())],
 }
 
 export const defaultListPageLayout: PageLayout = {
@@ -61,7 +60,6 @@ export const defaultListPageLayout: PageLayout = {
 				{ Component: Component.Darkmode() },
 			],
 		}),
-		Component.Explorer(),
 	],
 	right: [],
 }
