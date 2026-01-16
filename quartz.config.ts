@@ -8,7 +8,7 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
 	configuration: {
-		pageTitle: "Quartz 4",
+		pageTitle: "@yulmwu",
 		pageTitleSuffix: "",
 		enableSPA: true,
 		enablePopovers: true,
@@ -16,7 +16,7 @@ const config: QuartzConfig = {
 			provider: "plausible",
 		},
 		locale: "en-US",
-		baseUrl: "quartz.jzhao.xyz",
+		baseUrl: "articles.swua.kr",
 		ignorePatterns: ["private", "templates", ".obsidian"],
 		defaultDateType: "modified",
 		theme: {
@@ -72,12 +72,15 @@ const config: QuartzConfig = {
 			Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
 			Plugin.Description(),
 			Plugin.Latex({ renderEngine: "katex" }),
+			Plugin.CNAME(),
 		],
 		filters: [Plugin.RemoveDrafts()],
 		emitters: [
 			Plugin.AliasRedirects(),
 			Plugin.ComponentResources(),
-			Plugin.ContentPage(),
+			Plugin.ContentPage({
+				useCustomHomePage: true,
+			}),
 			Plugin.FolderPage(),
 			Plugin.TagPage(),
 			Plugin.ContentIndex({
@@ -88,7 +91,6 @@ const config: QuartzConfig = {
 			Plugin.Static(),
 			Plugin.Favicon(),
 			Plugin.NotFoundPage(),
-			// Comment out CustomOgImages to speed up build time
 			Plugin.CustomOgImages(),
 		],
 	},

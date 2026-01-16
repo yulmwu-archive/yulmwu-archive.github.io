@@ -2,6 +2,7 @@ import Content from "./pages/Content"
 import TagContent from "./pages/TagContent"
 import FolderContent from "./pages/FolderContent"
 import NotFound from "./pages/404"
+import HomePage from "./pages/HomePage"
 import ArticleTitle from "./ArticleTitle"
 import Darkmode from "./Darkmode"
 import ReaderMode from "./ReaderMode"
@@ -46,6 +47,7 @@ export {
 	MobileOnly,
 	RecentNotes,
 	NotFound,
+	HomePage,
 	Breadcrumbs,
 	Comments,
 	Flex,
