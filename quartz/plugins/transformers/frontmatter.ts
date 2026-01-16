@@ -147,6 +147,19 @@ declare module "vfile" {
 				cssclasses: string[]
 				socialImage: string
 				comments: boolean | string
+				author: string
+                slug: string
+				categories: string[]
+				series: {
+					name: string
+					slug: string
+				}
+				thumbnail: string
+				linked_posts: {
+					previous?: string
+					next?: string
+				}
+				is_private: boolean
 			}>
 	}
 }

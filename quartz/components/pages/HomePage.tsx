@@ -23,15 +23,28 @@ const groupPostsByDirectory = (posts: QuartzPluginData[]): PostsByDirectory => {
 	return postsByDirectory
 }
 
-const extractDirectoryTitles = (allFiles: QuartzPluginData[]): DirectoryTitles => {
+const extractDirectoryTitles = (postsByDirectory: PostsByDirectory, allFiles: QuartzPluginData[]): DirectoryTitles => {
 	const directoryTitles: DirectoryTitles = new Map()
+
+	postsByDirectory.forEach((posts, directory) => {
+		if (posts.length > 0) {
+			const firstPost = posts[0]
+			const seriesName = firstPost.frontmatter?.series?.name
+			if (seriesName) {
+				directoryTitles.set(directory, seriesName)
+				return
+			}
+		}
+	})
 
 	allFiles.forEach((file) => {
 		const slug = file.slug || ""
 		if (slug.endsWith("index") && slug !== "index") {
 			const directory = slug.replace(/\/index$/, "")
-			const title = file.frontmatter?.title || directory.split("/").pop() || directory
-			directoryTitles.set(directory, title)
+			if (!directoryTitles.has(directory)) {
+				const title = file.frontmatter?.title || directory.split("/").pop() || directory
+				directoryTitles.set(directory, title)
+			}
 		}
 	})
 
@@ -91,8 +104,8 @@ const HomePage: QuartzComponent = ({ allFiles, cfg, fileData }: QuartzComponentP
 	const posts = allFiles.filter((file) => file.slug && file.slug !== "index" && !file.slug.startsWith("tags/"))
 
 	const postsByDirectory = groupPostsByDirectory(posts)
-	const directoryTitles = extractDirectoryTitles(allFiles)
 	sortPostsByDate(postsByDirectory, cfg)
+	const directoryTitles = extractDirectoryTitles(postsByDirectory, allFiles)
 	const sortedDirectories = sortDirectories(Array.from(postsByDirectory.keys()))
 
 	return (
