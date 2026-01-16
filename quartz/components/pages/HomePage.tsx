@@ -111,7 +111,7 @@ const HomePage: QuartzComponent = ({ allFiles, cfg, fileData }: QuartzComponentP
 	return (
 		<div class="home-page">
 			<header class="home-header">
-				<h1>Welcome to {cfg.pageTitle}</h1>
+				<h1>Mirror of {cfg.pageTitle} Blog</h1>
 			</header>
 
 			{sortedDirectories.map((directory) => (

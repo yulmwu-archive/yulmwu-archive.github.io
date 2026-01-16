@@ -1,5 +1,5 @@
-import { PageLayout, SharedLayout } from "./quartz/cfg"
-import * as Component from "./quartz/components"
+import { PageLayout, SharedLayout } from './quartz/cfg'
+import * as Component from './quartz/components'
 
 export const sharedPageComponents: SharedLayout = {
 	head: Component.Head(),
@@ -7,15 +7,21 @@ export const sharedPageComponents: SharedLayout = {
 	afterBody: [],
 	footer: Component.Footer({
 		links: {
-			GitHub: "https://github.com/jackyzha0/quartz",
-			"Discord Community": "https://discord.gg/cRFFHYye7t",
+			GitHub: 'https://github.com/yulmwu',
+			Linkedin: 'https://www.linkedin.com/in/yulmwu/',
+			Velog: 'https://velog.io/@yulmwu',
 		},
 	}),
 }
 
 export const homePageLayout: PageLayout = {
-	beforeBody: [Component.Search(), Component.HomePage()],
-	left: [],
+	beforeBody: [Component.HomePage()],
+	left: [
+		Component.Search(),
+		Component.Flex({
+			components: [{ Component: Component.Darkmode() }, { Component: Component.ReaderMode() }],
+		}),
+	],
 	right: [],
 }
 
@@ -23,19 +29,17 @@ export const defaultContentPageLayout: PageLayout = {
 	beforeBody: [
 		Component.ConditionalRender({
 			component: Component.Breadcrumbs({ showCurrentPage: false }),
-			condition: (page) => page.fileData.slug !== "index",
+			condition: (page) => page.fileData.slug !== 'index',
 		}),
 		Component.ArticleTitle(),
 		Component.ContentMeta(),
 		Component.TagList(),
+		Component.SeriesNavigator(),
 	],
 	left: [
-        Component.Search(),
+		Component.Search(),
 		Component.Flex({
-			components: [
-				{ Component: Component.Darkmode() },
-				{ Component: Component.ReaderMode() },
-			],
+			components: [{ Component: Component.Darkmode() }, { Component: Component.ReaderMode() }],
 		}),
 	],
 	right: [Component.DesktopOnly(Component.TableOfContents())],
@@ -45,19 +49,16 @@ export const defaultListPageLayout: PageLayout = {
 	beforeBody: [
 		Component.ConditionalRender({
 			component: Component.Breadcrumbs({ showCurrentPage: false }),
-			condition: (page) => page.fileData.slug !== "index",
+			condition: (page) => page.fileData.slug !== 'index',
 		}),
 		Component.ArticleTitle(),
 		Component.ContentMeta(),
 		Component.TagList(),
 	],
 	left: [
-        Component.Search(),
+		Component.Search(),
 		Component.Flex({
-			components: [
-				{ Component: Component.Darkmode() },
-				{ Component: Component.ReaderMode() },
-			],
+			components: [{ Component: Component.Darkmode() }, { Component: Component.ReaderMode() }],
 		}),
 	],
 	right: [Component.DesktopOnly(Component.TableOfContents())],

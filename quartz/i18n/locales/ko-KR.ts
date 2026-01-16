@@ -58,6 +58,7 @@ export default {
 		},
 		contentMeta: {
 			readingTime: ({ minutes }) => `${minutes} min read`,
+            originalPostLinkText: "원본 게시글",
 		},
 	},
 	pages: {

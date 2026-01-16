@@ -12,11 +12,13 @@ interface ContentMetaOptions {
 	 */
 	showReadingTime: boolean
 	showComma: boolean
+    showOriginalPostLink?: boolean
 }
 
 const defaultOptions: ContentMetaOptions = {
-	showReadingTime: true,
+	showReadingTime: false,
 	showComma: true,
+    showOriginalPostLink: true,
 }
 
 export default ((opts?: Partial<ContentMetaOptions>) => {
@@ -41,6 +43,23 @@ export default ((opts?: Partial<ContentMetaOptions>) => {
 				})
 				segments.push(<span>{displayedTime}</span>)
 			}
+
+            if (options.showOriginalPostLink && fileData.slug) {
+                // const originalPostUrl = `https://velog.io/@yulmwu/${fileData.slug}`
+
+                const slug = fileData.slug.split("-").length >= 3
+                    ? fileData.slug.split("-").slice(3).join("-")
+                    : fileData.slug
+                const originalPostUrl = `https://velog.io/@yulmwu/${slug}`
+
+                const originalPostText = i18n(cfg.locale).components.contentMeta.originalPostLinkText
+
+                segments.push(
+                    <a href={originalPostUrl} target="_blank" rel="noopener noreferrer">
+                        {originalPostText}
+                    </a>
+                )
+            }
 
 			return (
 				<p show-comma={options.showComma} class={classNames(displayClass, "content-meta")}>

@@ -12,7 +12,7 @@ const TagList: QuartzComponent = ({ fileData, displayClass }: QuartzComponentPro
 					return (
 						<li>
 							<a href={linkDest} class="internal tag-link">
-								{tag}
+								{tag.replaceAll("#", "")}
 							</a>
 						</li>
 					)
