@@ -222,41 +222,28 @@ export function renderPage(
 	const Header = HeaderConstructor()
 	const Body = BodyConstructor()
 
-	const hasLeft = left.length > 0
-	const hasRight = right.length > 0
-
-	const LeftComponent = hasLeft ? (
+	const LeftComponent = (
 		<div class="left sidebar">
 			{left.map((BodyComponent) => (
 				<BodyComponent {...componentData} />
 			))}
 		</div>
-	) : null
+	)
 
-	const RightComponent = hasRight ? (
+	const RightComponent = (
 		<div class="right sidebar">
 			{right.map((BodyComponent) => (
 				<BodyComponent {...componentData} />
 			))}
 		</div>
-	) : null
+	)
 
 	const lang = componentData.fileData.frontmatter?.lang ?? cfg.locale?.split("-")[0] ?? "en"
 	const direction = i18n(cfg.locale).direction ?? "ltr"
-
-	// Add classes based on sidebar presence
-	const layoutClasses = [
-		!hasLeft && "no-left-sidebar",
-		!hasRight && "no-right-sidebar",
-		!hasLeft && !hasRight && "no-sidebars",
-	]
-		.filter(Boolean)
-		.join(" ")
-
 	const doc = (
 		<html lang={lang} dir={direction}>
 			<Head {...componentData} />
-			<body data-slug={slug} class={layoutClasses}>
+			<body data-slug={slug}>
 				<div id="quartz-root" class="page">
 					<Body {...componentData}>
 						{LeftComponent}

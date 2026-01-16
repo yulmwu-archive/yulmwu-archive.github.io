@@ -22,7 +22,7 @@ export const homePageLayout: PageLayout = {
 export const defaultContentPageLayout: PageLayout = {
 	beforeBody: [
 		Component.ConditionalRender({
-			component: Component.Breadcrumbs(),
+			component: Component.Breadcrumbs({ showCurrentPage: false }),
 			condition: (page) => page.fileData.slug !== "index",
 		}),
 		Component.ArticleTitle(),
@@ -30,18 +30,18 @@ export const defaultContentPageLayout: PageLayout = {
 		Component.TagList(),
 	],
 	left: [
-		// Component.PageTitle(),
-		// Component.MobileOnly(Component.Spacer()),
-		// Component.Flex({
-		// 	components: [
-		// 		{
-		// 			Component: Component.Search(),
-		// 			grow: true,
-		// 		},
-		// 		{ Component: Component.Darkmode() },
-		// 		{ Component: Component.ReaderMode() },
-		// 	],
-		// }),
+		Component.PageTitle(),
+		Component.MobileOnly(Component.Spacer()),
+		Component.Flex({
+			components: [
+				{
+					Component: Component.Search(),
+					grow: true,
+				},
+				{ Component: Component.Darkmode() },
+				{ Component: Component.ReaderMode() },
+			],
+		}),
 	],
 	right: [Component.DesktopOnly(Component.TableOfContents())],
 }

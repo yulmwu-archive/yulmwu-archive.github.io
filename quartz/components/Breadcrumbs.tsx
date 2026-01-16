@@ -53,8 +53,6 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
 			return null
 		}
 
-        pathNodes.pop()
-
 		const crumbs: CrumbData[] = pathNodes.map((node, idx) => {
 			const crumb = formatCrumb(node.displayName, fileData.slug!, simplifySlug(node.slug))
 			if (idx === 0) {
