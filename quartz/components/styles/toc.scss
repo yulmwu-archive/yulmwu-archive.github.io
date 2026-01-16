@@ -22,7 +22,7 @@ button.toc-header {
 	align-items: center;
 
 	& h3 {
-		font-size: 1rem;
+		font-size: 0.9rem;
 		display: inline-block;
 		margin: 0;
 	}
@@ -46,21 +46,27 @@ ul.toc-content.overflow {
 	max-height: calc(100% - 2rem);
 	overscroll-behavior: contain;
 	list-style: none;
+	font-size: 0.88rem;
 
-	& > li > a {
-		color: var(--dark);
-		opacity: 0.35;
-		transition:
-			0.5s ease opacity,
-			0.3s ease color;
-		&.in-view {
-			opacity: 0.75;
+	& > li {
+		margin: 0.3rem 0;
+		line-height: 1.4;
+
+		& > a {
+			color: var(--dark);
+			opacity: 0.35;
+			transition:
+				0.5s ease opacity,
+				0.3s ease color;
+			&.in-view {
+				opacity: 0.75;
+			}
 		}
 	}
 
 	@for $i from 0 through 6 {
 		& .depth-#{$i} {
-			padding-left: calc(1rem * #{$i});
+			padding-left: calc(0.8rem * #{$i});
 		}
 	}
 }
