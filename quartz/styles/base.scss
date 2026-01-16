@@ -209,12 +209,6 @@ a {
 			column-gap: #{map.get($mobileGrid, columnGap)};
 			row-gap: #{map.get($mobileGrid, rowGap)};
 			grid-template-areas: #{map.get($mobileGrid, templateAreas)};
-		}
-
-		@media all and not ($desktop) {
-			padding: 0 1rem;
-		}
-		@media all and ($mobile) {
 			margin: 0 auto;
 		}
 
@@ -222,7 +216,7 @@ a {
 			gap: 1.2rem;
 			top: 0;
 			box-sizing: border-box;
-			padding: $topSpacing 2rem 2rem 2rem;
+			padding: $topSpacing 1.5rem 2rem 1.5rem;
 			display: flex;
 			height: 100vh;
 			position: sticky;
@@ -277,7 +271,6 @@ a {
 			margin: $topSpacing 0 0 0;
 			@media all and ($mobile) {
 				margin-top: 0;
-				padding: 0;
 			}
 		}
 
@@ -316,6 +309,7 @@ body.no-left-sidebar .page > #quartz-body {
 			"grid-header grid-sidebar-right"
 			"grid-center grid-sidebar-right"
 			"grid-footer grid-sidebar-right";
+		padding: 0 0 0 2rem;
 	}
 	@media all and ($tablet) {
 		grid-template-columns: auto;
@@ -324,6 +318,10 @@ body.no-left-sidebar .page > #quartz-body {
 			"grid-center"
 			"grid-sidebar-right"
 			"grid-footer";
+        padding: 0 1rem 0 2rem;
+	}
+	@media all and ($mobile) {
+		padding: 0 1rem 0 2rem;
 	}
 }
 
@@ -334,6 +332,18 @@ body.no-right-sidebar .page > #quartz-body {
 			"grid-sidebar-left grid-header"
 			"grid-sidebar-left grid-center"
 			"grid-sidebar-left grid-footer";
+		padding: 0 2rem 0 0;
+	}
+	@media all and ($tablet) {
+		grid-template-columns: #{$sidePanelWidth} auto;
+		grid-template-areas:
+			"grid-sidebar-left grid-header"
+			"grid-sidebar-left grid-center"
+			"grid-sidebar-left grid-footer";
+		padding: 0 1rem;
+	}
+	@media all and ($mobile) {
+		padding: 0 1rem;
 	}
 }
 
@@ -353,17 +363,24 @@ body.no-sidebars {
 
 		.center,
 		footer {
-			max-width: 100% !important;
+			max-width: 1200px !important;
 			min-width: 0 !important;
 			width: 100%;
 			margin: 0 auto !important;
-			padding: 0 max(2rem, calc((100vw - 1200px) / 2));
+			padding: 0 2rem;
 			box-sizing: border-box;
 		}
 
 		footer {
 			margin-left: auto !important;
 			margin-right: auto !important;
+		}
+
+		@media all and ($tablet) {
+			.center,
+			footer {
+				padding: 0 1.5rem;
+			}
 		}
 
 		@media all and ($mobile) {
