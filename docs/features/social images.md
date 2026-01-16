@@ -1,5 +1,5 @@
 ---
-title: "Social Media Preview Cards"
+title: 'Social Media Preview Cards'
 ---
 
 A lot of social media platforms can display a rich preview for your website when sharing a link (most notably, a cover image, a title and a description).

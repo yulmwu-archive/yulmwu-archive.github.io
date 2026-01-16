@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] Pod AutoScaling with KEDA (Event Driven), with AWS SQS"
-description: "KEDA를 통한 쿠버네티스 Event Driven 파드 오토스케일링 (with Kafka, SQS)"
-slug: "2026-01-10-kubernetes-keda"
+title: '[Kubernetes w/ EKS] Pod AutoScaling with KEDA (Event Driven), with AWS SQS'
+description: 'KEDA를 통한 쿠버네티스 Event Driven 파드 오토스케일링 (with Kafka, SQS)'
+slug: '2026-01-10-kubernetes-keda'
 author: yulmwu
 date: 2026-01-10T02:35:23.258Z
 updated_at: 2026-01-15T10:11:00.902Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -86,7 +86,7 @@ kind: ClusterConfig
 metadata:
     name: demo-cluster
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 vpc:
     cidr: 10.1.0.0/16
     nat:
@@ -129,14 +129,14 @@ helm install keda kedacore/keda --namespace keda --create-namespace
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Sid": "ReadSqsQueueAttributesForScaling",
-                "Effect": "Allow",
-                "Action": ["sqs:GetQueueAttributes", "sqs:GetQueueUrl"],
-                "Resource": "*",
+                'Sid': 'ReadSqsQueueAttributesForScaling',
+                'Effect': 'Allow',
+                'Action': ['sqs:GetQueueAttributes', 'sqs:GetQueueUrl'],
+                'Resource': '*',
             },
         ],
 }
@@ -237,10 +237,10 @@ spec:
           authenticationRef:
               name: aws-irsa-keda-operator
           metadata:
-              queueURL: "https://sqs.ap-northeast-2.amazonaws.com/<ACCOUNT_ID>/keda-demo-queue"
-              queueLength: "5"
-              activationQueueLength: "0"
-              awsRegion: "ap-northeast-2"
+              queueURL: 'https://sqs.ap-northeast-2.amazonaws.com/<ACCOUNT_ID>/keda-demo-queue'
+              queueLength: '5'
+              activationQueueLength: '0'
+              awsRegion: 'ap-northeast-2'
 ```
 
 여기서 중요하게 살펴볼 것은 `queueLength`와 `activationQueueLength`인데, 각각 아래와 같은 역할을 한다. 다른 필드에 대해선 공식 문서를 참조하길 바란다.

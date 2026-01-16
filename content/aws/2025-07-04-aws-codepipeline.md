@@ -1,12 +1,12 @@
 ---
-title: "[AWS CI/CD] ECS, S3 Deployment with CodePipeline"
-description: "AWS CodePipeline CI/CD를 통한 ECS, S3(정적 웹 호스팅) 배포 자동화 실습"
-slug: "2025-07-04-aws-codepipeline"
+title: '[AWS CI/CD] ECS, S3 Deployment with CodePipeline'
+description: 'AWS CodePipeline CI/CD를 통한 ECS, S3(정적 웹 호스팅) 배포 자동화 실습'
+slug: '2025-07-04-aws-codepipeline'
 author: yulmwu
 date: 2025-07-04T12:53:29.547Z
 updated_at: 2025-12-08T10:44:08.594Z
-categories: ["AWS"]
-tags: ["CI/CD", "aws"]
+categories: ['AWS']
+tags: ['CI/CD', 'aws']
 series:
     name: AWS
     slug: aws
@@ -129,20 +129,20 @@ CloudFront 배포 생성 UI가 좀 간단하게 바뀌어서 위 사진에서 Cr
 
 ```yml
 {
-    "Version": "2008-10-17",
-    "Id": "PolicyForCloudFrontPrivateContent",
-    "Statement":
+    'Version': '2008-10-17',
+    'Id': 'PolicyForCloudFrontPrivateContent',
+    'Statement':
         [
             {
-                "Sid": "AllowCloudFrontServicePrincipal",
-                "Effect": "Allow",
-                "Principal": { "Service": "cloudfront.amazonaws.com" },
-                "Action": "s3:GetObject",
-                "Resource": "arn:aws:s3:::0801-test-bucket/*",
-                "Condition":
+                'Sid': 'AllowCloudFrontServicePrincipal',
+                'Effect': 'Allow',
+                'Principal': { 'Service': 'cloudfront.amazonaws.com' },
+                'Action': 's3:GetObject',
+                'Resource': 'arn:aws:s3:::0801-test-bucket/*',
+                'Condition':
                     {
-                        "StringEquals":
-                            { "AWS:SourceArn": "arn:aws:cloudfront::986129558966:distribution/E3O3HHFQ0EYZSL" },
+                        'StringEquals':
+                            { 'AWS:SourceArn': 'arn:aws:cloudfront::986129558966:distribution/E3O3HHFQ0EYZSL' },
                     },
             },
         ],

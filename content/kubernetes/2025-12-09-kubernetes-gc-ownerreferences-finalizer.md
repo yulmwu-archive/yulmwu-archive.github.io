@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Garbage Collection: OwnerReference, Orphaning and Finalizer"
-description: "쿠버네티스의 GC(Garbage Collection)와 OwnerReferences, Finalizer"
-slug: "2025-12-09-kubernetes-gc-ownerreferences-finalizer"
+title: '[Kubernetes] Garbage Collection: OwnerReference, Orphaning and Finalizer'
+description: '쿠버네티스의 GC(Garbage Collection)와 OwnerReferences, Finalizer'
+slug: '2025-12-09-kubernetes-gc-ownerreferences-finalizer'
 author: yulmwu
 date: 2025-12-09T03:03:45.564Z
 updated_at: 2026-01-14T13:18:24.518Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -190,12 +190,12 @@ data:
     a: b
 kind: ConfigMap
 metadata:
-    creationTimestamp: "2025-12-12T06:59:16Z"
+    creationTimestamp: '2025-12-12T06:59:16Z'
     finalizers:
         - example.com/cleanup
     name: finalizer-demo
     namespace: default
-    resourceVersion: "27434"
+    resourceVersion: '27434'
     uid: 53103bfd-6694-4b17-bca9-eda147e0937a
 ```
 
@@ -224,14 +224,14 @@ data:
     a: b
 kind: ConfigMap
 metadata:
-    creationTimestamp: "2025-12-12T06:59:16Z"
+    creationTimestamp: '2025-12-12T06:59:16Z'
     deletionGracePeriodSeconds: 0
-    deletionTimestamp: "2025-12-12T07:02:22Z"
+    deletionTimestamp: '2025-12-12T07:02:22Z'
     finalizers:
         - example.com/cleanup
     name: finalizer-demo
     namespace: default
-    resourceVersion: "27554"
+    resourceVersion: '27554'
     uid: 53103bfd-6694-4b17-bca9-eda147e0937a
 ```
 

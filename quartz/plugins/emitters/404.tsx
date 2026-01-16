@@ -1,14 +1,14 @@
-import { QuartzEmitterPlugin } from "../types"
-import { QuartzComponentProps } from "../../components/types"
-import BodyConstructor from "../../components/Body"
-import { pageResources, renderPage } from "../../components/renderPage"
-import { FullPageLayout } from "../../cfg"
-import { FullSlug } from "../../util/path"
-import { sharedPageComponents } from "../../../quartz.layout"
-import { NotFound } from "../../components"
-import { defaultProcessedContent } from "../vfile"
-import { write } from "./helpers"
-import { i18n } from "../../i18n"
+import { QuartzEmitterPlugin } from '../types'
+import { QuartzComponentProps } from '../../components/types'
+import BodyConstructor from '../../components/Body'
+import { pageResources, renderPage } from '../../components/renderPage'
+import { FullPageLayout } from '../../cfg'
+import { FullSlug } from '../../util/path'
+import { sharedPageComponents } from '../../../quartz.layout'
+import { NotFound } from '../../components'
+import { defaultProcessedContent } from '../vfile'
+import { write } from './helpers'
+import { i18n } from '../../i18n'
 
 export const NotFoundPage: QuartzEmitterPlugin = () => {
 	const opts: FullPageLayout = {
@@ -23,15 +23,15 @@ export const NotFoundPage: QuartzEmitterPlugin = () => {
 	const Body = BodyConstructor()
 
 	return {
-		name: "404Page",
+		name: '404Page',
 		getQuartzComponents() {
 			return [Head, Body, pageBody, Footer]
 		},
 		async *emit(ctx, _content, resources) {
 			const cfg = ctx.cfg.configuration
-			const slug = "404" as FullSlug
+			const slug = '404' as FullSlug
 
-			const url = new URL(`https://${cfg.baseUrl ?? "example.com"}`)
+			const url = new URL(`https://${cfg.baseUrl ?? 'example.com'}`)
 			const path = url.pathname as FullSlug
 			const notFound = i18n(cfg.locale).pages.error.title
 			const [tree, vfile] = defaultProcessedContent({
@@ -55,7 +55,7 @@ export const NotFoundPage: QuartzEmitterPlugin = () => {
 				ctx,
 				content: renderPage(cfg, slug, componentData, opts, externalResources),
 				slug,
-				ext: ".html",
+				ext: '.html',
 			})
 		},
 		async *partialEmit() {},

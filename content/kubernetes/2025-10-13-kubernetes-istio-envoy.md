@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Service Mesh with Istio and Envoy Sidecar Proxy"
-description: "쿠버네티스에서 Istio 및 Envoy 사이드카 프록시를 통한 고급 서비스 메시 구성하기"
-slug: "2025-10-13-kubernetes-istio-envoy"
+title: '[Kubernetes] Service Mesh with Istio and Envoy Sidecar Proxy'
+description: '쿠버네티스에서 Istio 및 Envoy 사이드카 프록시를 통한 고급 서비스 메시 구성하기'
+slug: '2025-10-13-kubernetes-istio-envoy'
 author: yulmwu
 date: 2025-10-13T00:01:35.748Z
 updated_at: 2026-01-12T17:23:26.387Z
-categories: ["Kubernetes"]
-tags: ["kubernetes", "networking"]
+categories: ['Kubernetes']
+tags: ['kubernetes', 'networking']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -93,7 +93,7 @@ kind: ClusterConfig
 metadata:
     name: eks-istio-demo
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 vpc:
     cidr: 10.1.0.0/16
     nat:
@@ -140,7 +140,7 @@ spec:
                 enabled: true
         pilot:
             env:
-                PILOT_ENABLE_GATEWAY_API: "true"
+                PILOT_ENABLE_GATEWAY_API: 'true'
 ```
 
 아래의 명령어로 이를 적용하고 설치한다.
@@ -185,11 +185,11 @@ spec:
                   image: rlawnsdud/demo
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "5678"
+                        value: '5678'
                       - name: APP_NAME
-                        value: "myapp v1"
+                        value: 'myapp v1'
                   ports:
                       - containerPort: 5678
 ---
@@ -227,11 +227,11 @@ spec:
                   image: rlawnsdud/demo
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "5678"
+                        value: '5678'
                       - name: APP_NAME
-                        value: "myapp v2"
+                        value: 'myapp v2'
                   ports:
                       - containerPort: 5678
 ---
@@ -267,13 +267,13 @@ spec:
                   image: rlawnsdud/demo
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "5678"
+                        value: '5678'
                       - name: APP_NAME
-                        value: "otherapp"
+                        value: 'otherapp'
                       - name: GLOBAL_PREFIX
-                        value: "/other"
+                        value: '/other'
                   ports:
                       - containerPort: 5678
 ---
@@ -370,7 +370,7 @@ spec:
                           value: istio
                     set:
                         - name: X-Canary
-                          value: "v2-20pct"
+                          value: 'v2-20pct'
               - type: ResponseHeaderModifier
                 responseHeaderModifier:
                     add:
@@ -378,7 +378,7 @@ spec:
                           value: istio
                     set:
                         - name: X-Canary
-                          value: "v2-20pct"
+                          value: 'v2-20pct'
 ```
 
 ```yaml
@@ -475,13 +475,13 @@ spec:
               listener:
                   filterChain:
                       filter:
-                          name: "envoy.filters.network.http_connection_manager"
+                          name: 'envoy.filters.network.http_connection_manager'
           patch:
               operation: INSERT_BEFORE
               value:
                   name: envoy.filters.http.local_ratelimit
                   typed_config:
-                      "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+                      '@type': type.googleapis.com/udpa.type.v1.TypedStruct
                       type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
                       value:
                           stat_prefix: http_local_rate_limiter

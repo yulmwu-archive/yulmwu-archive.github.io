@@ -1,8 +1,8 @@
-import { QuartzTransformerPlugin } from "../types"
-import { Root } from "mdast"
-import { visit } from "unist-util-visit"
-import { toString } from "mdast-util-to-string"
-import Slugger from "github-slugger"
+import { QuartzTransformerPlugin } from '../types'
+import { Root } from 'mdast'
+import { visit } from 'unist-util-visit'
+import { toString } from 'mdast-util-to-string'
+import Slugger from 'github-slugger'
 
 export interface Options {
 	maxDepth: 1 | 2 | 3 | 4 | 5 | 6
@@ -28,7 +28,7 @@ const slugAnchor = new Slugger()
 export const TableOfContents: QuartzTransformerPlugin<Partial<Options>> = (userOpts) => {
 	const opts = { ...defaultOptions, ...userOpts }
 	return {
-		name: "TableOfContents",
+		name: 'TableOfContents',
 		markdownPlugins() {
 			return [
 				() => {
@@ -38,7 +38,7 @@ export const TableOfContents: QuartzTransformerPlugin<Partial<Options>> = (userO
 							slugAnchor.reset()
 							const toc: TocEntry[] = []
 							let highestDepth: number = opts.maxDepth
-							visit(tree, "heading", (node) => {
+							visit(tree, 'heading', (node) => {
 								if (node.depth <= opts.maxDepth) {
 									const text = toString(node)
 									highestDepth = Math.min(highestDepth, node.depth)
@@ -65,7 +65,7 @@ export const TableOfContents: QuartzTransformerPlugin<Partial<Options>> = (userO
 	}
 }
 
-declare module "vfile" {
+declare module 'vfile' {
 	interface DataMap {
 		toc: TocEntry[]
 		collapseToc: boolean

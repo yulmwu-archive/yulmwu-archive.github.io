@@ -1,4 +1,4 @@
-import { registerEscapeHandler, removeAllChildren } from "./util"
+import { registerEscapeHandler, removeAllChildren } from './util'
 
 interface Position {
 	x: number
@@ -37,24 +37,24 @@ class DiagramPanZoom {
 
 		const resizeHandler = this.resetTransform.bind(this)
 
-		this.container.addEventListener("mousedown", mouseDownHandler)
-		document.addEventListener("mousemove", mouseMoveHandler)
-		document.addEventListener("mouseup", mouseUpHandler)
+		this.container.addEventListener('mousedown', mouseDownHandler)
+		document.addEventListener('mousemove', mouseMoveHandler)
+		document.addEventListener('mouseup', mouseUpHandler)
 
-		this.container.addEventListener("touchstart", touchStartHandler, { passive: false })
-		document.addEventListener("touchmove", touchMoveHandler, { passive: false })
-		document.addEventListener("touchend", touchEndHandler)
+		this.container.addEventListener('touchstart', touchStartHandler, { passive: false })
+		document.addEventListener('touchmove', touchMoveHandler, { passive: false })
+		document.addEventListener('touchend', touchEndHandler)
 
-		window.addEventListener("resize", resizeHandler)
+		window.addEventListener('resize', resizeHandler)
 
 		this.cleanups.push(
-			() => this.container.removeEventListener("mousedown", mouseDownHandler),
-			() => document.removeEventListener("mousemove", mouseMoveHandler),
-			() => document.removeEventListener("mouseup", mouseUpHandler),
-			() => this.container.removeEventListener("touchstart", touchStartHandler),
-			() => document.removeEventListener("touchmove", touchMoveHandler),
-			() => document.removeEventListener("touchend", touchEndHandler),
-			() => window.removeEventListener("resize", resizeHandler),
+			() => this.container.removeEventListener('mousedown', mouseDownHandler),
+			() => document.removeEventListener('mousemove', mouseMoveHandler),
+			() => document.removeEventListener('mouseup', mouseUpHandler),
+			() => this.container.removeEventListener('touchstart', touchStartHandler),
+			() => document.removeEventListener('touchmove', touchMoveHandler),
+			() => document.removeEventListener('touchend', touchEndHandler),
+			() => window.removeEventListener('resize', resizeHandler),
 		)
 	}
 
@@ -65,13 +65,13 @@ class DiagramPanZoom {
 	}
 
 	private setupNavigationControls() {
-		const controls = document.createElement("div")
-		controls.className = "mermaid-controls"
+		const controls = document.createElement('div')
+		controls.className = 'mermaid-controls'
 
 		// Zoom controls
-		const zoomIn = this.createButton("+", () => this.zoom(0.1))
-		const zoomOut = this.createButton("-", () => this.zoom(-0.1))
-		const resetBtn = this.createButton("Reset", () => this.resetTransform())
+		const zoomIn = this.createButton('+', () => this.zoom(0.1))
+		const zoomOut = this.createButton('-', () => this.zoom(-0.1))
+		const resetBtn = this.createButton('Reset', () => this.resetTransform())
 
 		controls.appendChild(zoomOut)
 		controls.appendChild(resetBtn)
@@ -81,11 +81,11 @@ class DiagramPanZoom {
 	}
 
 	private createButton(text: string, onClick: () => void): HTMLButtonElement {
-		const button = document.createElement("button")
+		const button = document.createElement('button')
 		button.textContent = text
-		button.className = "mermaid-control-button"
-		button.addEventListener("click", onClick)
-		window.addCleanup(() => button.removeEventListener("click", onClick))
+		button.className = 'mermaid-control-button'
+		button.addEventListener('click', onClick)
+		window.addCleanup(() => button.removeEventListener('click', onClick))
 		return button
 	}
 
@@ -93,7 +93,7 @@ class DiagramPanZoom {
 		if (e.button !== 0) return // Only handle left click
 		this.isDragging = true
 		this.startPan = { x: e.clientX - this.currentPan.x, y: e.clientY - this.currentPan.y }
-		this.container.style.cursor = "grabbing"
+		this.container.style.cursor = 'grabbing'
 	}
 
 	private onMouseMove(e: MouseEvent) {
@@ -110,7 +110,7 @@ class DiagramPanZoom {
 
 	private onMouseUp() {
 		this.isDragging = false
-		this.container.style.cursor = "grab"
+		this.container.style.cursor = 'grab'
 	}
 
 	private onTouchStart(e: TouchEvent) {
@@ -158,7 +158,7 @@ class DiagramPanZoom {
 	}
 
 	private resetTransform() {
-		const svg = this.content.querySelector("svg")!
+		const svg = this.content.querySelector('svg')!
 		const rect = svg.getBoundingClientRect()
 		const width = rect.width / this.scale
 		const height = rect.height / this.scale
@@ -173,26 +173,26 @@ class DiagramPanZoom {
 }
 
 const cssVars = [
-	"--secondary",
-	"--tertiary",
-	"--gray",
-	"--light",
-	"--lightgray",
-	"--highlight",
-	"--dark",
-	"--darkgray",
-	"--codeFont",
+	'--secondary',
+	'--tertiary',
+	'--gray',
+	'--light',
+	'--lightgray',
+	'--highlight',
+	'--dark',
+	'--darkgray',
+	'--codeFont',
 ] as const
 
 let mermaidImport = undefined
-document.addEventListener("nav", async () => {
-	const center = document.querySelector(".center") as HTMLElement
-	const nodes = center.querySelectorAll("code.mermaid") as NodeListOf<HTMLElement>
+document.addEventListener('nav', async () => {
+	const center = document.querySelector('.center') as HTMLElement
+	const nodes = center.querySelectorAll('code.mermaid') as NodeListOf<HTMLElement>
 	if (nodes.length === 0) return
 
 	mermaidImport ||= await import(
 		// @ts-ignore
-		"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs"
+		'https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs'
 	)
 	const mermaid = mermaidImport.default
 
@@ -204,7 +204,7 @@ document.addEventListener("nav", async () => {
 	async function renderMermaid() {
 		// de-init any other diagrams
 		for (const node of nodes) {
-			node.removeAttribute("data-processed")
+			node.removeAttribute('data-processed')
 			const oldText = textMapping.get(node)
 			if (oldText) {
 				node.innerHTML = oldText
@@ -219,21 +219,21 @@ document.addEventListener("nav", async () => {
 			{} as Record<(typeof cssVars)[number], string>,
 		)
 
-		const darkMode = document.documentElement.getAttribute("saved-theme") === "dark"
+		const darkMode = document.documentElement.getAttribute('saved-theme') === 'dark'
 		mermaid.initialize({
 			startOnLoad: false,
-			securityLevel: "loose",
-			theme: darkMode ? "dark" : "base",
+			securityLevel: 'loose',
+			theme: darkMode ? 'dark' : 'base',
 			themeVariables: {
-				fontFamily: computedStyleMap["--codeFont"],
-				primaryColor: computedStyleMap["--light"],
-				primaryTextColor: computedStyleMap["--darkgray"],
-				primaryBorderColor: computedStyleMap["--tertiary"],
-				lineColor: computedStyleMap["--darkgray"],
-				secondaryColor: computedStyleMap["--secondary"],
-				tertiaryColor: computedStyleMap["--tertiary"],
-				clusterBkg: computedStyleMap["--light"],
-				edgeLabelBackground: computedStyleMap["--highlight"],
+				fontFamily: computedStyleMap['--codeFont'],
+				primaryColor: computedStyleMap['--light'],
+				primaryTextColor: computedStyleMap['--darkgray'],
+				primaryBorderColor: computedStyleMap['--tertiary'],
+				lineColor: computedStyleMap['--darkgray'],
+				secondaryColor: computedStyleMap['--secondary'],
+				tertiaryColor: computedStyleMap['--tertiary'],
+				clusterBkg: computedStyleMap['--light'],
+				edgeLabelBackground: computedStyleMap['--highlight'],
 			},
 		})
 
@@ -241,60 +241,60 @@ document.addEventListener("nav", async () => {
 	}
 
 	await renderMermaid()
-	document.addEventListener("themechange", renderMermaid)
-	window.addCleanup(() => document.removeEventListener("themechange", renderMermaid))
+	document.addEventListener('themechange', renderMermaid)
+	window.addCleanup(() => document.removeEventListener('themechange', renderMermaid))
 
 	for (let i = 0; i < nodes.length; i++) {
 		const codeBlock = nodes[i] as HTMLElement
 		const pre = codeBlock.parentElement as HTMLPreElement
-		const clipboardBtn = pre.querySelector(".clipboard-button") as HTMLButtonElement
-		const expandBtn = pre.querySelector(".expand-button") as HTMLButtonElement
+		const clipboardBtn = pre.querySelector('.clipboard-button') as HTMLButtonElement
+		const expandBtn = pre.querySelector('.expand-button') as HTMLButtonElement
 
 		const clipboardStyle = window.getComputedStyle(clipboardBtn)
 		const clipboardWidth =
 			clipboardBtn.offsetWidth +
-			parseFloat(clipboardStyle.marginLeft || "0") +
-			parseFloat(clipboardStyle.marginRight || "0")
+			parseFloat(clipboardStyle.marginLeft || '0') +
+			parseFloat(clipboardStyle.marginRight || '0')
 
 		// Set expand button position
 		expandBtn.style.right = `calc(${clipboardWidth}px + 0.3rem)`
 		pre.prepend(expandBtn)
 
 		// query popup container
-		const popupContainer = pre.querySelector("#mermaid-container") as HTMLElement
+		const popupContainer = pre.querySelector('#mermaid-container') as HTMLElement
 		if (!popupContainer) return
 
 		let panZoom: DiagramPanZoom | null = null
 		function showMermaid() {
-			const container = popupContainer.querySelector("#mermaid-space") as HTMLElement
-			const content = popupContainer.querySelector(".mermaid-content") as HTMLElement
+			const container = popupContainer.querySelector('#mermaid-space') as HTMLElement
+			const content = popupContainer.querySelector('.mermaid-content') as HTMLElement
 			if (!content) return
 			removeAllChildren(content)
 
 			// Clone the mermaid content
-			const mermaidContent = codeBlock.querySelector("svg")!.cloneNode(true) as SVGElement
+			const mermaidContent = codeBlock.querySelector('svg')!.cloneNode(true) as SVGElement
 			content.appendChild(mermaidContent)
 
 			// Show container
-			popupContainer.classList.add("active")
-			container.style.cursor = "grab"
+			popupContainer.classList.add('active')
+			container.style.cursor = 'grab'
 
 			// Initialize pan-zoom after showing the popup
 			panZoom = new DiagramPanZoom(container, content)
 		}
 
 		function hideMermaid() {
-			popupContainer.classList.remove("active")
+			popupContainer.classList.remove('active')
 			panZoom?.cleanup()
 			panZoom = null
 		}
 
-		expandBtn.addEventListener("click", showMermaid)
+		expandBtn.addEventListener('click', showMermaid)
 		registerEscapeHandler(popupContainer, hideMermaid)
 
 		window.addCleanup(() => {
 			panZoom?.cleanup()
-			expandBtn.removeEventListener("click", showMermaid)
+			expandBtn.removeEventListener('click', showMermaid)
 		})
 	}
 })

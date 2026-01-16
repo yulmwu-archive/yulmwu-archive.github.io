@@ -1,6 +1,6 @@
-import { concatenateResources } from "../util/resources"
-import { classNames } from "../util/lang"
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
+import { concatenateResources } from '../util/resources'
+import { classNames } from '../util/lang'
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from './types'
 
 type FlexConfig = {
 	components: {
@@ -9,32 +9,32 @@ type FlexConfig = {
 		shrink?: boolean
 		basis?: string
 		order?: number
-		align?: "start" | "end" | "center" | "stretch"
-		justify?: "start" | "end" | "center" | "between" | "around"
+		align?: 'start' | 'end' | 'center' | 'stretch'
+		justify?: 'start' | 'end' | 'center' | 'between' | 'around'
 	}[]
-	direction?: "row" | "row-reverse" | "column" | "column-reverse"
-	wrap?: "nowrap" | "wrap" | "wrap-reverse"
+	direction?: 'row' | 'row-reverse' | 'column' | 'column-reverse'
+	wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
 	gap?: string
 }
 
 export default ((config: FlexConfig) => {
 	const Flex: QuartzComponent = (props: QuartzComponentProps) => {
-		const direction = config.direction ?? "row"
-		const wrap = config.wrap ?? "nowrap"
-		const gap = config.gap ?? "1rem"
+		const direction = config.direction ?? 'row'
+		const wrap = config.wrap ?? 'nowrap'
+		const gap = config.gap ?? '1rem'
 
 		return (
 			<div
-				class={classNames(props.displayClass, "flex-component")}
+				class={classNames(props.displayClass, 'flex-component')}
 				style={`flex-direction: ${direction}; flex-wrap: ${wrap}; gap: ${gap};`}
 			>
 				{config.components.map((c) => {
 					const grow = c.grow ? 1 : 0
 					const shrink = (c.shrink ?? true) ? 1 : 0
-					const basis = c.basis ?? "auto"
+					const basis = c.basis ?? 'auto'
 					const order = c.order ?? 0
-					const align = c.align ?? "center"
-					const justify = c.justify ?? "center"
+					const align = c.align ?? 'center'
+					const justify = c.justify ?? 'center'
 
 					return (
 						<div

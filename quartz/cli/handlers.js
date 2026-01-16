@@ -1,23 +1,23 @@
-import { promises } from "fs"
-import path from "path"
-import esbuild from "esbuild"
-import { styleText } from "util"
-import { sassPlugin } from "esbuild-sass-plugin"
-import fs from "fs"
-import { intro, outro, select, text } from "@clack/prompts"
-import { rm } from "fs/promises"
-import chokidar from "chokidar"
-import prettyBytes from "pretty-bytes"
-import { execSync, spawnSync } from "child_process"
-import http from "http"
-import serveHandler from "serve-handler"
-import { WebSocketServer } from "ws"
-import { randomUUID } from "crypto"
-import { Mutex } from "async-mutex"
-import { CreateArgv } from "./args.js"
-import { globby } from "globby"
-import { exitIfCancel, escapePath, gitPull, popContentFolder, stashContentFolder } from "./helpers.js"
-import { UPSTREAM_NAME, QUARTZ_SOURCE_BRANCH, ORIGIN_NAME, version, fp, cacheFile, cwd } from "./constants.js"
+import { promises } from 'fs'
+import path from 'path'
+import esbuild from 'esbuild'
+import { styleText } from 'util'
+import { sassPlugin } from 'esbuild-sass-plugin'
+import fs from 'fs'
+import { intro, outro, select, text } from '@clack/prompts'
+import { rm } from 'fs/promises'
+import chokidar from 'chokidar'
+import prettyBytes from 'pretty-bytes'
+import { execSync, spawnSync } from 'child_process'
+import http from 'http'
+import serveHandler from 'serve-handler'
+import { WebSocketServer } from 'ws'
+import { randomUUID } from 'crypto'
+import { Mutex } from 'async-mutex'
+import { CreateArgv } from './args.js'
+import { globby } from 'globby'
+import { exitIfCancel, escapePath, gitPull, popContentFolder, stashContentFolder } from './helpers.js'
+import { UPSTREAM_NAME, QUARTZ_SOURCE_BRANCH, ORIGIN_NAME, version, fp, cacheFile, cwd } from './constants.js'
 
 /**
  * Resolve content directory path
@@ -34,7 +34,7 @@ function resolveContentPath(contentPath) {
  */
 export async function handleCreate(argv) {
 	console.log()
-	intro(styleText(["bgGreen", "black"], ` Quartz v${version} `))
+	intro(styleText(['bgGreen', 'black'], ` Quartz v${version} `))
 	const contentFolder = resolveContentPath(argv.directory)
 	let setupStrategy = argv.strategy?.toLowerCase()
 	let linkResolutionStrategy = argv.links?.toLowerCase()
@@ -43,17 +43,17 @@ export async function handleCreate(argv) {
 	// If all cmd arguments were provided, check if they're valid
 	if (setupStrategy && linkResolutionStrategy) {
 		// If setup isn't, "new", source argument is required
-		if (setupStrategy !== "new") {
+		if (setupStrategy !== 'new') {
 			// Error handling
 			if (!sourceDirectory) {
 				outro(
 					styleText(
-						"red",
+						'red',
 						`Setup strategies (arg '${styleText(
-							"yellow",
+							'yellow',
 							`-${CreateArgv.strategy.alias[0]}`,
-						)}') other than '${styleText("yellow", "new")}' require content folder argument ('${styleText(
-							"yellow",
+						)}') other than '${styleText('yellow', 'new')}' require content folder argument ('${styleText(
+							'yellow',
 							`-${CreateArgv.source.alias[0]}`,
 						)}') to be set`,
 					),
@@ -63,22 +63,22 @@ export async function handleCreate(argv) {
 				if (!fs.existsSync(sourceDirectory)) {
 					outro(
 						styleText(
-							"red",
+							'red',
 							`Input directory to copy/symlink 'content' from not found ('${styleText(
-								"yellow",
+								'yellow',
 								sourceDirectory,
-							)}', invalid argument "${styleText("yellow", `-${CreateArgv.source.alias[0]}`)})`,
+							)}', invalid argument "${styleText('yellow', `-${CreateArgv.source.alias[0]}`)})`,
 						),
 					)
 					process.exit(1)
 				} else if (!fs.lstatSync(sourceDirectory).isDirectory()) {
 					outro(
 						styleText(
-							"red",
+							'red',
 							`Source directory to copy/symlink 'content' from is not a directory (found file at '${styleText(
-								"yellow",
+								'yellow',
 								sourceDirectory,
-							)}', invalid argument ${styleText("yellow", `-${CreateArgv.source.alias[0]}`)}")`,
+							)}', invalid argument ${styleText('yellow', `-${CreateArgv.source.alias[0]}`)}")`,
 						),
 					)
 					process.exit(1)
@@ -93,11 +93,11 @@ export async function handleCreate(argv) {
 			await select({
 				message: `Choose how to initialize the content in \`${contentFolder}\``,
 				options: [
-					{ value: "new", label: "Empty Quartz" },
-					{ value: "copy", label: "Copy an existing folder", hint: "overwrites `content`" },
+					{ value: 'new', label: 'Empty Quartz' },
+					{ value: 'copy', label: 'Copy an existing folder', hint: 'overwrites `content`' },
 					{
-						value: "symlink",
-						label: "Symlink an existing folder",
+						value: 'symlink',
+						label: 'Symlink an existing folder',
 						hint: "don't select this unless you know what you are doing!",
 					},
 				],
@@ -114,11 +114,11 @@ export async function handleCreate(argv) {
 		}
 	}
 
-	const gitkeepPath = path.join(contentFolder, ".gitkeep")
+	const gitkeepPath = path.join(contentFolder, '.gitkeep')
 	if (fs.existsSync(gitkeepPath)) {
 		await fs.promises.unlink(gitkeepPath)
 	}
-	if (setupStrategy === "copy" || setupStrategy === "symlink") {
+	if (setupStrategy === 'copy' || setupStrategy === 'symlink') {
 		let originalFolder = sourceDirectory
 
 		// If input directory was not passed, use cli
@@ -126,15 +126,15 @@ export async function handleCreate(argv) {
 			originalFolder = escapePath(
 				exitIfCancel(
 					await text({
-						message: "Enter the full path to existing content folder",
+						message: 'Enter the full path to existing content folder',
 						placeholder:
-							"On most terminal emulators, you can drag and drop a folder into the window and it will paste the full path",
+							'On most terminal emulators, you can drag and drop a folder into the window and it will paste the full path',
 						validate(fp) {
 							const fullPath = escapePath(fp)
 							if (!fs.existsSync(fullPath)) {
 								return "The given path doesn't exist"
 							} else if (!fs.lstatSync(fullPath).isDirectory()) {
-								return "The given path is not a folder"
+								return 'The given path is not a folder'
 							}
 						},
 					}),
@@ -143,17 +143,17 @@ export async function handleCreate(argv) {
 		}
 
 		await rmContentFolder()
-		if (setupStrategy === "copy") {
+		if (setupStrategy === 'copy') {
 			await fs.promises.cp(originalFolder, contentFolder, {
 				recursive: true,
 				preserveTimestamps: true,
 			})
-		} else if (setupStrategy === "symlink") {
-			await fs.promises.symlink(originalFolder, contentFolder, "dir")
+		} else if (setupStrategy === 'symlink') {
+			await fs.promises.symlink(originalFolder, contentFolder, 'dir')
 		}
-	} else if (setupStrategy === "new") {
+	} else if (setupStrategy === 'new') {
 		await fs.promises.writeFile(
-			path.join(contentFolder, "index.md"),
+			path.join(contentFolder, 'index.md'),
 			`---
 title: Welcome to Quartz
 ---
@@ -172,17 +172,17 @@ See the [documentation](https://quartz.jzhao.xyz) for how to get started.
 				message: `Choose how Quartz should resolve links in your content. This should match Obsidian's link format. You can change this later in \`quartz.config.ts\`.`,
 				options: [
 					{
-						value: "shortest",
-						label: "Treat links as shortest path",
-						hint: "(default)",
+						value: 'shortest',
+						label: 'Treat links as shortest path',
+						hint: '(default)',
 					},
 					{
-						value: "absolute",
-						label: "Treat links as absolute path",
+						value: 'absolute',
+						label: 'Treat links as absolute path',
 					},
 					{
-						value: "relative",
-						label: "Treat links as relative paths",
+						value: 'relative',
+						label: 'Treat links as relative paths',
 					},
 				],
 			}),
@@ -190,8 +190,8 @@ See the [documentation](https://quartz.jzhao.xyz) for how to get started.
 	}
 
 	// now, do config changes
-	const configFilePath = path.join(cwd, "quartz.config.ts")
-	let configContent = await fs.promises.readFile(configFilePath, { encoding: "utf-8" })
+	const configFilePath = path.join(cwd, 'quartz.config.ts')
+	let configContent = await fs.promises.readFile(configFilePath, { encoding: 'utf-8' })
 	configContent = configContent.replace(
 		/markdownLinkResolution: '(.+)'/,
 		`markdownLinkResolution: '${linkResolutionStrategy}'`,
@@ -200,7 +200,7 @@ See the [documentation](https://quartz.jzhao.xyz) for how to get started.
 
 	// setup remote
 	execSync(`git remote show upstream || git remote add upstream https://github.com/jackyzha0/quartz.git`, {
-		stdio: "ignore",
+		stdio: 'ignore',
 	})
 
 	outro(`You're all set! Not sure what to do next? Try:
@@ -219,7 +219,7 @@ export async function handleBuild(argv) {
 		argv.watch = true
 	}
 
-	console.log(`\n${styleText(["bgGreen", "black"], ` Quartz v${version} `)} \n`)
+	console.log(`\n${styleText(['bgGreen', 'black'], ` Quartz v${version} `)} \n`)
 	const ctx = await esbuild.context({
 		entryPoints: [fp],
 		outfile: cacheFile,
@@ -227,53 +227,53 @@ export async function handleBuild(argv) {
 		keepNames: true,
 		minifyWhitespace: true,
 		minifySyntax: true,
-		platform: "node",
-		format: "esm",
-		jsx: "automatic",
-		jsxImportSource: "preact",
-		packages: "external",
+		platform: 'node',
+		format: 'esm',
+		jsx: 'automatic',
+		jsxImportSource: 'preact',
+		packages: 'external',
 		metafile: true,
 		sourcemap: true,
 		sourcesContent: false,
 		plugins: [
 			sassPlugin({
-				type: "css-text",
+				type: 'css-text',
 				cssImports: true,
 			}),
 			sassPlugin({
 				filter: /\.inline\.scss$/,
-				type: "css",
+				type: 'css',
 				cssImports: true,
 			}),
 			{
-				name: "inline-script-loader",
+				name: 'inline-script-loader',
 				setup(build) {
 					build.onLoad({ filter: /\.inline\.(ts|js)$/ }, async (args) => {
-						let text = await promises.readFile(args.path, "utf8")
+						let text = await promises.readFile(args.path, 'utf8')
 
 						// remove default exports that we manually inserted
-						text = text.replace("export default", "")
-						text = text.replace("export", "")
+						text = text.replace('export default', '')
+						text = text.replace('export', '')
 
-						const sourcefile = path.relative(path.resolve("."), args.path)
+						const sourcefile = path.relative(path.resolve('.'), args.path)
 						const resolveDir = path.dirname(sourcefile)
 						const transpiled = await esbuild.build({
 							stdin: {
 								contents: text,
-								loader: "ts",
+								loader: 'ts',
 								resolveDir,
 								sourcefile,
 							},
 							write: false,
 							bundle: true,
 							minify: true,
-							platform: "browser",
-							format: "esm",
+							platform: 'browser',
+							format: 'esm',
 						})
 						const rawMod = transpiled.outputFiles[0].text
 						return {
 							contents: rawMod,
-							loader: "text",
+							loader: 'text',
 						}
 					})
 				},
@@ -294,19 +294,19 @@ export async function handleBuild(argv) {
 		}
 
 		if (cleanupBuild) {
-			console.log(styleText("yellow", "Detected a source code change, doing a hard rebuild..."))
+			console.log(styleText('yellow', 'Detected a source code change, doing a hard rebuild...'))
 			await cleanupBuild()
 		}
 
 		const result = await ctx.rebuild().catch((err) => {
-			console.error(`${styleText("red", "Couldn't parse Quartz configuration:")} ${fp}`)
-			console.log(`Reason: ${styleText("grey", err)}`)
+			console.error(`${styleText('red', "Couldn't parse Quartz configuration:")} ${fp}`)
+			console.log(`Reason: ${styleText('grey', err)}`)
 			process.exit(1)
 		})
 		release()
 
 		if (argv.bundleInfo) {
-			const outputFileName = "quartz/.quartz-cache/transpiled-build.mjs"
+			const outputFileName = 'quartz/.quartz-cache/transpiled-build.mjs'
 			const meta = result.metafile.outputs[outputFileName]
 			console.log(`Successfully transpiled ${Object.keys(meta.inputs).length} files (${prettyBytes(meta.bytes)})`)
 			console.log(await esbuild.analyzeMetafile(result.metafile, { color: true }))
@@ -324,17 +324,17 @@ export async function handleBuild(argv) {
 	let clientRefresh = () => {}
 	if (argv.serve) {
 		const connections = []
-		clientRefresh = () => connections.forEach((conn) => conn.send("rebuild"))
+		clientRefresh = () => connections.forEach((conn) => conn.send('rebuild'))
 
-		if (argv.baseDir !== "" && !argv.baseDir.startsWith("/")) {
-			argv.baseDir = "/" + argv.baseDir
+		if (argv.baseDir !== '' && !argv.baseDir.startsWith('/')) {
+			argv.baseDir = '/' + argv.baseDir
 		}
 
 		await build(clientRefresh)
 		const server = http.createServer(async (req, res) => {
 			if (argv.baseDir && !req.url?.startsWith(argv.baseDir)) {
 				console.log(
-					styleText("red", `[404] ${req.url} (warning: link outside of site, this is likely a Quartz bug)`),
+					styleText('red', `[404] ${req.url} (warning: link outside of site, this is likely a Quartz bug)`),
 				)
 				res.writeHead(404)
 				res.end()
@@ -351,24 +351,24 @@ export async function handleBuild(argv) {
 					directoryListing: false,
 					headers: [
 						{
-							source: "**/*.*",
-							headers: [{ key: "Content-Disposition", value: "inline" }],
+							source: '**/*.*',
+							headers: [{ key: 'Content-Disposition', value: 'inline' }],
 						},
 						{
-							source: "**/*.webp",
-							headers: [{ key: "Content-Type", value: "image/webp" }],
+							source: '**/*.webp',
+							headers: [{ key: 'Content-Type', value: 'image/webp' }],
 						},
 						// fixes bug where avif images are displayed as text instead of images (future proof)
 						{
-							source: "**/*.avif",
-							headers: [{ key: "Content-Type", value: "image/avif" }],
+							source: '**/*.avif',
+							headers: [{ key: 'Content-Type', value: 'image/avif' }],
 						},
 					],
 				})
 				const status = res.statusCode
 				const statusString =
-					status >= 200 && status < 300 ? styleText("green", `[${status}]`) : styleText("red", `[${status}]`)
-				console.log(statusString + styleText("grey", ` ${argv.baseDir}${req.url}`))
+					status >= 200 && status < 300 ? styleText('green', `[${status}]`) : styleText('red', `[${status}]`)
+				console.log(statusString + styleText('grey', ` ${argv.baseDir}${req.url}`))
 				release()
 			}
 
@@ -377,17 +377,17 @@ export async function handleBuild(argv) {
 				res.writeHead(302, {
 					Location: newFp,
 				})
-				console.log(styleText("yellow", "[302]") + styleText("grey", ` ${argv.baseDir}${req.url} -> ${newFp}`))
+				console.log(styleText('yellow', '[302]') + styleText('grey', ` ${argv.baseDir}${req.url} -> ${newFp}`))
 				res.end()
 			}
 
-			let fp = req.url?.split("?")[0] ?? "/"
+			let fp = req.url?.split('?')[0] ?? '/'
 
 			// handle redirects
-			if (fp.endsWith("/")) {
+			if (fp.endsWith('/')) {
 				// /trailing/
 				// does /trailing/index.html exist? if so, serve it
-				const indexFp = path.posix.join(fp, "index.html")
+				const indexFp = path.posix.join(fp, 'index.html')
 				if (fs.existsSync(path.posix.join(argv.output, indexFp))) {
 					req.url = fp
 					return serve()
@@ -395,8 +395,8 @@ export async function handleBuild(argv) {
 
 				// does /trailing.html exist? if so, redirect to /trailing
 				let base = fp.slice(0, -1)
-				if (path.extname(base) === "") {
-					base += ".html"
+				if (path.extname(base) === '') {
+					base += '.html'
 				}
 				if (fs.existsSync(path.posix.join(argv.output, base))) {
 					return redirect(fp.slice(0, -1))
@@ -405,8 +405,8 @@ export async function handleBuild(argv) {
 				// /regular
 				// does /regular.html exist? if so, serve it
 				let base = fp
-				if (path.extname(base) === "") {
-					base += ".html"
+				if (path.extname(base) === '') {
+					base += '.html'
 				}
 				if (fs.existsSync(path.posix.join(argv.output, base))) {
 					req.url = fp
@@ -414,9 +414,9 @@ export async function handleBuild(argv) {
 				}
 
 				// does /regular/index.html exist? if so, redirect to /regular/
-				let indexFp = path.posix.join(fp, "index.html")
+				let indexFp = path.posix.join(fp, 'index.html')
 				if (fs.existsSync(path.posix.join(argv.output, indexFp))) {
-					return redirect(fp + "/")
+					return redirect(fp + '/')
 				}
 			}
 
@@ -425,9 +425,9 @@ export async function handleBuild(argv) {
 
 		server.listen(argv.port)
 		const wss = new WebSocketServer({ port: argv.wsPort })
-		wss.on("connection", (ws) => connections.push(ws))
+		wss.on('connection', (ws) => connections.push(ws))
 		console.log(
-			styleText("cyan", `Started a Quartz server listening at http://localhost:${argv.port}${argv.baseDir}`),
+			styleText('cyan', `Started a Quartz server listening at http://localhost:${argv.port}${argv.baseDir}`),
 		)
 	} else {
 		await build(clientRefresh)
@@ -436,20 +436,20 @@ export async function handleBuild(argv) {
 
 	if (argv.watch) {
 		const paths = await globby([
-			"**/*.ts",
-			"quartz/cli/*.js",
-			"quartz/static/**/*",
-			"**/*.tsx",
-			"**/*.scss",
-			"package.json",
+			'**/*.ts',
+			'quartz/cli/*.js',
+			'quartz/static/**/*',
+			'**/*.tsx',
+			'**/*.scss',
+			'package.json',
 		])
 		chokidar
 			.watch(paths, { ignoreInitial: true })
-			.on("add", () => build(clientRefresh))
-			.on("change", () => build(clientRefresh))
-			.on("unlink", () => build(clientRefresh))
+			.on('add', () => build(clientRefresh))
+			.on('change', () => build(clientRefresh))
+			.on('unlink', () => build(clientRefresh))
 
-		console.log(styleText("grey", "hint: exit with ctrl+c"))
+		console.log(styleText('grey', 'hint: exit with ctrl+c'))
 	}
 }
 
@@ -459,8 +459,8 @@ export async function handleBuild(argv) {
  */
 export async function handleUpdate(argv) {
 	const contentFolder = resolveContentPath(argv.directory)
-	console.log(`\n${styleText(["bgGreen", "black"], ` Quartz v${version} `)} \n`)
-	console.log("Backing up your content")
+	console.log(`\n${styleText(['bgGreen', 'black'], ` Quartz v${version} `)} \n`)
+	console.log('Backing up your content')
 	execSync(`git remote show upstream || git remote add upstream https://github.com/jackyzha0/quartz.git`)
 	await stashContentFolder(contentFolder)
 	console.log(
@@ -470,13 +470,13 @@ export async function handleUpdate(argv) {
 	try {
 		gitPull(UPSTREAM_NAME, QUARTZ_SOURCE_BRANCH)
 	} catch {
-		console.log(styleText("red", "An error occurred above while pulling updates."))
+		console.log(styleText('red', 'An error occurred above while pulling updates.'))
 		await popContentFolder(contentFolder)
 		return
 	}
 
 	await popContentFolder(contentFolder)
-	console.log("Ensuring dependencies are up to date")
+	console.log('Ensuring dependencies are up to date')
 
 	/*
   On Windows, if the command `npm` is really `npm.cmd', this call fails
@@ -490,16 +490,16 @@ export async function handleUpdate(argv) {
   See: https://nodejs.org/api/child_process.html#spawning-bat-and-cmd-files-on-windows
   */
 
-	const opts = { stdio: "inherit" }
-	if (process.platform === "win32") {
+	const opts = { stdio: 'inherit' }
+	if (process.platform === 'win32') {
 		opts.shell = true
 	}
 
-	const res = spawnSync("npm", ["i"], opts)
+	const res = spawnSync('npm', ['i'], opts)
 	if (res.status === 0) {
-		console.log(styleText("green", "Done!"))
+		console.log(styleText('green', 'Done!'))
 	} else {
-		console.log(styleText("red", "An error occurred above while installing dependencies."))
+		console.log(styleText('red', 'An error occurred above while installing dependencies.'))
 	}
 }
 
@@ -518,14 +518,14 @@ export async function handleRestore(argv) {
  */
 export async function handleSync(argv) {
 	const contentFolder = resolveContentPath(argv.directory)
-	console.log(`\n${styleText(["bgGreen", "black"], ` Quartz v${version} `)}\n`)
-	console.log("Backing up your content")
+	console.log(`\n${styleText(['bgGreen', 'black'], ` Quartz v${version} `)}\n`)
+	console.log('Backing up your content')
 
 	if (argv.commit) {
 		const contentStat = await fs.promises.lstat(contentFolder)
 		if (contentStat.isSymbolicLink()) {
 			const linkTarg = await fs.promises.readlink(contentFolder)
-			console.log(styleText("yellow", "Detected symlink, trying to dereference before committing"))
+			console.log(styleText('yellow', 'Detected symlink, trying to dereference before committing'))
 
 			// stash symlink file
 			await stashContentFolder(contentFolder)
@@ -537,13 +537,13 @@ export async function handleSync(argv) {
 			})
 		}
 
-		const currentTimestamp = new Date().toLocaleString("en-US", {
-			dateStyle: "medium",
-			timeStyle: "short",
+		const currentTimestamp = new Date().toLocaleString('en-US', {
+			dateStyle: 'medium',
+			timeStyle: 'short',
 		})
 		const commitMessage = argv.message ?? `Quartz sync: ${currentTimestamp}`
-		spawnSync("git", ["add", "."], { stdio: "inherit" })
-		spawnSync("git", ["commit", "-m", commitMessage], { stdio: "inherit" })
+		spawnSync('git', ['add', '.'], { stdio: 'inherit' })
+		spawnSync('git', ['commit', '-m', commitMessage], { stdio: 'inherit' })
 
 		if (contentStat.isSymbolicLink()) {
 			// put symlink back
@@ -560,7 +560,7 @@ export async function handleSync(argv) {
 		try {
 			gitPull(ORIGIN_NAME, QUARTZ_SOURCE_BRANCH)
 		} catch {
-			console.log(styleText("red", "An error occurred above while pulling updates."))
+			console.log(styleText('red', 'An error occurred above while pulling updates.'))
 			await popContentFolder(contentFolder)
 			return
 		}
@@ -568,16 +568,16 @@ export async function handleSync(argv) {
 
 	await popContentFolder(contentFolder)
 	if (argv.push) {
-		console.log("Pushing your changes")
-		const currentBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim()
-		const res = spawnSync("git", ["push", "-uf", ORIGIN_NAME, currentBranch], {
-			stdio: "inherit",
+		console.log('Pushing your changes')
+		const currentBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+		const res = spawnSync('git', ['push', '-uf', ORIGIN_NAME, currentBranch], {
+			stdio: 'inherit',
 		})
 		if (res.status !== 0) {
-			console.log(styleText("red", `An error occurred above while pushing to remote ${ORIGIN_NAME}.`))
+			console.log(styleText('red', `An error occurred above while pushing to remote ${ORIGIN_NAME}.`))
 			return
 		}
 	}
 
-	console.log(styleText("green", "Done!"))
+	console.log(styleText('green', 'Done!'))
 }

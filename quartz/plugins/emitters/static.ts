@@ -1,15 +1,15 @@
-import { FilePath, QUARTZ, joinSegments } from "../../util/path"
-import { QuartzEmitterPlugin } from "../types"
-import fs from "fs"
-import { glob } from "../../util/glob"
-import { dirname } from "path"
+import { FilePath, QUARTZ, joinSegments } from '../../util/path'
+import { QuartzEmitterPlugin } from '../types'
+import fs from 'fs'
+import { glob } from '../../util/glob'
+import { dirname } from 'path'
 
 export const Static: QuartzEmitterPlugin = () => ({
-	name: "Static",
+	name: 'Static',
 	async *emit({ argv, cfg }) {
-		const staticPath = joinSegments(QUARTZ, "static")
-		const fps = await glob("**", staticPath, cfg.configuration.ignorePatterns)
-		const outputStaticPath = joinSegments(argv.output, "static")
+		const staticPath = joinSegments(QUARTZ, 'static')
+		const fps = await glob('**', staticPath, cfg.configuration.ignorePatterns)
+		const outputStaticPath = joinSegments(argv.output, 'static')
 		await fs.promises.mkdir(outputStaticPath, { recursive: true })
 		for (const fp of fps) {
 			const src = joinSegments(staticPath, fp) as FilePath

@@ -1,12 +1,12 @@
 ---
-title: "[AWS Networking] EC2 Source/Destination Checking (Feat. NAT Instance)"
-description: "AWS EC2의 Source/Destination Check 옵션 (Feat. EC2 NAT Instance)"
-slug: "2026-01-04-aws-source-destination-check"
+title: '[AWS Networking] EC2 Source/Destination Checking (Feat. NAT Instance)'
+description: 'AWS EC2의 Source/Destination Check 옵션 (Feat. EC2 NAT Instance)'
+slug: '2026-01-04-aws-source-destination-check'
 author: yulmwu
 date: 2026-01-04T00:52:31.030Z
 updated_at: 2026-01-15T05:32:49.925Z
-categories: ["AWS"]
-tags: ["aws"]
+categories: ['AWS']
+tags: ['aws']
 series:
     name: AWS
     slug: aws

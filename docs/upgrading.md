@@ -1,5 +1,5 @@
 ---
-title: "Upgrading Quartz"
+title: 'Upgrading Quartz'
 ---
 
 > [!note]

@@ -1,13 +1,13 @@
-import path from "path"
-import fs from "fs"
-import { BuildCtx } from "../../util/ctx"
-import { FilePath, FullSlug, joinSegments } from "../../util/path"
-import { Readable } from "stream"
+import path from 'path'
+import fs from 'fs'
+import { BuildCtx } from '../../util/ctx'
+import { FilePath, FullSlug, joinSegments } from '../../util/path'
+import { Readable } from 'stream'
 
 type WriteOptions = {
 	ctx: BuildCtx
 	slug: FullSlug
-	ext: `.${string}` | ""
+	ext: `.${string}` | ''
 	content: string | Buffer | Readable
 }
 

@@ -16,11 +16,11 @@ type FlexConfig = {
 		shrink?: boolean // whether component should shrink if needed
 		basis?: string // initial main size of the component
 		order?: number // order in flex container
-		align?: "start" | "end" | "center" | "stretch" // cross-axis alignment
-		justify?: "start" | "end" | "center" | "between" | "around" // main-axis alignment
+		align?: 'start' | 'end' | 'center' | 'stretch' // cross-axis alignment
+		justify?: 'start' | 'end' | 'center' | 'between' | 'around' // main-axis alignment
 	}[]
-	direction?: "row" | "row-reverse" | "column" | "column-reverse"
-	wrap?: "nowrap" | "wrap" | "wrap-reverse"
+	direction?: 'row' | 'row-reverse' | 'column' | 'column-reverse'
+	wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
 	gap?: string
 }
 ```
@@ -36,8 +36,8 @@ Component.Flex({
 		},
 		{ Component: Component.Darkmode() }, // Darkmode keeps its natural size
 	],
-	direction: "row",
-	gap: "1rem",
+	direction: 'row',
+	gap: '1rem',
 })
 ```
 
@@ -86,7 +86,7 @@ type ConditionalRenderConfig = {
 ```typescript
 Component.ConditionalRender({
 	component: Component.Search(),
-	condition: (props) => props.displayClass !== "fullpage",
+	condition: (props) => props.displayClass !== 'fullpage',
 })
 ```
 
@@ -95,7 +95,7 @@ The example above would only render the Search component when the page is not in
 ```typescript
 Component.ConditionalRender({
 	component: Component.Breadcrumbs(),
-	condition: (page) => page.fileData.slug !== "index",
+	condition: (page) => page.fileData.slug !== 'index',
 })
 ```
 

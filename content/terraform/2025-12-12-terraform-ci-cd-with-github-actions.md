@@ -1,12 +1,12 @@
 ---
-title: "[Terraform CI/CD] Terraform CI/CD Pipeline with Github Actions"
-description: "Github Actions를 통한 Terraform CI/CD 파이프라인 구축"
-slug: "2025-12-12-terraform-ci-cd-with-github-actions"
+title: '[Terraform CI/CD] Terraform CI/CD Pipeline with Github Actions'
+description: 'Github Actions를 통한 Terraform CI/CD 파이프라인 구축'
+slug: '2025-12-12-terraform-ci-cd-with-github-actions'
 author: yulmwu
 date: 2025-12-12T08:59:59.463Z
 updated_at: 2026-01-10T06:13:12.377Z
-categories: ["Terraform"]
-tags: ["CI/CD", "aws", "terraform"]
+categories: ['Terraform']
+tags: ['CI/CD', 'aws', 'terraform']
 series:
     name: Terraform
     slug: terraform
@@ -343,19 +343,19 @@ aws iam create-open-id-connect-provider \
 # trust-policy.json
 
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Effect": "Allow",
-                "Principal":
-                    { "Federated": "arn:aws:iam::986129558966:oidc-provider/token.actions.githubusercontent.com" },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition":
+                'Effect': 'Allow',
+                'Principal':
+                    { 'Federated': 'arn:aws:iam::986129558966:oidc-provider/token.actions.githubusercontent.com' },
+                'Action': 'sts:AssumeRoleWithWebIdentity',
+                'Condition':
                     {
-                        "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
-                        "StringLike":
-                            { "token.actions.githubusercontent.com:sub": "repo:yulmwu/terraform-ci-cd-example:*" },
+                        'StringEquals': { 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com' },
+                        'StringLike':
+                            { 'token.actions.githubusercontent.com:sub': 'repo:yulmwu/terraform-ci-cd-example:*' },
                     },
             },
         ],
@@ -374,45 +374,45 @@ aws iam create-role \
 # terraform-policy.json
 
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Sid": "S3BucketManagement",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'S3BucketManagement',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "s3:CreateBucket",
-                        "s3:DeleteBucket",
-                        "s3:PutBucketPolicy",
-                        "s3:GetBucketPolicy",
-                        "s3:PutBucketPublicAccessBlock",
-                        "s3:GetBucketPublicAccessBlock",
-                        "s3:PutEncryptionConfiguration",
-                        "s3:PutBucketOwnershipControls",
-                        "s3:ListBucket",
+                        's3:CreateBucket',
+                        's3:DeleteBucket',
+                        's3:PutBucketPolicy',
+                        's3:GetBucketPolicy',
+                        's3:PutBucketPublicAccessBlock',
+                        's3:GetBucketPublicAccessBlock',
+                        's3:PutEncryptionConfiguration',
+                        's3:PutBucketOwnershipControls',
+                        's3:ListBucket',
                     ],
-                "Resource":
-                    ["arn:aws:s3:::tf-static-site-demo-1213-bucket", "arn:aws:s3:::tf-static-site-demo-1213-bucket/*"],
+                'Resource':
+                    ['arn:aws:s3:::tf-static-site-demo-1213-bucket', 'arn:aws:s3:::tf-static-site-demo-1213-bucket/*'],
             },
             {
-                "Sid": "CloudFrontOAC",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'CloudFrontOAC',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "cloudfront:CreateOriginAccessControl",
-                        "cloudfront:GetOriginAccessControl",
-                        "cloudfront:DeleteOriginAccessControl",
-                        "cloudfront:UpdateOriginAccessControl",
-                        "cloudfront:ListOriginAccessControls",
-                        "cloudfront:CreateDistribution",
-                        "cloudfront:GetDistribution",
-                        "cloudfront:UpdateDistribution",
-                        "cloudfront:DeleteDistribution",
+                        'cloudfront:CreateOriginAccessControl',
+                        'cloudfront:GetOriginAccessControl',
+                        'cloudfront:DeleteOriginAccessControl',
+                        'cloudfront:UpdateOriginAccessControl',
+                        'cloudfront:ListOriginAccessControls',
+                        'cloudfront:CreateDistribution',
+                        'cloudfront:GetDistribution',
+                        'cloudfront:UpdateDistribution',
+                        'cloudfront:DeleteDistribution',
                     ],
-                "Resource": "*",
+                'Resource': '*',
             },
-            { "Sid": "IAMPassRole", "Effect": "Allow", "Action": ["iam:GetRole", "iam:PassRole"], "Resource": "*" },
+            { 'Sid': 'IAMPassRole', 'Effect': 'Allow', 'Action': ['iam:GetRole', 'iam:PassRole'], 'Resource': '*' },
         ],
 }
 ```
@@ -516,7 +516,7 @@ on:
     workflow_dispatch:
         inputs:
             plan_run_id:
-                description: "Terraform Plan workflow run_id (approved)"
+                description: 'Terraform Plan workflow run_id (approved)'
                 required: true
 ```
 

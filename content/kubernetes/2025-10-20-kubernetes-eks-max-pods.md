@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] Troubleshooting: Too many pods."
-description: "FailedScheduling: Too many pods ??"
-slug: "2025-10-20-kubernetes-eks-max-pods"
+title: '[Kubernetes w/ EKS] Troubleshooting: Too many pods.'
+description: 'FailedScheduling: Too many pods ??'
+slug: '2025-10-20-kubernetes-eks-max-pods'
 author: yulmwu
 date: 2025-10-20T00:35:31.233Z
 updated_at: 2026-01-15T10:42:45.310Z
-categories: ["Kubernetes"]
-tags: ["TROUBLESHOOTING", "eks", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['TROUBLESHOOTING', 'eks', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -27,7 +27,7 @@ kind: ClusterConfig
 metadata:
     name: eks-demo
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 vpc:
     cidr: 10.1.0.0/16
     nat:

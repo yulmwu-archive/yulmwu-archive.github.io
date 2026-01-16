@@ -1,12 +1,12 @@
 ---
-title: "[Cloudflare] DDoS protection with Cloudflare (Feat. AWS Shield)"
-description: "Cloudflare를 사용한 DDoS 방어 (Feat. AWS Shield)"
-slug: "2025-12-21-cloudflare-ddos-protection"
+title: '[Cloudflare] DDoS protection with Cloudflare (Feat. AWS Shield)'
+description: 'Cloudflare를 사용한 DDoS 방어 (Feat. AWS Shield)'
+slug: '2025-12-21-cloudflare-ddos-protection'
 author: yulmwu
 date: 2025-12-21T12:04:19.600Z
 updated_at: 2026-01-14T23:52:26.766Z
-categories: ["Cloudflare"]
-tags: ["Cloudflare", "aws", "security"]
+categories: ['Cloudflare']
+tags: ['Cloudflare', 'aws', 'security']
 series:
     name: Cloudflare
     slug: cloudflare

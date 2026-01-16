@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] Service(ClusterIP, NodePort, LoadBalancer) and Ingress(Nginx, AWS ALB)"
-description: "쿠버네티스 Service(ClusterIP, NodePort, LoadBalancer) 및 Ingress(Nginx, AWS ALB) + AWS EKS 실습"
-slug: "2025-08-31-kubernetes-service-ingress"
+title: '[Kubernetes w/ EKS] Service(ClusterIP, NodePort, LoadBalancer) and Ingress(Nginx, AWS ALB)'
+description: '쿠버네티스 Service(ClusterIP, NodePort, LoadBalancer) 및 Ingress(Nginx, AWS ALB) + AWS EKS 실습'
+slug: '2025-08-31-kubernetes-service-ingress'
 author: yulmwu
 date: 2025-08-31T04:04:42.869Z
 updated_at: 2026-01-14T03:17:10.537Z
-categories: ["Kubernetes"]
-tags: ["eks", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['eks', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -210,14 +210,14 @@ kind: ClusterConfig
 metadata:
     name: eks-test
     region: ap-northeast-2
-    version: "1.33" # 표준 지원 기간(초과 시 추가 요금), EOL 확인
+    version: '1.33' # 표준 지원 기간(초과 시 추가 요금), EOL 확인
 
 vpc:
     cidr: 10.0.0.0/16
 
 managedNodeGroups:
     - name: ng-private
-      instanceTypes: ["t3.small"]
+      instanceTypes: ['t3.small']
       desiredCapacity: 2
       minSize: 2
       maxSize: 3
@@ -225,7 +225,7 @@ managedNodeGroups:
       labels: { nodegroup: private }
 
     - name: ng-public
-      instanceTypes: ["t3.small"]
+      instanceTypes: ['t3.small']
       desiredCapacity: 1
       minSize: 1
       maxSize: 1
@@ -278,9 +278,9 @@ spec:
                       - containerPort: 8080
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "8080"
+                        value: '8080'
                       - name: APP_NAME
                         valueFrom:
                             fieldRef:
@@ -307,9 +307,9 @@ spec:
                       - containerPort: 8080
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "8080"
+                        value: '8080'
                       - name: APP_NAME
                         valueFrom:
                             fieldRef:
@@ -427,9 +427,9 @@ kind: Service
 metadata:
     name: app-lb-svc
     annotations:
-        service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-        service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
+        service.beta.kubernetes.io/aws-load-balancer-type: 'nlb'
+        service.beta.kubernetes.io/aws-load-balancer-scheme: 'internet-facing'
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: 'instance'
 spec:
     type: LoadBalancer
     selector:
@@ -535,7 +535,7 @@ kind: Ingress
 metadata:
     name: app-ingress
     annotations:
-        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/use-regex: 'true'
         nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
     ingressClassName: nginx
@@ -599,7 +599,7 @@ ingress.networking.k8s.io/app-ingress   nginx   *       172.20.174.15   80      
 >
 > ```yaml
 > - name: GLOBAL_PREFIX
->   value: "/v1" # app2에 /v2로 변경 후 추가
+>   value: '/v1' # app2에 /v2로 변경 후 추가
 > ```
 
 ALB Ingress Controller를 사용하기 위해선 따로 설치를 해줘야 한다.

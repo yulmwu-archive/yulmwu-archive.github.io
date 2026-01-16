@@ -1,12 +1,12 @@
 ---
-title: "[AWS Misc] Secrets Manager Key Rotation Lambda"
-description: "AWS Lambda를 사용한 Secrets Manager 키 로테이션 "
-slug: "2025-08-12-aws-secrets-manager-key-rotation-lambda"
+title: '[AWS Misc] Secrets Manager Key Rotation Lambda'
+description: 'AWS Lambda를 사용한 Secrets Manager 키 로테이션 '
+slug: '2025-08-12-aws-secrets-manager-key-rotation-lambda'
 author: yulmwu
 date: 2025-08-12T13:35:35.857Z
 updated_at: 2026-01-15T01:23:39.908Z
-categories: ["AWS"]
-tags: ["Misc", "aws"]
+categories: ['AWS']
+tags: ['Misc', 'aws']
 series:
     name: AWS
     slug: aws
@@ -62,14 +62,14 @@ import {
 	GetSecretValueCommand,
 	DescribeSecretCommand,
 	UpdateSecretVersionStageCommand,
-} from "@aws-sdk/client-secrets-manager"
-import crypto from "crypto"
+} from '@aws-sdk/client-secrets-manager'
+import crypto from 'crypto'
 ```
 
 그리고 Secrets Manager 클라이언트와 필요한 설정 등을 명시해두었다.
 
 ```js
-const SECRET_KEYS = ["session_secret_key"]
+const SECRET_KEYS = ['session_secret_key']
 const SECRET_LENGTH = 32
 
 const secretsManager = new SecretsManagerClient()
@@ -82,16 +82,16 @@ export const handler = async (event) => {
 	console.log(`Step: ${event.Step} for secret: ${event.SecretId}`)
 
 	switch (event.Step) {
-		case "createSecret":
+		case 'createSecret':
 			await createSecret(event)
 			break
-		case "setSecret":
+		case 'setSecret':
 			await setSecret(event)
 			break
-		case "testSecret":
+		case 'testSecret':
 			await testSecret(event)
 			break
-		case "finishSecret":
+		case 'finishSecret':
 			await finishSecret(event)
 			break
 		default:
@@ -109,7 +109,7 @@ const createSecret = async (event) => {
 	const newSecretValue = {}
 
 	SECRET_KEYS.forEach((key) => {
-		newSecretValue[key] = crypto.randomBytes(SECRET_LENGTH).toString("base64").slice(0, SECRET_LENGTH)
+		newSecretValue[key] = crypto.randomBytes(SECRET_LENGTH).toString('base64').slice(0, SECRET_LENGTH)
 	})
 
 	await secretsManager.send(
@@ -117,7 +117,7 @@ const createSecret = async (event) => {
 			SecretId: event.SecretId,
 			ClientRequestToken: event.ClientRequestToken,
 			SecretString: JSON.stringify(newSecretValue),
-			VersionStages: ["AWSPENDING"],
+			VersionStages: ['AWSPENDING'],
 		}),
 	)
 
@@ -131,7 +131,7 @@ const createSecret = async (event) => {
 
 ```js
 const setSecret = async (event) => {
-	console.log("Set secret step - If needed, apply AWSPENDING to your app/service")
+	console.log('Set secret step - If needed, apply AWSPENDING to your app/service')
 }
 ```
 
@@ -144,7 +144,7 @@ const testSecret = async (event) => {
 	const data = await secretsManager.send(
 		new GetSecretValueCommand({
 			SecretId: event.SecretId,
-			VersionStage: "AWSPENDING",
+			VersionStage: 'AWSPENDING',
 		}),
 	)
 
@@ -156,7 +156,7 @@ const testSecret = async (event) => {
 			}
 		})
 
-		console.log("Test passed for pending secret.")
+		console.log('Test passed for pending secret.')
 	} catch (err) {
 		throw new Error(`Test failed: ${err.message}`)
 	}
@@ -176,19 +176,19 @@ const finishSecret = async (event) => {
 	)
 
 	const currentVersionId = Object.keys(currentVersion.VersionIdsToStages).find((vId) =>
-		currentVersion.VersionIdsToStages[vId].includes("AWSCURRENT"),
+		currentVersion.VersionIdsToStages[vId].includes('AWSCURRENT'),
 	)
 
 	await secretsManager.send(
 		new UpdateSecretVersionStageCommand({
 			SecretId: event.SecretId,
-			VersionStage: "AWSCURRENT",
+			VersionStage: 'AWSCURRENT',
 			MoveToVersionId: event.ClientRequestToken,
 			RemoveFromVersionId: currentVersionId,
 		}),
 	)
 
-	console.log("Secret rotation finished.")
+	console.log('Secret rotation finished.')
 }
 ```
 
@@ -242,16 +242,16 @@ Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
 ```yaml
 {
-    "Sid": "SecretsManagerRotationPermissions",
-    "Effect": "Allow",
-    "Action":
+    'Sid': 'SecretsManagerRotationPermissions',
+    'Effect': 'Allow',
+    'Action':
         [
-            "secretsmanager:GetSecretValue",
-            "secretsmanager:PutSecretValue",
-            "secretsmanager:DescribeSecret",
-            "secretsmanager:UpdateSecretVersionStage",
+            'secretsmanager:GetSecretValue',
+            'secretsmanager:PutSecretValue',
+            'secretsmanager:DescribeSecret',
+            'secretsmanager:UpdateSecretVersionStage',
         ],
-    "Resource": "arn:aws:secretsmanager:ap-northeast-2:986129558966:secret:TestSecret-mMbwEt",
+    'Resource': 'arn:aws:secretsmanager:ap-northeast-2:986129558966:secret:TestSecret-mMbwEt',
 }
 ```
 

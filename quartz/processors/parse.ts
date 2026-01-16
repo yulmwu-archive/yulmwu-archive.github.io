@@ -1,19 +1,19 @@
-import esbuild from "esbuild"
-import remarkParse from "remark-parse"
-import remarkRehype from "remark-rehype"
-import { Processor, unified } from "unified"
-import { Root as MDRoot } from "remark-parse/lib"
-import { Root as HTMLRoot } from "hast"
-import { MarkdownContent, ProcessedContent } from "../plugins/vfile"
-import { PerfTimer } from "../util/perf"
-import { read } from "to-vfile"
-import { FilePath, QUARTZ, slugifyFilePath } from "../util/path"
-import path from "path"
-import workerpool, { Promise as WorkerPromise } from "workerpool"
-import { QuartzLogger } from "../util/log"
-import { trace } from "../util/trace"
-import { BuildCtx, WorkerSerializableBuildCtx } from "../util/ctx"
-import { styleText } from "util"
+import esbuild from 'esbuild'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import { Processor, unified } from 'unified'
+import { Root as MDRoot } from 'remark-parse/lib'
+import { Root as HTMLRoot } from 'hast'
+import { MarkdownContent, ProcessedContent } from '../plugins/vfile'
+import { PerfTimer } from '../util/perf'
+import { read } from 'to-vfile'
+import { FilePath, QUARTZ, slugifyFilePath } from '../util/path'
+import path from 'path'
+import workerpool, { Promise as WorkerPromise } from 'workerpool'
+import { QuartzLogger } from '../util/log'
+import { trace } from '../util/trace'
+import { BuildCtx, WorkerSerializableBuildCtx } from '../util/ctx'
+import { styleText } from 'util'
 
 export type QuartzMdProcessor = Processor<MDRoot, MDRoot, MDRoot>
 export type QuartzHtmlProcessor = Processor<undefined, MDRoot, HTMLRoot>
@@ -50,29 +50,29 @@ function* chunks<T>(arr: T[], n: number) {
 
 async function transpileWorkerScript() {
 	// transpile worker script
-	const cacheFile = "./.quartz-cache/transpiled-worker.mjs"
-	const fp = "./quartz/worker.ts"
+	const cacheFile = './.quartz-cache/transpiled-worker.mjs'
+	const fp = './quartz/worker.ts'
 	return esbuild.build({
 		entryPoints: [fp],
 		outfile: path.join(QUARTZ, cacheFile),
 		bundle: true,
 		keepNames: true,
-		platform: "node",
-		format: "esm",
-		packages: "external",
+		platform: 'node',
+		format: 'esm',
+		packages: 'external',
 		sourcemap: true,
 		sourcesContent: false,
 		plugins: [
 			{
-				name: "css-and-scripts-as-text",
+				name: 'css-and-scripts-as-text',
 				setup(build) {
 					build.onLoad({ filter: /\.scss$/ }, (_) => ({
-						contents: "",
-						loader: "text",
+						contents: '',
+						loader: 'text',
 					}))
 					build.onLoad({ filter: /\.inline\.(ts|js)$/ }, (_) => ({
-						contents: "",
-						loader: "text",
+						contents: '',
+						loader: 'text',
 					}))
 				},
 			},
@@ -163,10 +163,10 @@ export async function parseMarkdown(ctx: BuildCtx, fps: FilePath[]): Promise<Pro
 		}
 	} else {
 		await transpileWorkerScript()
-		const pool = workerpool.pool("./quartz/bootstrap-worker.mjs", {
-			minWorkers: "max",
+		const pool = workerpool.pool('./quartz/bootstrap-worker.mjs', {
+			minWorkers: 'max',
 			maxWorkers: concurrency,
-			workerType: "thread",
+			workerType: 'thread',
 		})
 		const errorHandler = (err: any) => {
 			console.error(err)
@@ -184,14 +184,14 @@ export async function parseMarkdown(ctx: BuildCtx, fps: FilePath[]): Promise<Pro
 		const textToMarkdownPromises: WorkerPromise<MarkdownContent[]>[] = []
 		let processedFiles = 0
 		for (const chunk of chunks(fps, CHUNK_SIZE)) {
-			textToMarkdownPromises.push(pool.exec("parseMarkdown", [serializableCtx, chunk]))
+			textToMarkdownPromises.push(pool.exec('parseMarkdown', [serializableCtx, chunk]))
 		}
 
 		const mdResults: Array<MarkdownContent[]> = await Promise.all(
 			textToMarkdownPromises.map(async (promise) => {
 				const result = await promise
 				processedFiles += result.length
-				log.updateText(`text->markdown ${styleText("gray", `${processedFiles}/${fps.length}`)}`)
+				log.updateText(`text->markdown ${styleText('gray', `${processedFiles}/${fps.length}`)}`)
 				return result
 			}),
 		).catch(errorHandler)
@@ -199,13 +199,13 @@ export async function parseMarkdown(ctx: BuildCtx, fps: FilePath[]): Promise<Pro
 		const markdownToHtmlPromises: WorkerPromise<ProcessedContent[]>[] = []
 		processedFiles = 0
 		for (const mdChunk of mdResults) {
-			markdownToHtmlPromises.push(pool.exec("processHtml", [serializableCtx, mdChunk]))
+			markdownToHtmlPromises.push(pool.exec('processHtml', [serializableCtx, mdChunk]))
 		}
 		const results: ProcessedContent[][] = await Promise.all(
 			markdownToHtmlPromises.map(async (promise) => {
 				const result = await promise
 				processedFiles += result.length
-				log.updateText(`markdown->html ${styleText("gray", `${processedFiles}/${fps.length}`)}`)
+				log.updateText(`markdown->html ${styleText('gray', `${processedFiles}/${fps.length}`)}`)
 				return result
 			}),
 		).catch(errorHandler)

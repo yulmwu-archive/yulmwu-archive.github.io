@@ -1,5 +1,5 @@
 ---
-title: "Citations"
+title: 'Citations'
 tags:
     - plugin/transformer
 ---

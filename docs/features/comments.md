@@ -58,7 +58,7 @@ Quartz also exposes a few of the other Giscus options as well and you can provid
 
 ```ts
 type Options = {
-	provider: "giscus"
+	provider: 'giscus'
 	options: {
 		repo: `${string}/${string}`
 		repoId: string
@@ -79,7 +79,7 @@ type Options = {
 
 		// how to map pages -> discussions
 		// defaults to 'url'
-		mapping?: "url" | "title" | "og:title" | "specific" | "number" | "pathname"
+		mapping?: 'url' | 'title' | 'og:title' | 'specific' | 'number' | 'pathname'
 
 		// use strict title matching
 		// defaults to true
@@ -91,7 +91,7 @@ type Options = {
 
 		// where to put the comment input box relative to the comments
 		// defaults to 'bottom'
-		inputPosition?: "top" | "bottom"
+		inputPosition?: 'top' | 'bottom'
 
 		// set your preference language here
 		// defaults to 'en'

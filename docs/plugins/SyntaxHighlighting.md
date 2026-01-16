@@ -1,5 +1,5 @@
 ---
-title: "SyntaxHighlighting"
+title: 'SyntaxHighlighting'
 tags:
     - plugin/transformer
 ---

@@ -1,18 +1,18 @@
-import { FullSlug, joinSegments } from "../../util/path"
-import { QuartzEmitterPlugin } from "../types"
+import { FullSlug, joinSegments } from '../../util/path'
+import { QuartzEmitterPlugin } from '../types'
 
 // @ts-ignore
-import spaRouterScript from "../../components/scripts/spa.inline"
+import spaRouterScript from '../../components/scripts/spa.inline'
 // @ts-ignore
-import popoverScript from "../../components/scripts/popover.inline"
-import styles from "../../styles/custom.scss"
-import popoverStyle from "../../components/styles/popover.scss"
-import { BuildCtx } from "../../util/ctx"
-import { QuartzComponent } from "../../components/types"
-import { googleFontHref, googleFontSubsetHref, joinStyles, processGoogleFonts } from "../../util/theme"
-import { Features, transform } from "lightningcss"
-import { transform as transpile } from "esbuild"
-import { write } from "./helpers"
+import popoverScript from '../../components/scripts/popover.inline'
+import styles from '../../styles/custom.scss'
+import popoverStyle from '../../components/styles/popover.scss'
+import { BuildCtx } from '../../util/ctx'
+import { QuartzComponent } from '../../components/types'
+import { googleFontHref, googleFontSubsetHref, joinStyles, processGoogleFonts } from '../../util/theme'
+import { Features, transform } from 'lightningcss'
+import { transform as transpile } from 'esbuild'
+import { write } from './helpers'
 
 type ComponentResources = {
 	css: string[]
@@ -61,7 +61,7 @@ function getComponentResources(ctx: BuildCtx): ComponentResources {
 
 async function joinScripts(scripts: string[]): Promise<string> {
 	// wrap with iife to prevent scope collision
-	const script = scripts.map((script) => `(function () {${script}})();`).join("\n")
+	const script = scripts.map((script) => `(function () {${script}})();`).join('\n')
 
 	// minify with esbuild
 	const res = await transpile(script, {
@@ -80,7 +80,7 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
 		componentResources.css.push(popoverStyle)
 	}
 
-	if (cfg.analytics?.provider === "google") {
+	if (cfg.analytics?.provider === 'google') {
 		const tagId = cfg.analytics.tagId
 		componentResources.afterDOMLoaded.push(`
       const gtagScript = document.createElement('script');
@@ -101,8 +101,8 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       
       document.head.appendChild(gtagScript);
     `)
-	} else if (cfg.analytics?.provider === "plausible") {
-		const plausibleHost = cfg.analytics.host ?? "https://plausible.io"
+	} else if (cfg.analytics?.provider === 'plausible') {
+		const plausibleHost = cfg.analytics.host ?? 'https://plausible.io'
 		componentResources.afterDOMLoaded.push(`
       const plausibleScript = document.createElement('script');
       plausibleScript.src = '${plausibleHost}/js/script.manual.js';
@@ -118,17 +118,17 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
 
       document.head.appendChild(plausibleScript);
     `)
-	} else if (cfg.analytics?.provider === "umami") {
+	} else if (cfg.analytics?.provider === 'umami') {
 		componentResources.afterDOMLoaded.push(`
       const umamiScript = document.createElement("script");
-      umamiScript.src = "${cfg.analytics.host ?? "https://analytics.umami.is"}/script.js";
+      umamiScript.src = "${cfg.analytics.host ?? 'https://analytics.umami.is'}/script.js";
       umamiScript.setAttribute("data-website-id", "${cfg.analytics.websiteId}");
       umamiScript.setAttribute("data-auto-track", "true");
       umamiScript.defer = true;
 
       document.head.appendChild(umamiScript);
     `)
-	} else if (cfg.analytics?.provider === "goatcounter") {
+	} else if (cfg.analytics?.provider === 'goatcounter') {
 		componentResources.afterDOMLoaded.push(`
       const goatcounterScriptPre = document.createElement('script');
       goatcounterScriptPre.textContent = \`
@@ -136,9 +136,9 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       \`;
       document.head.appendChild(goatcounterScriptPre);
 
-      const endpoint = "https://${cfg.analytics.websiteId}.${cfg.analytics.host ?? "goatcounter.com"}/count";
+      const endpoint = "https://${cfg.analytics.websiteId}.${cfg.analytics.host ?? 'goatcounter.com'}/count";
       const goatcounterScript = document.createElement('script');
-      goatcounterScript.src = "${cfg.analytics.scriptSrc ?? "https://gc.zgo.at/count.js"}";
+      goatcounterScript.src = "${cfg.analytics.scriptSrc ?? 'https://gc.zgo.at/count.js'}";
       goatcounterScript.defer = true;
       goatcounterScript.setAttribute('data-goatcounter', endpoint);
       goatcounterScript.onload = () => {
@@ -151,12 +151,12 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
 
       document.head.appendChild(goatcounterScript);
     `)
-	} else if (cfg.analytics?.provider === "posthog") {
+	} else if (cfg.analytics?.provider === 'posthog') {
 		componentResources.afterDOMLoaded.push(`
       const posthogScript = document.createElement("script");
       posthogScript.innerHTML= \`!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
       posthog.init('${cfg.analytics.apiKey}', {
-        api_host: '${cfg.analytics.host ?? "https://app.posthog.com"}',
+        api_host: '${cfg.analytics.host ?? 'https://app.posthog.com'}',
         capture_pageview: false,
       });
       document.addEventListener('nav', () => {
@@ -165,7 +165,7 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
 
       document.head.appendChild(posthogScript);
     `)
-	} else if (cfg.analytics?.provider === "tinylytics") {
+	} else if (cfg.analytics?.provider === 'tinylytics') {
 		const siteId = cfg.analytics.siteId
 		componentResources.afterDOMLoaded.push(`
       const tinylyticsScript = document.createElement('script');
@@ -180,14 +180,14 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       
       document.head.appendChild(tinylyticsScript);
     `)
-	} else if (cfg.analytics?.provider === "cabin") {
+	} else if (cfg.analytics?.provider === 'cabin') {
 		componentResources.afterDOMLoaded.push(`
       const cabinScript = document.createElement("script")
-      cabinScript.src = "${cfg.analytics.host ?? "https://scripts.withcabin.com"}/hello.js"
+      cabinScript.src = "${cfg.analytics.host ?? 'https://scripts.withcabin.com'}/hello.js"
       cabinScript.defer = true
       document.head.appendChild(cabinScript)
     `)
-	} else if (cfg.analytics?.provider === "clarity") {
+	} else if (cfg.analytics?.provider === 'clarity') {
 		componentResources.afterDOMLoaded.push(`
       const clarityScript = document.createElement("script")
       clarityScript.innerHTML= \`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -196,7 +196,7 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       })(window, document, "clarity", "script", "${cfg.analytics.projectId}");\`
       document.head.appendChild(clarityScript)
     `)
-	} else if (cfg.analytics?.provider === "matomo") {
+	} else if (cfg.analytics?.provider === 'matomo') {
 		componentResources.afterDOMLoaded.push(`
       const matomoScript = document.createElement("script");
       matomoScript.innerHTML = \`
@@ -223,7 +223,7 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       \`
       document.head.appendChild(matomoScript);
     `)
-	} else if (cfg.analytics?.provider === "vercel") {
+	} else if (cfg.analytics?.provider === 'vercel') {
 		/**
 		 * script from {@link https://vercel.com/docs/analytics/quickstart?framework=html#add-the-script-tag-to-your-site|Vercel Docs}
 		 */
@@ -236,10 +236,10 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       vercelInsightsScript.defer = true
       document.head.appendChild(vercelInsightsScript)
     `)
-	} else if (cfg.analytics?.provider === "rybbit") {
+	} else if (cfg.analytics?.provider === 'rybbit') {
 		componentResources.afterDOMLoaded.push(`
       const rybbitScript = document.createElement("script");
-      rybbitScript.src = "${cfg.analytics.host ?? "https://app.rybbit.io"}/api/script.js";
+      rybbitScript.src = "${cfg.analytics.host ?? 'https://app.rybbit.io'}/api/script.js";
       rybbitScript.setAttribute("data-site-id", "${cfg.analytics.siteId}");
       rybbitScript.async = true;
       rybbitScript.defer = true;
@@ -264,15 +264,15 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
 // rebuilds may not work as expected.
 export const ComponentResources: QuartzEmitterPlugin = () => {
 	return {
-		name: "ComponentResources",
+		name: 'ComponentResources',
 		async *emit(ctx, _content, _resources) {
 			const cfg = ctx.cfg.configuration
 			// component specific scripts and styles
 			const componentResources = getComponentResources(ctx)
-			let googleFontsStyleSheet = ""
-			if (cfg.theme.fontOrigin === "local") {
+			let googleFontsStyleSheet = ''
+			if (cfg.theme.fontOrigin === 'local') {
 				// let the user do it themselves in css
-			} else if (cfg.theme.fontOrigin === "googleFonts" && !cfg.theme.cdnCaching) {
+			} else if (cfg.theme.fontOrigin === 'googleFonts' && !cfg.theme.cdnCaching) {
 				// when cdnCaching is true, we link to google fonts in Head.tsx
 				const theme = ctx.cfg.configuration.theme
 				const response = await fetch(googleFontHref(theme))
@@ -285,7 +285,7 @@ export const ComponentResources: QuartzEmitterPlugin = () => {
 				}
 
 				if (!cfg.baseUrl) {
-					throw new Error("baseUrl must be defined when using Google Fonts without cfg.theme.cdnCaching")
+					throw new Error('baseUrl must be defined when using Google Fonts without cfg.theme.cdnCaching')
 				}
 
 				const { processedStylesheet, fontFiles } = await processGoogleFonts(googleFontsStyleSheet, cfg.baseUrl)
@@ -301,7 +301,7 @@ export const ComponentResources: QuartzEmitterPlugin = () => {
 					const buf = await res.arrayBuffer()
 					yield write({
 						ctx,
-						slug: joinSegments("static", "fonts", fontFile.filename) as FullSlug,
+						slug: joinSegments('static', 'fonts', fontFile.filename) as FullSlug,
 						ext: `.${fontFile.extension}`,
 						content: Buffer.from(buf),
 					})
@@ -327,10 +327,10 @@ export const ComponentResources: QuartzEmitterPlugin = () => {
 
 			yield write({
 				ctx,
-				slug: "index" as FullSlug,
-				ext: ".css",
+				slug: 'index' as FullSlug,
+				ext: '.css',
 				content: transform({
-					filename: "index.css",
+					filename: 'index.css',
 					code: Buffer.from(stylesheet),
 					minify: true,
 					targets: {
@@ -346,15 +346,15 @@ export const ComponentResources: QuartzEmitterPlugin = () => {
 
 			yield write({
 				ctx,
-				slug: "prescript" as FullSlug,
-				ext: ".js",
+				slug: 'prescript' as FullSlug,
+				ext: '.js',
 				content: prescript,
 			})
 
 			yield write({
 				ctx,
-				slug: "postscript" as FullSlug,
-				ext: ".js",
+				slug: 'postscript' as FullSlug,
+				ext: '.js',
 				content: postscript,
 			})
 		},

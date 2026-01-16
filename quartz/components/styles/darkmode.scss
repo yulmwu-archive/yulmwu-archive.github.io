@@ -20,15 +20,15 @@
 	}
 }
 
-:root[saved-theme="dark"] {
+:root[saved-theme='dark'] {
 	color-scheme: dark;
 }
 
-:root[saved-theme="light"] {
+:root[saved-theme='light'] {
 	color-scheme: light;
 }
 
-:root[saved-theme="dark"] .darkmode {
+:root[saved-theme='dark'] .darkmode {
 	& > .dayIcon {
 		display: none;
 	}

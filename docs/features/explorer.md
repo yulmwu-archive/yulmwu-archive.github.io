@@ -1,5 +1,5 @@
 ---
-title: "Explorer"
+title: 'Explorer'
 tags:
     - component
 ---
@@ -79,7 +79,7 @@ Component.Explorer({
 		if ((!a.isFolder && !b.isFolder) || (a.isFolder && b.isFolder)) {
 			return a.displayName.localeCompare(b.displayName, undefined, {
 				numeric: true,
-				sensitivity: "base",
+				sensitivity: 'base',
 			})
 		}
 
@@ -144,7 +144,7 @@ Note that this example filters on the title but you can also do it via slug or a
 Component.Explorer({
 	filterFn: (node) => {
 		// set containing names of everything you want to filter out
-		const omit = new Set(["authoring content", "tags", "advanced"])
+		const omit = new Set(['authoring content', 'tags', 'advanced'])
 
 		// can also use node.slug or by anything on node.data
 		// note that node.data is only present for files that exist on disk
@@ -162,7 +162,7 @@ You can access the tags of a file by `node.data.tags`.
 Component.Explorer({
 	filterFn: (node) => {
 		// exclude files with the tag "explorerexclude"
-		return node.data?.tags?.includes("explorerexclude") !== true
+		return node.data?.tags?.includes('explorerexclude') !== true
 	},
 })
 ```
@@ -186,15 +186,15 @@ Component.Explorer({
 > and passing it in.
 >
 > ```ts title="quartz.layout.ts"
-> import { Options } from "./quartz/components/Explorer"
+> import { Options } from './quartz/components/Explorer'
 >
-> export const mapFn: Options["mapFn"] = (node) => {
+> export const mapFn: Options['mapFn'] = (node) => {
 > 	// implement your function here
 > }
-> export const filterFn: Options["filterFn"] = (node) => {
+> export const filterFn: Options['filterFn'] = (node) => {
 > 	// implement your function here
 > }
-> export const sortFn: Options["sortFn"] = (a, b) => {
+> export const sortFn: Options['sortFn'] = (a, b) => {
 > 	// implement your function here
 > }
 >
@@ -214,9 +214,9 @@ To add emoji prefixes (📁 for folders, 📄 for files), you could use a map fu
 Component.Explorer({
 	mapFn: (node) => {
 		if (node.isFolder) {
-			node.displayName = "📁 " + node.displayName
+			node.displayName = '📁 ' + node.displayName
 		} else {
-			node.displayName = "📄 " + node.displayName
+			node.displayName = '📄 ' + node.displayName
 		}
 	},
 })

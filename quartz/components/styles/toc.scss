@@ -1,4 +1,4 @@
-@use "../../styles/variables.scss" as *;
+@use '../../styles/variables.scss' as *;
 
 .toc {
 	display: flex;
@@ -8,8 +8,8 @@
 	flex: 0 0.5 auto;
 	border-left: 1px solid var(--lightgray);
 	padding-left: 1rem;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-	
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
 	&:has(button.toc-header.collapsed) {
 		flex: 0 1 1.4rem;
 	}

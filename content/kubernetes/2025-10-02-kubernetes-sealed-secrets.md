@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Secret Encryption with Sealed Secrets"
-description: "Sealed Secrets를 통한 외부 시크릿 저장소 없이 암호화된 시크릿 사용 방법"
-slug: "2025-10-02-kubernetes-sealed-secrets"
+title: '[Kubernetes] Secret Encryption with Sealed Secrets'
+description: 'Sealed Secrets를 통한 외부 시크릿 저장소 없이 암호화된 시크릿 사용 방법'
+slug: '2025-10-02-kubernetes-sealed-secrets'
 author: yulmwu
 date: 2025-10-02T02:48:42.263Z
 updated_at: 2026-01-10T05:48:01.468Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -150,7 +150,7 @@ apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
     annotations:
-        sealedsecrets.bitnami.com/namespace-wide: "true"
+        sealedsecrets.bitnami.com/namespace-wide: 'true'
     name: my-secret
     namespace: apps
 spec:
@@ -161,7 +161,7 @@ spec:
     template:
         metadata:
             annotations:
-                sealedsecrets.bitnami.com/namespace-wide: "true"
+                sealedsecrets.bitnami.com/namespace-wide: 'true'
             name: my-secret
             namespace: apps
         type: Opaque

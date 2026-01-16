@@ -1,6 +1,6 @@
-import { QuartzTransformerPlugin } from "../types"
-import rehypeRaw from "rehype-raw"
-import { PluggableList } from "unified"
+import { QuartzTransformerPlugin } from '../types'
+import rehypeRaw from 'rehype-raw'
+import { PluggableList } from 'unified'
 
 export interface Options {
 	/** Replace {{ relref }} with quartz wikilinks []() */
@@ -24,24 +24,24 @@ const defaultOptions: Options = {
 	replaceOrgLatex: true,
 }
 
-const relrefRegex = new RegExp(/\[([^\]]+)\]\(\{\{< relref "([^"]+)" >\}\}\)/, "g")
-const predefinedHeadingIdRegex = new RegExp(/(.*) {#(?:.*)}/, "g")
-const hugoShortcodeRegex = new RegExp(/{{(.*)}}/, "g")
-const figureTagRegex = new RegExp(/< ?figure src="(.*)" ?>/, "g")
+const relrefRegex = new RegExp(/\[([^\]]+)\]\(\{\{< relref "([^"]+)" >\}\}\)/, 'g')
+const predefinedHeadingIdRegex = new RegExp(/(.*) {#(?:.*)}/, 'g')
+const hugoShortcodeRegex = new RegExp(/{{(.*)}}/, 'g')
+const figureTagRegex = new RegExp(/< ?figure src="(.*)" ?>/, 'g')
 // \\\\\( -> matches \\(
 // (.+?) -> Lazy match for capturing the equation
 // \\\\\) -> matches \\)
-const inlineLatexRegex = new RegExp(/\\\\\((.+?)\\\\\)/, "g")
+const inlineLatexRegex = new RegExp(/\\\\\((.+?)\\\\\)/, 'g')
 // (?:\\begin{equation}|\\\\\(|\\\\\[) -> start of equation
 // ([\s\S]*?) -> Matches the block equation
 // (?:\\\\\]|\\\\\)|\\end{equation}) -> end of equation
 const blockLatexRegex = new RegExp(
 	/(?:\\begin{equation}|\\\\\(|\\\\\[)([\s\S]*?)(?:\\\\\]|\\\\\)|\\end{equation})/,
-	"g",
+	'g',
 )
 // \$\$[\s\S]*?\$\$ -> Matches block equations
 // \$.*?\$ -> Matches inline equations
-const quartzLatexRegex = new RegExp(/\$\$[\s\S]*?\$\$|\$.*?\$/, "g")
+const quartzLatexRegex = new RegExp(/\$\$[\s\S]*?\$\$|\$.*?\$/, 'g')
 
 /**
  * ox-hugo is an org exporter backend that exports org files to hugo-compatible
@@ -52,7 +52,7 @@ const quartzLatexRegex = new RegExp(/\$\$[\s\S]*?\$\$|\$.*?\$/, "g")
 export const OxHugoFlavouredMarkdown: QuartzTransformerPlugin<Partial<Options>> = (userOpts) => {
 	const opts = { ...defaultOptions, ...userOpts }
 	return {
-		name: "OxHugoFlavouredMarkdown",
+		name: 'OxHugoFlavouredMarkdown',
 		textTransform(_ctx, src) {
 			if (opts.wikilinks) {
 				src = src.toString()
@@ -99,7 +99,7 @@ export const OxHugoFlavouredMarkdown: QuartzTransformerPlugin<Partial<Options>> 
 
 				// ox-hugo escapes _ as \_
 				src = src.replaceAll(quartzLatexRegex, (value) => {
-					return value.replaceAll("\\_", "_")
+					return value.replaceAll('\\_', '_')
 				})
 			}
 			return src

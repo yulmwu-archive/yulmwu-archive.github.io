@@ -1,12 +1,12 @@
 ---
-title: "[AWS Networking] AWS Global Accelerator (AGA)"
-description: "AWS Global Accelerator를 통한 글로벌 서비스의 네트워크 퍼포먼스 올리기"
-slug: "2025-08-24-aws-global-accelerator"
+title: '[AWS Networking] AWS Global Accelerator (AGA)'
+description: 'AWS Global Accelerator를 통한 글로벌 서비스의 네트워크 퍼포먼스 올리기'
+slug: '2025-08-24-aws-global-accelerator'
 author: yulmwu
 date: 2025-08-24T05:15:47.274Z
 updated_at: 2026-01-09T17:36:18.736Z
-categories: ["AWS"]
-tags: ["aws", "networking"]
+categories: ['AWS']
+tags: ['aws', 'networking']
 series:
     name: AWS
     slug: aws

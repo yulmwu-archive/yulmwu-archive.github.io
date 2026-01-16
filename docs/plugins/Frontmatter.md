@@ -1,5 +1,5 @@
 ---
-title: "Frontmatter"
+title: 'Frontmatter'
 tags:
     - plugin/transformer
 ---

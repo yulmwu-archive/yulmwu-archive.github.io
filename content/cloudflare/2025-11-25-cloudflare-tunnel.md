@@ -1,12 +1,12 @@
 ---
-title: "[Cloudflare] Expose local servers to the internet with Cloudflare Tunnel"
-description: "Cloudflare Tunnel을 통한 포트 포워딩이나 Public IP 없이 로컬 서버 인터넷에 노출시키기"
-slug: "2025-11-25-cloudflare-tunnel"
+title: '[Cloudflare] Expose local servers to the internet with Cloudflare Tunnel'
+description: 'Cloudflare Tunnel을 통한 포트 포워딩이나 Public IP 없이 로컬 서버 인터넷에 노출시키기'
+slug: '2025-11-25-cloudflare-tunnel'
 author: yulmwu
 date: 2025-11-25T12:54:10.291Z
 updated_at: 2026-01-14T08:57:25.342Z
-categories: ["Cloudflare"]
-tags: ["Cloudflare"]
+categories: ['Cloudflare']
+tags: ['Cloudflare']
 series:
     name: Cloudflare
     slug: cloudflare

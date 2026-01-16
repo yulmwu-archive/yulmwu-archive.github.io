@@ -1,5 +1,5 @@
 ---
-title: "CreatedModifiedDate"
+title: 'CreatedModifiedDate'
 tags:
     - plugin/transformer
 ---

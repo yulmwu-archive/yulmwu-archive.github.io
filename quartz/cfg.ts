@@ -1,57 +1,57 @@
-import { ValidDateType } from "./components/Date"
-import { QuartzComponent } from "./components/types"
-import { ValidLocale } from "./i18n"
-import { PluginTypes } from "./plugins/types"
-import { Theme } from "./util/theme"
+import { ValidDateType } from './components/Date'
+import { QuartzComponent } from './components/types'
+import { ValidLocale } from './i18n'
+import { PluginTypes } from './plugins/types'
+import { Theme } from './util/theme'
 
 export type Analytics =
 	| null
 	| {
-			provider: "plausible"
+			provider: 'plausible'
 			host?: string
 	  }
 	| {
-			provider: "google"
+			provider: 'google'
 			tagId: string
 	  }
 	| {
-			provider: "umami"
+			provider: 'umami'
 			websiteId: string
 			host?: string
 	  }
 	| {
-			provider: "goatcounter"
+			provider: 'goatcounter'
 			websiteId: string
 			host?: string
 			scriptSrc?: string
 	  }
 	| {
-			provider: "posthog"
+			provider: 'posthog'
 			apiKey: string
 			host?: string
 	  }
 	| {
-			provider: "tinylytics"
+			provider: 'tinylytics'
 			siteId: string
 	  }
 	| {
-			provider: "cabin"
+			provider: 'cabin'
 			host?: string
 	  }
 	| {
-			provider: "clarity"
+			provider: 'clarity'
 			projectId?: string
 	  }
 	| {
-			provider: "matomo"
+			provider: 'matomo'
 			host: string
 			siteId: string
 	  }
 	| {
-			provider: "vercel"
+			provider: 'vercel'
 	  }
 	| {
-			provider: "rybbit"
+			provider: 'rybbit'
 			siteId: string
 			host?: string
 	  }
@@ -101,5 +101,5 @@ export interface FullPageLayout {
 	footer: QuartzComponent
 }
 
-export type PageLayout = Pick<FullPageLayout, "beforeBody" | "left" | "right">
-export type SharedLayout = Pick<FullPageLayout, "head" | "header" | "footer" | "afterBody">
+export type PageLayout = Pick<FullPageLayout, 'beforeBody' | 'left' | 'right'>
+export type SharedLayout = Pick<FullPageLayout, 'head' | 'header' | 'footer' | 'afterBody'>

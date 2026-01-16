@@ -1,5 +1,5 @@
 ---
-title: "Mermaid Diagrams"
+title: 'Mermaid Diagrams'
 tags:
     - feature/transformer
 ---

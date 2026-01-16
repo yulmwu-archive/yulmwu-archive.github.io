@@ -1,12 +1,12 @@
 ---
-title: "[AWS Computing] Configure EC2 Bastion Host"
-description: "AWS EC2 Bastion Host 구성 방법"
-slug: "2025-07-18-ec2-bastion-host"
+title: '[AWS Computing] Configure EC2 Bastion Host'
+description: 'AWS EC2 Bastion Host 구성 방법'
+slug: '2025-07-18-ec2-bastion-host'
 author: yulmwu
 date: 2025-07-18T11:55:33.318Z
 updated_at: 2026-01-14T08:59:36.167Z
-categories: ["AWS"]
-tags: ["Computing", "aws"]
+categories: ['AWS']
+tags: ['Computing', 'aws']
 series:
     name: AWS
     slug: aws

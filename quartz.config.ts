@@ -1,5 +1,5 @@
-import { QuartzConfig } from "./quartz/cfg"
-import * as Plugin from "./quartz/plugins"
+import { QuartzConfig } from './quartz/cfg'
+import * as Plugin from './quartz/plugins'
 
 /**
  * Quartz 4 Configuration
@@ -8,47 +8,47 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
 	configuration: {
-		pageTitle: "@yulmwu",
-		pageTitleSuffix: "",
+		pageTitle: '@yulmwu',
+		pageTitleSuffix: '',
 		enableSPA: true,
 		enablePopovers: true,
 		analytics: {
-			provider: "plausible",
+			provider: 'plausible',
 		},
-		locale: "en-US",
-		baseUrl: "articles.swua.kr",
-		ignorePatterns: ["private", "templates", ".obsidian"],
-		defaultDateType: "modified",
+		locale: 'en-US',
+		baseUrl: 'articles.swua.kr',
+		ignorePatterns: ['private', 'templates', '.obsidian'],
+		defaultDateType: 'modified',
 		theme: {
-			fontOrigin: "googleFonts",
+			fontOrigin: 'googleFonts',
 			cdnCaching: true,
 			typography: {
 				header: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 나눔고딕, 'Nanum Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', arial, 돋움, Dotum, Tahoma, Geneva, sans-serif",
 				body: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 나눔고딕, 'Nanum Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', arial, 돋움, Dotum, Tahoma, Geneva, sans-serif",
-				code: "IBM Plex Mono",
+				code: 'IBM Plex Mono',
 			},
 			colors: {
 				lightMode: {
-					light: "#ffffff",
-					lightgray: "#e5e5e5",
-					gray: "#b8b8b8",
-					darkgray: "#4e4e4e",
-					dark: "#2b2b2b",
-					secondary: "#284b63",
-					tertiary: "#84a59d",
-					highlight: "rgba(143, 159, 169, 0.15)",
-					textHighlight: "#fff23688",
+					light: '#ffffff',
+					lightgray: '#e5e5e5',
+					gray: '#b8b8b8',
+					darkgray: '#4e4e4e',
+					dark: '#2b2b2b',
+					secondary: '#284b63',
+					tertiary: '#84a59d',
+					highlight: 'rgba(143, 159, 169, 0.15)',
+					textHighlight: '#fff23688',
 				},
 				darkMode: {
-					light: "#161618",
-					lightgray: "#393639",
-					gray: "#646464",
-					darkgray: "#d4d4d4",
-					dark: "#ebebec",
-					secondary: "#7b97aa",
-					tertiary: "#84a59d",
-					highlight: "rgba(143, 159, 169, 0.15)",
-					textHighlight: "#b3aa0288",
+					light: '#161618',
+					lightgray: '#393639',
+					gray: '#646464',
+					darkgray: '#d4d4d4',
+					dark: '#ebebec',
+					secondary: '#7b97aa',
+					tertiary: '#84a59d',
+					highlight: 'rgba(143, 159, 169, 0.15)',
+					textHighlight: '#b3aa0288',
 				},
 			},
 		},
@@ -57,12 +57,12 @@ const config: QuartzConfig = {
 		transformers: [
 			Plugin.FrontMatter(),
 			Plugin.CreatedModifiedDate({
-				priority: ["frontmatter", "git", "filesystem"],
+				priority: ['frontmatter', 'git', 'filesystem'],
 			}),
 			Plugin.SyntaxHighlighting({
 				theme: {
-					light: "github-light",
-					dark: "github-dark",
+					light: 'github-light',
+					dark: 'github-dark',
 				},
 				keepBackground: false,
 			}),
@@ -70,9 +70,9 @@ const config: QuartzConfig = {
 			Plugin.GitHubFlavoredMarkdown({ enableSmartyPants: false }),
 			Plugin.FlexibleEmphasis(),
 			Plugin.TableOfContents(),
-			Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
+			Plugin.CrawlLinks({ markdownLinkResolution: 'shortest' }),
 			Plugin.Description(),
-			Plugin.Latex({ renderEngine: "katex" }),
+			Plugin.Latex({ renderEngine: 'katex' }),
 			Plugin.CNAME(),
 		],
 		filters: [Plugin.RemoveDrafts()],

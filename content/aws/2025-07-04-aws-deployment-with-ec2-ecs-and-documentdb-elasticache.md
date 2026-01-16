@@ -1,12 +1,12 @@
 ---
-title: "[AWS Computing] Deployment with EC2 + ECS Fargate + DocumentDB, ElastiCache Redis OSS"
-description: "AWS EC2, ECS Fargate를 통한 MSA 애플리케이션 배포 및 DocumentDB 및 ElastiCache(Redis OSS) 구성 실습"
-slug: "2025-07-04-aws-deployment-with-ec2-ecs-and-documentdb-elasticache"
+title: '[AWS Computing] Deployment with EC2 + ECS Fargate + DocumentDB, ElastiCache Redis OSS'
+description: 'AWS EC2, ECS Fargate를 통한 MSA 애플리케이션 배포 및 DocumentDB 및 ElastiCache(Redis OSS) 구성 실습'
+slug: '2025-07-04-aws-deployment-with-ec2-ecs-and-documentdb-elasticache'
 author: yulmwu
 date: 2025-07-04T12:53:19.543Z
 updated_at: 2025-12-30T08:45:22.692Z
-categories: ["AWS"]
-tags: ["Computing", "aws"]
+categories: ['AWS']
+tags: ['Computing', 'aws']
 series:
     name: AWS
     slug: aws
@@ -85,7 +85,7 @@ async function getSecret(): Promise<Record<string, string>> {
 	const response = await client.send(command)
 
 	if (!response.SecretString) {
-		throw new Error("SecretString not found")
+		throw new Error('SecretString not found')
 	}
 
 	return JSON.parse(response.SecretString)
@@ -100,7 +100,7 @@ const secret = await getSecret()
 app.use(
 	session({
 		store: new RedisStore({ client: redisClient }),
-		secret: secret["session_secret_key"],
+		secret: secret['session_secret_key'],
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
@@ -122,11 +122,11 @@ MongoDB 클라이언트는 NestJS에서 공식적으로 지원한다. (`@nestjs/
 아래와 같이 모듈에서 import하여 사용할 수 있다.
 
 ```ts
-import { Module } from "@nestjs/common"
-import { MongooseModule } from "@nestjs/mongoose"
-import { AuthService } from "./auth.service"
-import { AuthController } from "./auth.controller"
-import { User, UserSchema } from "./user.entity"
+import { Module } from '@nestjs/common'
+import { MongooseModule } from '@nestjs/mongoose'
+import { AuthService } from './auth.service'
+import { AuthController } from './auth.controller'
+import { User, UserSchema } from './user.entity'
 
 @Module({
 	imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
@@ -139,8 +139,8 @@ export class AuthModule {}
 스키마는 아래와 같이 작성하였다. (포스트 스키마는 코드를 따로 참조하길 바람)
 
 ```ts
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import { Document } from "mongoose"
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Document } from 'mongoose'
 
 @Schema()
 export class User extends Document {
@@ -164,12 +164,12 @@ const redisClient = redis.createClient({
 	url: process.env.REDIS_URL!,
 })
 
-redisClient.on("error", (err) => {
-	console.error("Redis error:", err)
+redisClient.on('error', (err) => {
+	console.error('Redis error:', err)
 })
 
-redisClient.on("connect", () => {
-	console.log("Connected to Redis")
+redisClient.on('connect', () => {
+	console.log('Connected to Redis')
 })
 
 await redisClient.connect()
@@ -179,7 +179,7 @@ const secret = await getSecret()
 app.use(
 	session({
 		store: new RedisStore({ client: redisClient }), // 세션 저장에 Redis 사용
-		secret: secret["session_secret_key"],
+		secret: secret['session_secret_key'],
 		resave: false,
 		saveUninitialized: false,
 		cookie: {

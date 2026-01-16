@@ -66,7 +66,7 @@ export type QuartzComponentProps = {
 	cfg: GlobalConfiguration
 	tree: Node<QuartzPluginData>
 	allFiles: QuartzPluginData[]
-	displayClass?: "mobile-only" | "desktop-only"
+	displayClass?: 'mobile-only' | 'desktop-only'
 }
 ```
 
@@ -104,7 +104,7 @@ Imported styles, however, can be from SCSS files:
 
 ```tsx {1-2,9} title="quartz/components/YourComponent.tsx"
 // assuming your stylesheet is in quartz/components/styles/YourComponent.scss
-import styles from "./styles/YourComponent.scss"
+import styles from './styles/YourComponent.scss'
 
 export default (() => {
 	function YourComponent() {
@@ -152,19 +152,19 @@ The `.afterDOMLoaded` script executes once the page has been completely loaded. 
 If you need to create an `afterDOMLoaded` script that depends on _page specific_ elements that may change when navigating to a new page, you can listen for the `"nav"` event that gets fired whenever a page loads (which may happen on navigation if [[SPA Routing]] is enabled).
 
 ```ts
-document.addEventListener("nav", () => {
+document.addEventListener('nav', () => {
 	// do page specific logic here
 	// e.g. attach event listeners
-	const toggleSwitch = document.querySelector("#switch") as HTMLInputElement
-	toggleSwitch.addEventListener("change", switchTheme)
-	window.addCleanup(() => toggleSwitch.removeEventListener("change", switchTheme))
+	const toggleSwitch = document.querySelector('#switch') as HTMLInputElement
+	toggleSwitch.addEventListener('change', switchTheme)
+	window.addCleanup(() => toggleSwitch.removeEventListener('change', switchTheme))
 })
 ```
 
 You can also add the equivalent of a `beforeunload` event for [[SPA Routing]] via the `prenav` event.
 
 ```ts
-document.addEventListener("prenav", () => {
+document.addEventListener('prenav', () => {
 	// executed after an SPA navigation is triggered but
 	// before the page is replaced
 	// one usage pattern is to store things in sessionStorage
@@ -185,7 +185,7 @@ Quartz supports importing component code through `.inline.ts` files.
 ```tsx title="quartz/components/YourComponent.tsx"
 // @ts-ignore: typescript doesn't know about our inline bundling system
 // so we need to silence the error
-import script from "./scripts/graph.inline"
+import script from './scripts/graph.inline'
 
 export default (() => {
 	function YourComponent() {
@@ -199,10 +199,10 @@ export default (() => {
 
 ```ts title="quartz/components/scripts/graph.inline.ts"
 // any imports here are bundled for the browser
-import * as d3 from "d3"
+import * as d3 from 'd3'
 
-document.getElementById("btn").onclick = () => {
-	alert("button clicked!")
+document.getElementById('btn').onclick = () => {
+	alert('button clicked!')
 }
 ```
 
@@ -213,10 +213,10 @@ Additionally, like what is shown in the example above, you can import packages i
 After creating your custom component, re-export it in `quartz/components/index.ts`:
 
 ```ts title="quartz/components/index.ts" {4,10}
-import ArticleTitle from "./ArticleTitle"
-import Content from "./pages/Content"
-import Darkmode from "./Darkmode"
-import YourComponent from "./YourComponent"
+import ArticleTitle from './ArticleTitle'
+import Content from './pages/Content'
+import Darkmode from './Darkmode'
+import YourComponent from './YourComponent'
 
 export { ArticleTitle, Content, Darkmode, YourComponent }
 ```
@@ -226,7 +226,7 @@ Then, you can use it like any other component in `quartz.layout.ts` via `Compone
 As Quartz components are just functions that return React components, you can compositionally use them in other Quartz components.
 
 ```tsx title="quartz/components/AnotherComponent.tsx"
-import YourComponentConstructor from "./YourComponent"
+import YourComponentConstructor from './YourComponent'
 
 export default (() => {
 	const YourComponent = YourComponentConstructor()

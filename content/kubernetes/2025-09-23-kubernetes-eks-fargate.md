@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] EKS Fargate Cluster"
-description: "AWS EC2 노드 프로비저닝 없이 EKS 클러스터 구성하기 (AWS Fargate)"
-slug: "2025-09-23-kubernetes-eks-fargate"
+title: '[Kubernetes w/ EKS] EKS Fargate Cluster'
+description: 'AWS EC2 노드 프로비저닝 없이 EKS 클러스터 구성하기 (AWS Fargate)'
+slug: '2025-09-23-kubernetes-eks-fargate'
 author: yulmwu
 date: 2025-09-23T03:09:18.966Z
 updated_at: 2025-12-20T17:54:28.428Z
-categories: ["Kubernetes"]
-tags: ["aws", "eks", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['aws', 'eks', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -68,9 +68,9 @@ kind: ClusterConfig
 metadata:
     name: eks-fargate-demo
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 vpc:
-    cidr: "10.0.0.0/16"
+    cidr: '10.0.0.0/16'
 iam:
     withOIDC: true
 fargateProfiles:
@@ -154,13 +154,13 @@ spec:
                       - containerPort: 80
                   resources:
                       requests:
-                          cpu: "0.25"
-                          memory: "512Mi"
-                          ephemeral-storage: "10Gi"
+                          cpu: '0.25'
+                          memory: '512Mi'
+                          ephemeral-storage: '10Gi'
                       limits:
-                          cpu: "0.25"
-                          memory: "512Mi"
-                          ephemeral-storage: "10Gi"
+                          cpu: '0.25'
+                          memory: '512Mi'
+                          ephemeral-storage: '10Gi'
 ```
 
 마찬가지로 `apps` 네임스페이스에 `run: on-fargate` 라벨을 붙여 파드를 생성하도록 한다.

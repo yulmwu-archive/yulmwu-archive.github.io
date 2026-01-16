@@ -1,7 +1,7 @@
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../types"
-import { formatDate, getDate } from "../Date"
-import style from "../styles/homePage.scss"
-import { QuartzPluginData } from "../../plugins/vfile"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from '../types'
+import { formatDate, getDate } from '../Date'
+import style from '../styles/homePage.scss'
+import { QuartzPluginData } from '../../plugins/vfile'
 
 type PostsByDirectory = Map<string, QuartzPluginData[]>
 type DirectoryTitles = Map<string, string>
@@ -10,9 +10,9 @@ const groupPostsByDirectory = (posts: QuartzPluginData[]): PostsByDirectory => {
 	const postsByDirectory: PostsByDirectory = new Map()
 
 	posts.forEach((post) => {
-		const slug = post.slug || ""
-		const parts = slug.split("/")
-		const directory = parts.length > 1 ? parts.slice(0, -1).join("/") : "root"
+		const slug = post.slug || ''
+		const parts = slug.split('/')
+		const directory = parts.length > 1 ? parts.slice(0, -1).join('/') : 'root'
 
 		if (!postsByDirectory.has(directory)) {
 			postsByDirectory.set(directory, [])
@@ -38,11 +38,11 @@ const extractDirectoryTitles = (postsByDirectory: PostsByDirectory, allFiles: Qu
 	})
 
 	allFiles.forEach((file) => {
-		const slug = file.slug || ""
-		if (slug.endsWith("index") && slug !== "index") {
-			const directory = slug.replace(/\/index$/, "")
+		const slug = file.slug || ''
+		if (slug.endsWith('index') && slug !== 'index') {
+			const directory = slug.replace(/\/index$/, '')
 			if (!directoryTitles.has(directory)) {
-				const title = file.frontmatter?.title || directory.split("/").pop() || directory
+				const title = file.frontmatter?.title || directory.split('/').pop() || directory
 				directoryTitles.set(directory, title)
 			}
 		}
@@ -64,8 +64,8 @@ const sortPostsByDate = (postsByDirectory: PostsByDirectory, cfg: any) => {
 
 const sortDirectories = (directories: string[]): string[] => {
 	return directories.sort((a, b) => {
-		if (a === "root") return -1
-		if (b === "root") return 1
+		if (a === 'root') return -1
+		if (b === 'root') return 1
 		return a.localeCompare(b)
 	})
 }
@@ -73,7 +73,7 @@ const sortDirectories = (directories: string[]): string[] => {
 const PostCard = ({ post, cfg }: { post: QuartzPluginData; cfg: any }) => {
 	const date = getDate(cfg, post)
 	const title = post.frontmatter?.title || post.slug
-	const description = post.description || ""
+	const description = post.description || ''
 	const tags = post.frontmatter?.tags || []
 
 	return (
@@ -101,7 +101,7 @@ const PostCard = ({ post, cfg }: { post: QuartzPluginData; cfg: any }) => {
 }
 
 const HomePage: QuartzComponent = ({ allFiles, cfg, fileData }: QuartzComponentProps) => {
-	const posts = allFiles.filter((file) => file.slug && file.slug !== "index" && !file.slug.startsWith("tags/"))
+	const posts = allFiles.filter((file) => file.slug && file.slug !== 'index' && !file.slug.startsWith('tags/'))
 
 	const postsByDirectory = groupPostsByDirectory(posts)
 	sortPostsByDate(postsByDirectory, cfg)
@@ -116,9 +116,9 @@ const HomePage: QuartzComponent = ({ allFiles, cfg, fileData }: QuartzComponentP
 
 			{sortedDirectories.map((directory) => (
 				<div class="posts-section">
-					{directory !== "root" && (
+					{directory !== 'root' && (
 						<h2 class="section-title">
-							{directoryTitles.get(directory) || directory.split("/").pop() || directory}
+							{directoryTitles.get(directory) || directory.split('/').pop() || directory}
 						</h2>
 					)}
 					<div class="posts-grid">

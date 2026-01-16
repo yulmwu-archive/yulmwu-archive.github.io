@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] Managing TLS/SSL Certificates with cert-manager"
+title: '[Kubernetes w/ EKS] Managing TLS/SSL Certificates with cert-manager'
 description: "cert-manager를 통한 쿠버네티스 TLS/SSL 인증서 관리 (Feat. Let's Encrypt, DNS-01 ACME 및 AWS Route53 연동 실습)"
-slug: "2026-01-09-kubernetes-cert-manager"
+slug: '2026-01-09-kubernetes-cert-manager'
 author: yulmwu
 date: 2026-01-09T06:37:47.568Z
 updated_at: 2026-01-15T08:55:51.714Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -61,7 +61,7 @@ kind: ClusterConfig
 metadata:
     name: demo-cluster
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 vpc:
     cidr: 10.1.0.0/16
     nat:
@@ -384,16 +384,16 @@ helm install cert-manager oci://quay.io/jetstack/charts/cert-manager \
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
-            { "Effect": "Allow", "Action": "route53:GetChange", "Resource": "arn:aws:route53:::change/*" },
+            { 'Effect': 'Allow', 'Action': 'route53:GetChange', 'Resource': 'arn:aws:route53:::change/*' },
             {
-                "Effect": "Allow",
-                "Action": ["route53:ChangeResourceRecordSets", "route53:ListResourceRecordSets"],
-                "Resource": "arn:aws:route53:::hostedzone/Z0136818OELW4IM10AE4",
+                'Effect': 'Allow',
+                'Action': ['route53:ChangeResourceRecordSets', 'route53:ListResourceRecordSets'],
+                'Resource': 'arn:aws:route53:::hostedzone/Z0136818OELW4IM10AE4',
             },
-            { "Effect": "Allow", "Action": "route53:ListHostedZonesByName", "Resource": "*" },
+            { 'Effect': 'Allow', 'Action': 'route53:ListHostedZonesByName', 'Resource': '*' },
         ],
 }
 ```

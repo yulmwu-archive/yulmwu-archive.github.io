@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] Pod AutoScaling with HPA "
-description: "쿠버네티스 파드 수평적 오토스케일링(HPA) 실습"
-slug: "2025-09-06-kubernetes-hpa"
+title: '[Kubernetes w/ EKS] Pod AutoScaling with HPA '
+description: '쿠버네티스 파드 수평적 오토스케일링(HPA) 실습'
+slug: '2025-09-06-kubernetes-hpa'
 author: yulmwu
 date: 2025-09-06T01:59:45.085Z
 updated_at: 2026-01-12T00:43:20.545Z
-categories: ["Kubernetes"]
-tags: ["eks", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['eks', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -120,14 +120,14 @@ kind: ClusterConfig
 metadata:
     name: eks-test
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 
 vpc:
     cidr: 10.0.0.0/16
 
 managedNodeGroups:
     - name: ng-public
-      instanceTypes: ["t3.small"]
+      instanceTypes: ['t3.small']
       desiredCapacity: 1
       minSize: 1
       maxSize: 1
@@ -178,18 +178,18 @@ spec:
                       - containerPort: 80
                   env:
                       - name: PORT
-                        value: "80"
+                        value: '80'
                       - name: APP_NAME
                         valueFrom:
                             fieldRef:
                                 fieldPath: metadata.name
                   resources:
                       requests:
-                          cpu: "100m"
-                          memory: "128Mi"
+                          cpu: '100m'
+                          memory: '128Mi'
                       limits:
-                          cpu: "500m"
-                          memory: "256Mi"
+                          cpu: '500m'
+                          memory: '256Mi'
                   readinessProbe:
                       httpGet:
                           path: /

@@ -1,8 +1,8 @@
-@use "sass:map";
+@use 'sass:map';
 
-@use "./variables.scss" as *;
-@use "./syntax.scss";
-@use "./callouts.scss";
+@use './variables.scss' as *;
+@use './syntax.scss';
+@use './callouts.scss';
 
 html {
 	overflow-x: hidden;
@@ -45,14 +45,14 @@ ul,
 .katex,
 .math,
 .typst-doc,
-g[class~="typst-text"] {
+g[class~='typst-text'] {
 	color: var(--darkgray);
 	fill: var(--darkgray);
 	overflow-wrap: break-word;
 	text-wrap: pretty;
 }
 
-path[class~="typst-shape"] {
+path[class~='typst-shape'] {
 	stroke: var(--darkgray);
 }
 
@@ -163,12 +163,12 @@ a {
 			font-size: 2rem;
 		}
 
-		& li:has(> input[type="checkbox"]) {
+		& li:has(> input[type='checkbox']) {
 			list-style-type: none;
 			padding-left: 0;
 		}
 
-		& li:has(> input[type="checkbox"]:checked) {
+		& li:has(> input[type='checkbox']:checked) {
 			text-decoration: line-through;
 			text-decoration-color: var(--gray);
 			color: var(--gray);
@@ -303,7 +303,7 @@ a {
 	border-top: 1px solid var(--lightgray);
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
 	transform: translateY(2px);
 	color: var(--secondary);
 	border: 1px solid var(--lightgray);
@@ -321,7 +321,7 @@ input[type="checkbox"] {
 		background-color: var(--secondary);
 
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			left: 4px;
 			top: 1px;
@@ -368,7 +368,7 @@ thead {
 	font-weight: revert;
 	margin-bottom: 0;
 
-	article > & > a[role="anchor"] {
+	article > & > a[role='anchor'] {
 		color: var(--dark);
 		background-color: transparent;
 	}
@@ -380,7 +380,7 @@ h3,
 h4,
 h5,
 h6 {
-	&[id] > a[href^="#"] {
+	&[id] > a[href^='#'] {
 		margin: 0 0.5rem;
 		opacity: 0;
 		transition: opacity 0.2s ease;
@@ -393,7 +393,7 @@ h6 {
 		opacity: 1;
 	}
 
-	&:not([id]) > a[role="anchor"] {
+	&:not([id]) > a[role='anchor'] {
 		display: none;
 	}
 }
@@ -495,11 +495,11 @@ pre {
 			}
 		}
 
-		&[data-line-numbers-max-digits="2"] > [data-line]::before {
+		&[data-line-numbers-max-digits='2'] > [data-line]::before {
 			width: 2rem;
 		}
 
-		&[data-line-numbers-max-digits="3"] > [data-line]::before {
+		&[data-line-numbers-max-digits='3'] > [data-line]::before {
 			width: 3rem;
 		}
 	}
@@ -578,7 +578,7 @@ article a:has(> img) {
 	padding: 0;
 	border-radius: 0;
 	margin: 1.5rem 0;
-	
+
 	&:hover {
 		background-color: transparent;
 	}
@@ -609,7 +609,7 @@ video {
 
 .spacer {
 	// flex: 2 1 auto;
-    margin-bottom: 2px;
+	margin-bottom: 2px;
 }
 
 div:has(> .overflow) {
@@ -625,7 +625,7 @@ ol.overflow {
 	margin-bottom: 0;
 
 	// clearfix
-	content: "";
+	content: '';
 	clear: both;
 
 	& > li.overflow-end {

@@ -1,19 +1,19 @@
-document.addEventListener("DOMContentLoaded", () => {
-	const images = document.querySelectorAll("article img")
+document.addEventListener('DOMContentLoaded', () => {
+	const images = document.querySelectorAll('article img')
 
 	images.forEach((img) => {
 		// Skip if image is already wrapped in a link
-		if (img.parentElement?.tagName === "A") {
+		if (img.parentElement?.tagName === 'A') {
 			return
 		}
 
-		const src = img.getAttribute("src")
+		const src = img.getAttribute('src')
 		if (src) {
 			// Create a wrapper link
-			const link = document.createElement("a")
+			const link = document.createElement('a')
 			link.href = src
-			link.target = "_blank"
-			link.rel = "noopener noreferrer"
+			link.target = '_blank'
+			link.rel = 'noopener noreferrer'
 
 			// Replace image with link-wrapped image
 			img.parentNode?.insertBefore(link, img)

@@ -1,12 +1,12 @@
 ---
-title: "[AWS Computing] Deployment with ECR, ECS and Fargate"
-description: "AWS ECS 및 Fargate를 통한 컨테이너 컴퓨팅"
-slug: "2025-07-04-ecs-deploy"
+title: '[AWS Computing] Deployment with ECR, ECS and Fargate'
+description: 'AWS ECS 및 Fargate를 통한 컨테이너 컴퓨팅'
+slug: '2025-07-04-ecs-deploy'
 author: yulmwu
 date: 2025-07-04T12:51:41.224Z
 updated_at: 2025-12-24T05:51:31.371Z
-categories: ["AWS"]
-tags: ["Computing", "aws"]
+categories: ['AWS']
+tags: ['Computing', 'aws']
 series:
     name: AWS
     slug: aws
@@ -334,8 +334,8 @@ name: Deploy Backend
 on:
     push:
         paths:
-            - "backend/**"
-            - ".github/workflows/backend-deploy.yaml"
+            - 'backend/**'
+            - '.github/workflows/backend-deploy.yaml'
 
 jobs:
     deploy:

@@ -1,12 +1,12 @@
 ---
-title: "[AWS Misc] Backup Velog periodically (Lambda, EventBridge Scheduler, S3)"
-description: "AWS Lambda + EventBridge Scheduler를 통한 주기적인 Velog 백업 자동화"
-slug: "2025-07-05-velog-backup-with-eventbridge"
+title: '[AWS Misc] Backup Velog periodically (Lambda, EventBridge Scheduler, S3)'
+description: 'AWS Lambda + EventBridge Scheduler를 통한 주기적인 Velog 백업 자동화'
+slug: '2025-07-05-velog-backup-with-eventbridge'
 author: yulmwu
 date: 2025-07-05T04:23:58.191Z
 updated_at: 2026-01-06T11:29:29.261Z
-categories: ["AWS"]
-tags: ["Misc", "aws"]
+categories: ['AWS']
+tags: ['Misc', 'aws']
 series:
     name: AWS
     slug: aws
@@ -215,17 +215,17 @@ Postman을 사용하여 글에 들어갔을 때 호출되는 `ReadPost`에 대�
 그러면 아래와 같이 간단한 코드를 통해 요청을 보낼 수 있다.
 
 ```ts
-import { GraphQLClient } from "graphql-request"
-import { getSdk, VelogPostsQueryVariables } from "./generated/graphql"
+import { GraphQLClient } from 'graphql-request'
+import { getSdk, VelogPostsQueryVariables } from './generated/graphql'
 
-const client = new GraphQLClient("https://v2.velog.io/graphql")
+const client = new GraphQLClient('https://v2.velog.io/graphql')
 
 const sdk = getSdk(client)
 
 const variables: VelogPostsQueryVariables = {
-	cursor: "",
+	cursor: '',
 	limit: 10,
-	username: "yulmwu",
+	username: 'yulmwu',
 }
 
 const fetchUser = async () => {
@@ -235,9 +235,9 @@ const fetchUser = async () => {
 fetchUser()
 	.then((data) => {
 		console.log(data)
-		console.log("Total posts fetched:", data.posts?.length)
+		console.log('Total posts fetched:', data.posts?.length)
 	})
-	.catch((error) => console.error("Error fetching user:", error))
+	.catch((error) => console.error('Error fetching user:', error))
 ```
 
 ![](https://velog.velcdn.com/images/yulmwu/post/a883d1f3-34d6-4c14-b885-9d41e4fdf99b/image.png)
@@ -271,11 +271,11 @@ DevTools에서 JWT 엑세스 토큰을 추출한 뒤 GraphQL 클라이언트 헤
 너무 복잡해지고 귀찮아지므로 이 작업은 처리하지 않고, 환경 변수로 받아 수동으로 설정하게 하였다.
 
 ```ts
-import dotenv from "dotenv"
+import dotenv from 'dotenv'
 
 dotenv.config({ quiet: true })
 
-const client = new GraphQLClient("https://v2.velog.io/graphql", {
+const client = new GraphQLClient('https://v2.velog.io/graphql', {
 	headers: {
 		Authorization: `Bearer ${process.env.VELOG_JWT_ACCESS_TOKEN}`,
 	},

@@ -10,9 +10,9 @@ For example, A `foo.md` has the following frontmatter
 
 ```md title="foo.md"
 ---
-title: "Foo"
+title: 'Foo'
 alias:
-    - "bar"
+    - 'bar'
 ---
 ```
 

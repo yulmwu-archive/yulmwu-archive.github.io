@@ -1,12 +1,12 @@
 ---
-title: "[AWS Streaming] UI/UX Click Heatmap with AWS KDS, MSF, Glue, and Athena Pipeline"
-description: "AWS Kinesis Data Streams, Flink, Glue 및 Athena를 통한 UI/UX 클릭 히트맵 파이프라인 구축하기 (PoC/MVP)"
-slug: "2025-12-28-aws-click-heatmap-with-kds-msf-glue-athena"
+title: '[AWS Streaming] UI/UX Click Heatmap with AWS KDS, MSF, Glue, and Athena Pipeline'
+description: 'AWS Kinesis Data Streams, Flink, Glue 및 Athena를 통한 UI/UX 클릭 히트맵 파이프라인 구축하기 (PoC/MVP)'
+slug: '2025-12-28-aws-click-heatmap-with-kds-msf-glue-athena'
 author: yulmwu
 date: 2025-12-28T10:51:06.968Z
 updated_at: 2026-01-13T08:00:05.841Z
-categories: ["AWS"]
-tags: ["aws"]
+categories: ['AWS']
+tags: ['aws']
 series:
     name: AWS
     slug: aws
@@ -152,9 +152,9 @@ Kinesis Data Streams는 앞서 말했 듯 EFO를 구성하지는 않겠다. 다�
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
-        [{ "Effect": "Allow", "Principal": { "Service": "firehose.amazonaws.com" }, "Action": "sts:AssumeRole" }],
+    'Version': '2012-10-17',
+    'Statement':
+        [{ 'Effect': 'Allow', 'Principal': { 'Service': 'firehose.amazonaws.com' }, 'Action': 'sts:AssumeRole' }],
 }
 ```
 
@@ -164,35 +164,35 @@ Kinesis Data Streams는 앞서 말했 듯 EFO를 구성하지는 않겠다. 다�
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Sid": "S3Write",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'S3Write',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "s3:AbortMultipartUpload",
-                        "s3:GetBucketLocation",
-                        "s3:GetObject",
-                        "s3:ListBucket",
-                        "s3:ListBucketMultipartUploads",
-                        "s3:PutObject",
+                        's3:AbortMultipartUpload',
+                        's3:GetBucketLocation',
+                        's3:GetObject',
+                        's3:ListBucket',
+                        's3:ListBucketMultipartUploads',
+                        's3:PutObject',
                     ],
-                "Resource": ["arn:aws:s3:::heatmap-demo-raw-1230", "arn:aws:s3:::heatmap-demo-raw-1230/*"],
+                'Resource': ['arn:aws:s3:::heatmap-demo-raw-1230', 'arn:aws:s3:::heatmap-demo-raw-1230/*'],
             },
             {
-                "Sid": "KinesisRead",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'KinesisRead',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "kinesis:DescribeStream",
-                        "kinesis:DescribeStreamSummary",
-                        "kinesis:GetShardIterator",
-                        "kinesis:GetRecords",
-                        "kinesis:ListShards",
+                        'kinesis:DescribeStream',
+                        'kinesis:DescribeStreamSummary',
+                        'kinesis:GetShardIterator',
+                        'kinesis:GetRecords',
+                        'kinesis:ListShards',
                     ],
-                "Resource": "arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds",
+                'Resource': 'arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds',
             },
         ],
 }
@@ -259,13 +259,13 @@ Firehose와 마찬가지로 IAM 역할과 역할에 Attach할 정책을 만들�
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Effect": "Allow",
-                "Principal": { "Service": "kinesisanalytics.amazonaws.com" },
-                "Action": "sts:AssumeRole",
+                'Effect': 'Allow',
+                'Principal': { 'Service': 'kinesisanalytics.amazonaws.com' },
+                'Action': 'sts:AssumeRole',
             },
         ],
 }
@@ -279,50 +279,50 @@ Firehose와 마찬가지로 IAM 역할과 역할에 Attach할 정책을 만들�
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Sid": "S3Access",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'S3Access',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "s3:AbortMultipartUpload",
-                        "s3:GetObject",
-                        "s3:ListBucketMultipartUploads",
-                        "s3:PutObject",
-                        "s3:ListBucket",
-                        "s3:DeleteObject",
-                        "s3:ListMultipartUploadParts",
+                        's3:AbortMultipartUpload',
+                        's3:GetObject',
+                        's3:ListBucketMultipartUploads',
+                        's3:PutObject',
+                        's3:ListBucket',
+                        's3:DeleteObject',
+                        's3:ListMultipartUploadParts',
                     ],
-                "Resource": ["arn:aws:s3:::heatmap-demo-curated-1230", "arn:aws:s3:::heatmap-demo-curated-1230/*"],
+                'Resource': ['arn:aws:s3:::heatmap-demo-curated-1230', 'arn:aws:s3:::heatmap-demo-curated-1230/*'],
             },
             {
-                "Sid": "KinesisRead",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'KinesisRead',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "kinesis:DescribeStream",
-                        "kinesis:DescribeStreamSummary",
-                        "kinesis:GetRecords",
-                        "kinesis:GetShardIterator",
-                        "kinesis:ListShards",
-                        "kinesis:ListStreams",
-                        "kinesis:SubscribeToShard",
+                        'kinesis:DescribeStream',
+                        'kinesis:DescribeStreamSummary',
+                        'kinesis:GetRecords',
+                        'kinesis:GetShardIterator',
+                        'kinesis:ListShards',
+                        'kinesis:ListStreams',
+                        'kinesis:SubscribeToShard',
                     ],
-                "Resource": "arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds",
+                'Resource': 'arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds',
             },
             {
-                "Sid": "CloudWatchLogs",
-                "Effect": "Allow",
-                "Action": ["logs:PutLogEvents", "logs:CreateLogStream", "logs:DescribeLogStreams"],
-                "Resource": "arn:aws:logs:*:*:log-group:/aws/kinesis-analytics/heatmap-demo-flink:*",
+                'Sid': 'CloudWatchLogs',
+                'Effect': 'Allow',
+                'Action': ['logs:PutLogEvents', 'logs:CreateLogStream', 'logs:DescribeLogStreams'],
+                'Resource': 'arn:aws:logs:*:*:log-group:/aws/kinesis-analytics/heatmap-demo-flink:*',
             },
             {
-                "Sid": "CloudWatchLogsCreateGroup",
-                "Effect": "Allow",
-                "Action": ["logs:CreateLogGroup"],
-                "Resource": "*",
+                'Sid': 'CloudWatchLogsCreateGroup',
+                'Effect': 'Allow',
+                'Action': ['logs:CreateLogGroup'],
+                'Resource': '*',
             },
         ],
 }
@@ -425,51 +425,51 @@ Glue Crawler를 위한 IAM 역할과 정책을 생성해주도록 하자. 이는
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement": [{ "Effect": "Allow", "Principal": { "Service": "glue.amazonaws.com" }, "Action": "sts:AssumeRole" }],
+    'Version': '2012-10-17',
+    'Statement': [{ 'Effect': 'Allow', 'Principal': { 'Service': 'glue.amazonaws.com' }, 'Action': 'sts:AssumeRole' }],
 }
 ```
 
 ```yaml
 {
-    "Version": "2012-10-17",
-    "Statement":
+    'Version': '2012-10-17',
+    'Statement':
         [
             {
-                "Sid": "S3ReadCurated",
-                "Effect": "Allow",
-                "Action": ["s3:GetObject", "s3:ListBucket"],
-                "Resource": ["arn:aws:s3:::heatmap-demo-curated-1230", "arn:aws:s3:::heatmap-demo-curated-1230/*"],
+                'Sid': 'S3ReadCurated',
+                'Effect': 'Allow',
+                'Action': ['s3:GetObject', 's3:ListBucket'],
+                'Resource': ['arn:aws:s3:::heatmap-demo-curated-1230', 'arn:aws:s3:::heatmap-demo-curated-1230/*'],
             },
             {
-                "Sid": "GlueCatalogAccess",
-                "Effect": "Allow",
-                "Action":
+                'Sid': 'GlueCatalogAccess',
+                'Effect': 'Allow',
+                'Action':
                     [
-                        "glue:CreateTable",
-                        "glue:UpdateTable",
-                        "glue:GetDatabase",
-                        "glue:GetTable",
-                        "glue:GetTables",
-                        "glue:BatchGetPartition",
-                        "glue:BatchCreatePartition",
-                        "glue:CreatePartition",
-                        "glue:UpdatePartition",
-                        "glue:GetPartition",
-                        "glue:GetPartitions",
+                        'glue:CreateTable',
+                        'glue:UpdateTable',
+                        'glue:GetDatabase',
+                        'glue:GetTable',
+                        'glue:GetTables',
+                        'glue:BatchGetPartition',
+                        'glue:BatchCreatePartition',
+                        'glue:CreatePartition',
+                        'glue:UpdatePartition',
+                        'glue:GetPartition',
+                        'glue:GetPartitions',
                     ],
-                "Resource":
+                'Resource':
                     [
-                        "arn:aws:glue:*:*:catalog",
-                        "arn:aws:glue:*:*:database/heatmap_demo",
-                        "arn:aws:glue:*:*:table/heatmap_demo/*",
+                        'arn:aws:glue:*:*:catalog',
+                        'arn:aws:glue:*:*:database/heatmap_demo',
+                        'arn:aws:glue:*:*:table/heatmap_demo/*',
                     ],
             },
             {
-                "Sid": "CloudWatchLogs",
-                "Effect": "Allow",
-                "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
-                "Resource": "arn:aws:logs:*:*:log-group:/aws-glue/crawlers:*",
+                'Sid': 'CloudWatchLogs',
+                'Effect': 'Allow',
+                'Action': ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+                'Resource': 'arn:aws:logs:*:*:log-group:/aws-glue/crawlers:*',
             },
         ],
 }

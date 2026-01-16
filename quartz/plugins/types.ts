@@ -1,10 +1,10 @@
-import { PluggableList } from "unified"
-import { StaticResources } from "../util/resources"
-import { ProcessedContent } from "./vfile"
-import { QuartzComponent } from "../components/types"
-import { FilePath } from "../util/path"
-import { BuildCtx } from "../util/ctx"
-import { VFile } from "vfile"
+import { PluggableList } from 'unified'
+import { StaticResources } from '../util/resources'
+import { ProcessedContent } from './vfile'
+import { QuartzComponent } from '../components/types'
+import { FilePath } from '../util/path'
+import { BuildCtx } from '../util/ctx'
+import { VFile } from 'vfile'
 
 export interface PluginTypes {
 	transformers: QuartzTransformerPluginInstance[]
@@ -32,7 +32,7 @@ export type QuartzFilterPluginInstance = {
 }
 
 export type ChangeEvent = {
-	type: "add" | "change" | "delete"
+	type: 'add' | 'change' | 'delete'
 	path: FilePath
 	file?: VFile
 }

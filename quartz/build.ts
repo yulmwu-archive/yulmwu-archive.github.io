@@ -1,35 +1,35 @@
-import sourceMapSupport from "source-map-support"
+import sourceMapSupport from 'source-map-support'
 sourceMapSupport.install(options)
-import path from "path"
-import { PerfTimer } from "./util/perf"
-import { rm } from "fs/promises"
-import { GlobbyFilterFunction, isGitIgnored } from "globby"
-import { styleText } from "util"
-import { parseMarkdown } from "./processors/parse"
-import { filterContent } from "./processors/filter"
-import { emitContent } from "./processors/emit"
-import cfg from "../quartz.config"
-import { FilePath, joinSegments, slugifyFilePath } from "./util/path"
-import chokidar from "chokidar"
-import { ProcessedContent } from "./plugins/vfile"
-import { Argv, BuildCtx } from "./util/ctx"
-import { glob, toPosixPath } from "./util/glob"
-import { trace } from "./util/trace"
-import { options } from "./util/sourcemap"
-import { Mutex } from "async-mutex"
-import { getStaticResourcesFromPlugins } from "./plugins"
-import { randomIdNonSecure } from "./util/random"
-import { ChangeEvent } from "./plugins/types"
-import { minimatch } from "minimatch"
+import path from 'path'
+import { PerfTimer } from './util/perf'
+import { rm } from 'fs/promises'
+import { GlobbyFilterFunction, isGitIgnored } from 'globby'
+import { styleText } from 'util'
+import { parseMarkdown } from './processors/parse'
+import { filterContent } from './processors/filter'
+import { emitContent } from './processors/emit'
+import cfg from '../quartz.config'
+import { FilePath, joinSegments, slugifyFilePath } from './util/path'
+import chokidar from 'chokidar'
+import { ProcessedContent } from './plugins/vfile'
+import { Argv, BuildCtx } from './util/ctx'
+import { glob, toPosixPath } from './util/glob'
+import { trace } from './util/trace'
+import { options } from './util/sourcemap'
+import { Mutex } from 'async-mutex'
+import { getStaticResourcesFromPlugins } from './plugins'
+import { randomIdNonSecure } from './util/random'
+import { ChangeEvent } from './plugins/types'
+import { minimatch } from 'minimatch'
 
 type ContentMap = Map<
 	FilePath,
 	| {
-			type: "markdown"
+			type: 'markdown'
 			content: ProcessedContent
 	  }
 	| {
-			type: "other"
+			type: 'other'
 	  }
 >
 
@@ -38,7 +38,7 @@ type BuildData = {
 	ignored: GlobbyFilterFunction
 	mut: Mutex
 	contentMap: ContentMap
-	changesSinceLastBuild: Record<FilePath, ChangeEvent["type"]>
+	changesSinceLastBuild: Record<FilePath, ChangeEvent['type']>
 	lastBuildMs: number
 }
 
@@ -56,23 +56,23 @@ async function buildQuartz(argv: Argv, mut: Mutex, clientRefresh: () => void) {
 	const output = argv.output
 
 	const pluginCount = Object.values(cfg.plugins).flat().length
-	const pluginNames = (key: "transformers" | "filters" | "emitters") => cfg.plugins[key].map((plugin) => plugin.name)
+	const pluginNames = (key: 'transformers' | 'filters' | 'emitters') => cfg.plugins[key].map((plugin) => plugin.name)
 	if (argv.verbose) {
 		console.log(`Loaded ${pluginCount} plugins`)
-		console.log(`  Transformers: ${pluginNames("transformers").join(", ")}`)
-		console.log(`  Filters: ${pluginNames("filters").join(", ")}`)
-		console.log(`  Emitters: ${pluginNames("emitters").join(", ")}`)
+		console.log(`  Transformers: ${pluginNames('transformers').join(', ')}`)
+		console.log(`  Filters: ${pluginNames('filters').join(', ')}`)
+		console.log(`  Emitters: ${pluginNames('emitters').join(', ')}`)
 	}
 
 	const release = await mut.acquire()
-	perf.addEvent("clean")
+	perf.addEvent('clean')
 	await rm(output, { recursive: true, force: true })
-	console.log(`Cleaned output directory \`${output}\` in ${perf.timeSince("clean")}`)
+	console.log(`Cleaned output directory \`${output}\` in ${perf.timeSince('clean')}`)
 
-	perf.addEvent("glob")
-	const allFiles = await glob("**/*.*", argv.directory, cfg.configuration.ignorePatterns)
-	const markdownPaths = allFiles.filter((fp) => fp.endsWith(".md")).sort()
-	console.log(`Found ${markdownPaths.length} input files from \`${argv.directory}\` in ${perf.timeSince("glob")}`)
+	perf.addEvent('glob')
+	const allFiles = await glob('**/*.*', argv.directory, cfg.configuration.ignorePatterns)
+	const markdownPaths = allFiles.filter((fp) => fp.endsWith('.md')).sort()
+	console.log(`Found ${markdownPaths.length} input files from \`${argv.directory}\` in ${perf.timeSince('glob')}`)
 
 	const filePaths = markdownPaths.map((fp) => joinSegments(argv.directory, fp) as FilePath)
 	ctx.allFiles = allFiles
@@ -82,7 +82,7 @@ async function buildQuartz(argv: Argv, mut: Mutex, clientRefresh: () => void) {
 	const filteredContent = filterContent(ctx, parsedFiles)
 
 	await emitContent(ctx, filteredContent)
-	console.log(styleText("green", `Done processing ${markdownPaths.length} files in ${perf.timeSince()}`))
+	console.log(styleText('green', `Done processing ${markdownPaths.length} files in ${perf.timeSince()}`))
 	release()
 
 	if (argv.watch) {
@@ -98,14 +98,14 @@ async function startWatching(ctx: BuildCtx, mut: Mutex, initialContent: Processe
 	const contentMap: ContentMap = new Map()
 	for (const filePath of allFiles) {
 		contentMap.set(filePath, {
-			type: "other",
+			type: 'other',
 		})
 	}
 
 	for (const content of initialContent) {
 		const [_tree, vfile] = content
 		contentMap.set(vfile.data.relativePath!, {
-			type: "markdown",
+			type: 'markdown',
 			content,
 		})
 	}
@@ -117,7 +117,7 @@ async function startWatching(ctx: BuildCtx, mut: Mutex, initialContent: Processe
 		contentMap,
 		ignored: (fp) => {
 			const pathStr = toPosixPath(fp.toString())
-			if (pathStr.startsWith(".git/")) return true
+			if (pathStr.startsWith('.git/')) return true
 			if (gitIgnoredMatcher(pathStr)) return true
 			for (const pattern of cfg.configuration.ignorePatterns) {
 				if (minimatch(pathStr, pattern)) {
@@ -132,7 +132,7 @@ async function startWatching(ctx: BuildCtx, mut: Mutex, initialContent: Processe
 		lastBuildMs: 0,
 	}
 
-	const watcher = chokidar.watch(".", {
+	const watcher = chokidar.watch('.', {
 		awaitWriteFinish: { stabilityThreshold: 250 },
 		persistent: true,
 		cwd: argv.directory,
@@ -141,22 +141,22 @@ async function startWatching(ctx: BuildCtx, mut: Mutex, initialContent: Processe
 
 	const changes: ChangeEvent[] = []
 	watcher
-		.on("add", (fp) => {
+		.on('add', (fp) => {
 			fp = toPosixPath(fp)
 			if (buildData.ignored(fp)) return
-			changes.push({ path: fp as FilePath, type: "add" })
+			changes.push({ path: fp as FilePath, type: 'add' })
 			void rebuild(changes, clientRefresh, buildData)
 		})
-		.on("change", (fp) => {
+		.on('change', (fp) => {
 			fp = toPosixPath(fp)
 			if (buildData.ignored(fp)) return
-			changes.push({ path: fp as FilePath, type: "change" })
+			changes.push({ path: fp as FilePath, type: 'change' })
 			void rebuild(changes, clientRefresh, buildData)
 		})
-		.on("unlink", (fp) => {
+		.on('unlink', (fp) => {
 			fp = toPosixPath(fp)
 			if (buildData.ignored(fp)) return
-			changes.push({ path: fp as FilePath, type: "delete" })
+			changes.push({ path: fp as FilePath, type: 'delete' })
 			void rebuild(changes, clientRefresh, buildData)
 		})
 
@@ -182,8 +182,8 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 	}
 
 	const perf = new PerfTimer()
-	perf.addEvent("rebuild")
-	console.log(styleText("yellow", "Detected change, rebuilding..."))
+	perf.addEvent('rebuild')
+	console.log(styleText('yellow', 'Detected change, rebuilding...'))
 
 	// update changesSinceLastBuild
 	for (const change of changes) {
@@ -193,7 +193,7 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 	const staticResources = getStaticResourcesFromPlugins(ctx)
 	const pathsToParse: FilePath[] = []
 	for (const [fp, type] of Object.entries(changesSinceLastBuild)) {
-		if (type === "delete" || path.extname(fp) !== ".md") continue
+		if (type === 'delete' || path.extname(fp) !== '.md') continue
 		const fullPath = joinSegments(argv.directory, toPosixPath(fp)) as FilePath
 		pathsToParse.push(fullPath)
 	}
@@ -201,7 +201,7 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 	const parsed = await parseMarkdown(ctx, pathsToParse)
 	for (const content of parsed) {
 		contentMap.set(content[1].data.relativePath!, {
-			type: "markdown",
+			type: 'markdown',
 			content,
 		})
 	}
@@ -210,16 +210,16 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 	// we do this weird play of add => compute change events => remove
 	// so that partialEmitters can do appropriate cleanup based on the content of deleted files
 	for (const [file, change] of Object.entries(changesSinceLastBuild)) {
-		if (change === "delete") {
+		if (change === 'delete') {
 			// universal delete case
 			contentMap.delete(file as FilePath)
 		}
 
 		// manually track non-markdown files as processed files only
 		// contains markdown files
-		if (change === "add" && path.extname(file) !== ".md") {
+		if (change === 'add' && path.extname(file) !== '.md') {
 			contentMap.set(file as FilePath, {
-				type: "other",
+				type: 'other',
 			})
 		}
 	}
@@ -227,7 +227,7 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 	const changeEvents: ChangeEvent[] = Object.entries(changesSinceLastBuild).map(([fp, type]) => {
 		const path = fp as FilePath
 		const processedContent = contentMap.get(path)
-		if (processedContent?.type === "markdown") {
+		if (processedContent?.type === 'markdown') {
 			const [_tree, file] = processedContent.content
 			return {
 				type,
@@ -248,7 +248,7 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 	let processedFiles = filterContent(
 		ctx,
 		Array.from(contentMap.values())
-			.filter((file) => file.type === "markdown")
+			.filter((file) => file.type === 'markdown')
 			.map((file) => file.content),
 	)
 
@@ -280,8 +280,8 @@ async function rebuild(changes: ChangeEvent[], clientRefresh: () => void, buildD
 		}
 	}
 
-	console.log(`Emitted ${emittedFiles} files to \`${argv.output}\` in ${perf.timeSince("rebuild")}`)
-	console.log(styleText("green", `Done rebuilding in ${perf.timeSince()}`))
+	console.log(`Emitted ${emittedFiles} files to \`${argv.output}\` in ${perf.timeSince('rebuild')}`)
+	console.log(styleText('green', `Done rebuilding in ${perf.timeSince()}`))
 	changes.splice(0, numChangesInBuild)
 	clientRefresh()
 	release()
@@ -291,6 +291,6 @@ export default async (argv: Argv, mut: Mutex, clientRefresh: () => void) => {
 	try {
 		return await buildQuartz(argv, mut, clientRefresh)
 	} catch (err) {
-		trace("\nExiting Quartz due to a fatal error", err as Error)
+		trace('\nExiting Quartz due to a fatal error', err as Error)
 	}
 }

@@ -1,15 +1,15 @@
-import { render } from "preact-render-to-string"
-import { QuartzComponent, QuartzComponentProps } from "./types"
-import HeaderConstructor from "./Header"
-import BodyConstructor from "./Body"
-import { JSResourceToScriptElement, StaticResources } from "../util/resources"
-import { FullSlug, RelativeURL, joinSegments, normalizeHastElement } from "../util/path"
-import { clone } from "../util/clone"
-import { visit } from "unist-util-visit"
-import { Root, Element, ElementContent } from "hast"
-import { GlobalConfiguration } from "../cfg"
-import { i18n } from "../i18n"
-import { styleText } from "util"
+import { render } from 'preact-render-to-string'
+import { QuartzComponent, QuartzComponentProps } from './types'
+import HeaderConstructor from './Header'
+import BodyConstructor from './Body'
+import { JSResourceToScriptElement, StaticResources } from '../util/resources'
+import { FullSlug, RelativeURL, joinSegments, normalizeHastElement } from '../util/path'
+import { clone } from '../util/clone'
+import { visit } from 'unist-util-visit'
+import { Root, Element, ElementContent } from 'hast'
+import { GlobalConfiguration } from '../cfg'
+import { i18n } from '../i18n'
+import { styleText } from 'util'
 
 interface RenderComponents {
 	head: QuartzComponent
@@ -24,25 +24,25 @@ interface RenderComponents {
 
 const headerRegex = new RegExp(/h[1-6]/)
 export function pageResources(baseDir: FullSlug | RelativeURL, staticResources: StaticResources): StaticResources {
-	const contentIndexPath = joinSegments(baseDir, "static/contentIndex.json")
+	const contentIndexPath = joinSegments(baseDir, 'static/contentIndex.json')
 	const contentIndexScript = `const fetchData = fetch("${contentIndexPath}").then(data => data.json())`
 
 	const resources: StaticResources = {
 		css: [
 			{
-				content: joinSegments(baseDir, "index.css"),
+				content: joinSegments(baseDir, 'index.css'),
 			},
 			...staticResources.css,
 		],
 		js: [
 			{
-				src: joinSegments(baseDir, "prescript.js"),
-				loadTime: "beforeDOMReady",
-				contentType: "external",
+				src: joinSegments(baseDir, 'prescript.js'),
+				loadTime: 'beforeDOMReady',
+				contentType: 'external',
 			},
 			{
-				loadTime: "beforeDOMReady",
-				contentType: "inline",
+				loadTime: 'beforeDOMReady',
+				contentType: 'inline',
 				spaPreserve: true,
 				script: contentIndexScript,
 			},
@@ -52,10 +52,10 @@ export function pageResources(baseDir: FullSlug | RelativeURL, staticResources: 
 	}
 
 	resources.js.push({
-		src: joinSegments(baseDir, "postscript.js"),
-		loadTime: "afterDOMReady",
-		moduleType: "module",
-		contentType: "external",
+		src: joinSegments(baseDir, 'postscript.js'),
+		loadTime: 'afterDOMReady',
+		moduleType: 'module',
+		contentType: 'external',
 	})
 
 	return resources
@@ -69,24 +69,24 @@ function renderTranscludes(
 	visited: Set<FullSlug>,
 ) {
 	// process transcludes in componentData
-	visit(root, "element", (node, _index, _parent) => {
-		if (node.tagName === "blockquote") {
+	visit(root, 'element', (node, _index, _parent) => {
+		if (node.tagName === 'blockquote') {
 			const classNames = (node.properties?.className ?? []) as string[]
-			if (classNames.includes("transclude")) {
+			if (classNames.includes('transclude')) {
 				const inner = node.children[0] as Element
-				const transcludeTarget = (inner.properties["data-slug"] ?? slug) as FullSlug
+				const transcludeTarget = (inner.properties['data-slug'] ?? slug) as FullSlug
 				if (visited.has(transcludeTarget)) {
 					console.warn(
-						styleText("yellow", `Warning: Skipping circular transclusion: ${slug} -> ${transcludeTarget}`),
+						styleText('yellow', `Warning: Skipping circular transclusion: ${slug} -> ${transcludeTarget}`),
 					)
 					node.children = [
 						{
-							type: "element",
-							tagName: "p",
-							properties: { style: "color: var(--secondary);" },
+							type: 'element',
+							tagName: 'p',
+							properties: { style: 'color: var(--secondary);' },
 							children: [
 								{
-									type: "text",
+									type: 'text',
 									value: `Circular transclusion detected: ${transcludeTarget}`,
 								},
 							],
@@ -102,15 +102,15 @@ function renderTranscludes(
 				}
 
 				let blockRef = node.properties.dataBlock as string | undefined
-				if (blockRef?.startsWith("#^")) {
+				if (blockRef?.startsWith('#^')) {
 					// block transclude
-					blockRef = blockRef.slice("#^".length)
+					blockRef = blockRef.slice('#^'.length)
 					let blockNode = page.blocks?.[blockRef]
 					if (blockNode) {
-						if (blockNode.tagName === "li") {
+						if (blockNode.tagName === 'li') {
 							blockNode = {
-								type: "element",
-								tagName: "ul",
+								type: 'element',
+								tagName: 'ul',
 								properties: {},
 								children: [blockNode],
 							}
@@ -119,16 +119,16 @@ function renderTranscludes(
 						node.children = [
 							normalizeHastElement(blockNode, slug, transcludeTarget),
 							{
-								type: "element",
-								tagName: "a",
-								properties: { href: inner.properties?.href, class: ["internal", "transclude-src"] },
+								type: 'element',
+								tagName: 'a',
+								properties: { href: inner.properties?.href, class: ['internal', 'transclude-src'] },
 								children: [
-									{ type: "text", value: i18n(cfg.locale).components.transcludes.linkToOriginal },
+									{ type: 'text', value: i18n(cfg.locale).components.transcludes.linkToOriginal },
 								],
 							},
 						]
 					}
-				} else if (blockRef?.startsWith("#") && page.htmlAst) {
+				} else if (blockRef?.startsWith('#') && page.htmlAst) {
 					// header transclude
 					blockRef = blockRef.slice(1)
 					let startIdx = undefined
@@ -136,7 +136,7 @@ function renderTranscludes(
 					let endIdx = undefined
 					for (const [i, el] of page.htmlAst.children.entries()) {
 						// skip non-headers
-						if (!(el.type === "element" && el.tagName.match(headerRegex))) continue
+						if (!(el.type === 'element' && el.tagName.match(headerRegex))) continue
 						const depth = Number(el.tagName.substring(1))
 
 						// lookin for our blockref
@@ -162,22 +162,22 @@ function renderTranscludes(
 							normalizeHastElement(child as Element, slug, transcludeTarget),
 						),
 						{
-							type: "element",
-							tagName: "a",
-							properties: { href: inner.properties?.href, class: ["internal", "transclude-src"] },
-							children: [{ type: "text", value: i18n(cfg.locale).components.transcludes.linkToOriginal }],
+							type: 'element',
+							tagName: 'a',
+							properties: { href: inner.properties?.href, class: ['internal', 'transclude-src'] },
+							children: [{ type: 'text', value: i18n(cfg.locale).components.transcludes.linkToOriginal }],
 						},
 					]
 				} else if (page.htmlAst) {
 					// page transclude
 					node.children = [
 						{
-							type: "element",
-							tagName: "h1",
+							type: 'element',
+							tagName: 'h1',
 							properties: {},
 							children: [
 								{
-									type: "text",
+									type: 'text',
 									value:
 										page.frontmatter?.title ??
 										i18n(cfg.locale).components.transcludes.transcludeOf({
@@ -190,10 +190,10 @@ function renderTranscludes(
 							normalizeHastElement(child as Element, slug, transcludeTarget),
 						),
 						{
-							type: "element",
-							tagName: "a",
-							properties: { href: inner.properties?.href, class: ["internal", "transclude-src"] },
-							children: [{ type: "text", value: i18n(cfg.locale).components.transcludes.linkToOriginal }],
+							type: 'element',
+							tagName: 'a',
+							properties: { href: inner.properties?.href, class: ['internal', 'transclude-src'] },
+							children: [{ type: 'text', value: i18n(cfg.locale).components.transcludes.linkToOriginal }],
 						},
 					]
 				}
@@ -238,8 +238,8 @@ export function renderPage(
 		</div>
 	)
 
-	const lang = componentData.fileData.frontmatter?.lang ?? cfg.locale?.split("-")[0] ?? "en"
-	const direction = i18n(cfg.locale).direction ?? "ltr"
+	const lang = componentData.fileData.frontmatter?.lang ?? cfg.locale?.split('-')[0] ?? 'en'
+	const direction = i18n(cfg.locale).direction ?? 'ltr'
 	const doc = (
 		<html lang={lang} dir={direction}>
 			<Head {...componentData} />
@@ -274,10 +274,10 @@ export function renderPage(
 				</div>
 			</body>
 			{pageResources.js
-				.filter((resource) => resource.loadTime === "afterDOMReady")
+				.filter((resource) => resource.loadTime === 'afterDOMReady')
 				.map((res) => JSResourceToScriptElement(res, true))}
 		</html>
 	)
 
-	return "<!DOCTYPE html>\n" + render(doc)
+	return '<!DOCTYPE html>\n' + render(doc)
 }

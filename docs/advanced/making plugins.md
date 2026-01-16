@@ -54,46 +54,46 @@ Normally for both `remark` and `rehype`, you can find existing plugins that you 
 A good example of a transformer plugin that borrows from the `remark` and `rehype` ecosystems is the [[plugins/Latex|Latex]] plugin:
 
 ```ts title="quartz/plugins/transformers/latex.ts"
-import remarkMath from "remark-math"
-import rehypeKatex from "rehype-katex"
-import rehypeMathjax from "rehype-mathjax/svg"
-import { QuartzTransformerPlugin } from "../types"
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import rehypeMathjax from 'rehype-mathjax/svg'
+import { QuartzTransformerPlugin } from '../types'
 
 interface Options {
-	renderEngine: "katex" | "mathjax"
+	renderEngine: 'katex' | 'mathjax'
 }
 
 export const Latex: QuartzTransformerPlugin<Options> = (opts?: Options) => {
-	const engine = opts?.renderEngine ?? "katex"
+	const engine = opts?.renderEngine ?? 'katex'
 	return {
-		name: "Latex",
+		name: 'Latex',
 		markdownPlugins() {
 			return [remarkMath]
 		},
 		htmlPlugins() {
-			if (engine === "katex") {
+			if (engine === 'katex') {
 				// if you need to pass options into a plugin, you
 				// can use a tuple of [plugin, options]
-				return [[rehypeKatex, { output: "html" }]]
+				return [[rehypeKatex, { output: 'html' }]]
 			} else {
 				return [rehypeMathjax]
 			}
 		},
 		externalResources() {
-			if (engine === "katex") {
+			if (engine === 'katex') {
 				return {
 					css: [
 						{
 							// base css
-							content: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css",
+							content: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css',
 						},
 					],
 					js: [
 						{
 							// fix copy behaviour: https://github.com/KaTeX/KaTeX/blob/main/contrib/copy-tex/README.md
-							src: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js",
-							loadTime: "afterDOMReady",
-							contentType: "external",
+							src: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js',
+							loadTime: 'afterDOMReady',
+							contentType: 'external',
 						},
 					],
 				}
@@ -108,7 +108,7 @@ Another common thing that transformer plugins will do is parse a file and add ex
 ```ts
 export const AddWordCount: QuartzTransformerPlugin = () => {
 	return {
-		name: "AddWordCount",
+		name: 'AddWordCount',
 		markdownPlugins() {
 			return [
 				() => {
@@ -116,7 +116,7 @@ export const AddWordCount: QuartzTransformerPlugin = () => {
 						// tree is an `mdast` root element
 						// file is a `vfile`
 						const text = file.value
-						const words = text.split(" ").length
+						const words = text.split(' ').length
 						file.data.wordcount = words
 					}
 				},
@@ -127,7 +127,7 @@ export const AddWordCount: QuartzTransformerPlugin = () => {
 
 // tell typescript about our custom data fields we are adding
 // other plugins will then also be aware of this data field
-declare module "vfile" {
+declare module 'vfile' {
 	interface DataMap {
 		wordcount: number
 	}
@@ -193,10 +193,10 @@ A filter plugin must define a `name` field and a `shouldPublish` function that t
 For example, here is the built-in plugin for removing drafts:
 
 ```ts title="quartz/plugins/filters/draft.ts"
-import { QuartzFilterPlugin } from "../types"
+import { QuartzFilterPlugin } from '../types'
 
 export const RemoveDrafts: QuartzFilterPlugin<{}> = () => ({
-	name: "RemoveDrafts",
+	name: 'RemoveDrafts',
 	shouldPublish(_ctx, [_tree, vfile]) {
 		// uses frontmatter parsed from transformers
 		const draftFlag: boolean = vfile.data?.frontmatter?.draft ?? false
@@ -246,7 +246,7 @@ export type WriteOptions = (data: {
 	// the name of the file to emit (not including the file extension)
 	slug: FullSlug
 	// the file extension
-	ext: `.${string}` | ""
+	ext: `.${string}` | ''
 	// the file content to add
 	content: string
 }) => Promise<FilePath>
@@ -272,7 +272,7 @@ export const ContentPage: QuartzEmitterPlugin = () => {
 	}
 	const { head, header, beforeBody, pageBody, afterBody, left, right, footer } = layout
 	return {
-		name: "ContentPage",
+		name: 'ContentPage',
 		getQuartzComponents() {
 			return [head, ...header, ...beforeBody, pageBody, ...afterBody, ...left, ...right, footer]
 		},
@@ -296,7 +296,7 @@ export const ContentPage: QuartzEmitterPlugin = () => {
 				const fp = await emit({
 					content,
 					slug: file.data.slug!,
-					ext: ".html",
+					ext: '.html',
 				})
 
 				fps.push(fp)

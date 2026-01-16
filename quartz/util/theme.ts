@@ -32,36 +32,36 @@ export interface Theme {
 	}
 	cdnCaching: boolean
 	colors: Colors
-	fontOrigin: "googleFonts" | "local"
+	fontOrigin: 'googleFonts' | 'local'
 }
 
 export type ThemeKey = keyof Colors
 
 const DEFAULT_SANS_SERIF =
 	'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
-const DEFAULT_MONO = "ui-monospace, SFMono-Regular, SF Mono, Menlo, monospace"
+const DEFAULT_MONO = 'ui-monospace, SFMono-Regular, SF Mono, Menlo, monospace'
 
 export function getFontSpecificationName(spec: FontSpecification): string {
-	if (typeof spec === "string") {
+	if (typeof spec === 'string') {
 		return spec
 	}
 
 	return spec.name
 }
 
-function formatFontSpecification(type: "title" | "header" | "body" | "code", spec: FontSpecification) {
-	if (typeof spec === "string") {
+function formatFontSpecification(type: 'title' | 'header' | 'body' | 'code', spec: FontSpecification) {
+	if (typeof spec === 'string') {
 		spec = { name: spec }
 	}
 
-	const defaultIncludeWeights = type === "header" ? [400, 700] : [400, 600]
-	const defaultIncludeItalic = type === "body"
+	const defaultIncludeWeights = type === 'header' ? [400, 700] : [400, 600]
+	const defaultIncludeItalic = type === 'body'
 	const weights = spec.weights ?? defaultIncludeWeights
 	const italic = spec.includeItalic ?? defaultIncludeItalic
 
 	const features: string[] = []
 	if (italic) {
-		features.push("ital")
+		features.push('ital')
 	}
 
 	if (weights.length > 1) {
@@ -69,14 +69,14 @@ function formatFontSpecification(type: "title" | "header" | "body" | "code", spe
 			? weights
 					.flatMap((w) => [`0,${w}`, `1,${w}`])
 					.sort()
-					.join(";")
-			: weights.join(";")
+					.join(';')
+			: weights.join(';')
 
 		features.push(`wght@${weightSpec}`)
 	}
 
 	if (features.length > 0) {
-		return `${spec.name}:${features.join(",")}`
+		return `${spec.name}:${features.join(',')}`
 	}
 
 	return spec.name
@@ -84,16 +84,16 @@ function formatFontSpecification(type: "title" | "header" | "body" | "code", spe
 
 export function googleFontHref(theme: Theme) {
 	const { header, body, code } = theme.typography
-	const headerFont = formatFontSpecification("header", header)
-	const bodyFont = formatFontSpecification("body", body)
-	const codeFont = formatFontSpecification("code", code)
+	const headerFont = formatFontSpecification('header', header)
+	const bodyFont = formatFontSpecification('body', body)
+	const codeFont = formatFontSpecification('code', code)
 
 	return `https://fonts.googleapis.com/css2?family=${headerFont}&family=${bodyFont}&family=${codeFont}&display=swap`
 }
 
 export function googleFontSubsetHref(theme: Theme, text: string) {
 	const title = theme.typography.title || theme.typography.header
-	const titleFont = formatFontSpecification("title", title)
+	const titleFont = formatFontSpecification('title', title)
 
 	return `https://fonts.googleapis.com/css2?family=${titleFont}&text=${encodeURIComponent(text)}&display=swap`
 }
@@ -105,10 +105,10 @@ export interface GoogleFontFile {
 }
 
 const fontMimeMap: Record<string, string> = {
-	truetype: "ttf",
-	woff: "woff",
-	woff2: "woff2",
-	opentype: "otf",
+	truetype: 'ttf',
+	woff: 'woff',
+	woff2: 'woff2',
+	opentype: 'otf',
 }
 
 export async function processGoogleFonts(
@@ -138,7 +138,7 @@ export async function processGoogleFonts(
 
 export function joinStyles(theme: Theme, ...stylesheet: string[]) {
 	return `
-${stylesheet.join("\n\n")}
+${stylesheet.join('\n\n')}
 
 :root {
   --light: ${theme.colors.lightMode.light};

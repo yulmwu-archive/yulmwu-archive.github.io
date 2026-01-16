@@ -1,5 +1,5 @@
 ---
-title: "Obsidian Compatibility"
+title: 'Obsidian Compatibility'
 tags:
     - feature/transformer
 ---

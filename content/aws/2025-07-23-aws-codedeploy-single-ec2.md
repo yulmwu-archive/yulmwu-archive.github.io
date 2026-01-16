@@ -1,12 +1,12 @@
 ---
-title: "[AWS CI/CD] EC2 Deployment with CodeDeploy + Github Actions #1 (Single EC2 Instance)"
-description: "AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (Single EC2 Instance)"
-slug: "2025-07-23-aws-codedeploy-single-ec2"
+title: '[AWS CI/CD] EC2 Deployment with CodeDeploy + Github Actions #1 (Single EC2 Instance)'
+description: 'AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (Single EC2 Instance)'
+slug: '2025-07-23-aws-codedeploy-single-ec2'
 author: yulmwu
 date: 2025-07-23T05:21:34.383Z
 updated_at: 2026-01-10T03:03:54.023Z
-categories: ["AWS"]
-tags: ["CI/CD", "aws"]
+categories: ['AWS']
+tags: ['CI/CD', 'aws']
 series:
     name: AWS
     slug: aws

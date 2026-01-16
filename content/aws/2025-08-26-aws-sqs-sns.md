@@ -1,12 +1,12 @@
 ---
-title: "[AWS Integration] MSA with SQS & Pub/Sub Pattern with SNS"
-description: "AWS SQS and SNS를 통한 MSA 애플리케이션 간 메시징 솔루션 (+ DLQ)"
-slug: "2025-08-26-aws-sqs-sns"
+title: '[AWS Integration] MSA with SQS & Pub/Sub Pattern with SNS'
+description: 'AWS SQS and SNS를 통한 MSA 애플리케이션 간 메시징 솔루션 (+ DLQ)'
+slug: '2025-08-26-aws-sqs-sns'
 author: yulmwu
 date: 2025-08-26T04:24:51.006Z
 updated_at: 2026-01-12T08:25:13.127Z
-categories: ["AWS"]
-tags: ["Integration", "aws"]
+categories: ['AWS']
+tags: ['Integration', 'aws']
 series:
     name: AWS
     slug: aws
@@ -278,9 +278,9 @@ SQS_QUEUE_URL=https://sqs.ap-northeast-2.amazonaws.com/ACCOUNT_ID/QUEUE
 ```ts
 // sqs.producer.service.ts
 
-import { Injectable, Logger } from "@nestjs/common"
-import { ConfigService } from "@nestjs/config"
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs"
+import { Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 
 export interface SqsSendOptions {
 	type?: string
@@ -291,7 +291,7 @@ export interface SqsSendOptions {
 }
 
 export interface SqsMessageAttribute {
-	DataType: "String" | "Number" | "Binary"
+	DataType: 'String' | 'Number' | 'Binary'
 	StringValue?: string
 	BinaryValue?: Uint8Array
 }
@@ -304,13 +304,13 @@ export class SqsProducerService {
 
 	constructor(private readonly config: ConfigService) {
 		this.client = new SQSClient({
-			region: this.config.get<string>("AWS_REGION"),
+			region: this.config.get<string>('AWS_REGION'),
 		})
-		this.queueUrl = this.config.get<string>("SQS_QUEUE_URL", "")
+		this.queueUrl = this.config.get<string>('SQS_QUEUE_URL', '')
 	}
 
 	async send(body: any, options?: SqsSendOptions): Promise<string | undefined> {
-		const MessageBody = typeof body === "string" ? body : JSON.stringify(body)
+		const MessageBody = typeof body === 'string' ? body : JSON.stringify(body)
 
 		const cmd = new SendMessageCommand({
 			QueueUrl: this.queueUrl,
@@ -340,10 +340,10 @@ AWS SDK SQS 클라이언트를 사용하여 간단하게 메시지를 보내는 
 ```ts
 // sqs.consumer.service.ts
 
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from "@nestjs/common"
-import { ConfigService } from "@nestjs/config"
-import { SQSClient } from "@aws-sdk/client-sqs"
-import { Consumer } from "sqs-consumer"
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { SQSClient } from '@aws-sdk/client-sqs'
+import { Consumer } from 'sqs-consumer'
 
 @Injectable()
 export class SqsConsumerService implements OnModuleInit, OnModuleDestroy {
@@ -355,9 +355,9 @@ export class SqsConsumerService implements OnModuleInit, OnModuleDestroy {
 
 	constructor(private readonly config: ConfigService) {
 		this.client = new SQSClient({
-			region: this.config.get<string>("AWS_REGION"),
+			region: this.config.get<string>('AWS_REGION'),
 		})
-		this.queueUrl = this.config.get<string>("SQS_QUEUE_URL", "")
+		this.queueUrl = this.config.get<string>('SQS_QUEUE_URL', '')
 	}
 
 	onModuleInit() {
@@ -367,8 +367,8 @@ export class SqsConsumerService implements OnModuleInit, OnModuleDestroy {
 			batchSize: 10,
 			waitTimeSeconds: 20,
 			visibilityTimeout: 10,
-			messageAttributeNames: ["All"],
-			messageSystemAttributeNames: ["ApproximateReceiveCount"],
+			messageAttributeNames: ['All'],
+			messageSystemAttributeNames: ['ApproximateReceiveCount'],
 			handleMessage: async (message) => {
 				const body = this.safeParse(message.Body)
 
@@ -381,19 +381,19 @@ export class SqsConsumerService implements OnModuleInit, OnModuleDestroy {
 			},
 		})
 
-		this.consumer.on("error", (err) => this.logger.error(`Consumer error: ${err.message}`, err.stack))
-		this.consumer.on("processing_error", (err) => this.logger.error(`Processing error: ${err.message}`, err.stack))
-		this.consumer.on("message_received", (m) => this.logger.debug(`Received: ${m.MessageId}`))
-		this.consumer.on("message_processed", (m) => this.logger.debug(`Processed: ${m.MessageId}`))
+		this.consumer.on('error', (err) => this.logger.error(`Consumer error: ${err.message}`, err.stack))
+		this.consumer.on('processing_error', (err) => this.logger.error(`Processing error: ${err.message}`, err.stack))
+		this.consumer.on('message_received', (m) => this.logger.debug(`Received: ${m.MessageId}`))
+		this.consumer.on('message_processed', (m) => this.logger.debug(`Processed: ${m.MessageId}`))
 
 		this.consumer.start()
-		this.logger.log("SQS consumer started")
+		this.logger.log('SQS consumer started')
 	}
 
 	async onModuleDestroy() {
 		if (this.consumer) {
 			this.consumer.stop()
-			this.logger.log("SQS consumer stopped")
+			this.logger.log('SQS consumer stopped')
 		}
 	}
 
@@ -411,17 +411,17 @@ export class SqsConsumerService implements OnModuleInit, OnModuleDestroy {
 			const parsedPayloadBody = this.jsonParse(payload?.Message)
 
 			switch (parsedPayloadBody?.type || payload?.type) {
-				case "order.created":
-					this.logger.log("[order.created]", payload, meta)
+				case 'order.created':
+					this.logger.log('[order.created]', payload, meta)
 					break
-				case "throw.error":
-					throw new Error("Test error")
+				case 'throw.error':
+					throw new Error('Test error')
 				default:
-					this.logger.log("[message]", payload, meta)
+					this.logger.log('[message]', payload, meta)
 			}
 			return true
 		} catch (e: any) {
-			this.logger.error("dispatch error: " + e?.message)
+			this.logger.error('dispatch error: ' + e?.message)
 			return false
 		}
 	}

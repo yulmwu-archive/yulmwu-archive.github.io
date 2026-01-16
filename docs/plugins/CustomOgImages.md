@@ -26,13 +26,13 @@ The Custom OG Images emitter plugin generates social media preview images for yo
 This plugin accepts the following configuration options:
 
 ```typescript title="quartz.config.ts"
-import { CustomOgImages } from "./quartz/plugins/emitters/ogImage"
+import { CustomOgImages } from './quartz/plugins/emitters/ogImage'
 
 const config: QuartzConfig = {
 	plugins: {
 		emitters: [
 			CustomOgImages({
-				colorScheme: "lightMode", // what colors to use for generating image, same as theme colors from config, valid values are "darkMode" and "lightMode"
+				colorScheme: 'lightMode', // what colors to use for generating image, same as theme colors from config, valid values are "darkMode" and "lightMode"
 				width: 1200, // width to generate with (in pixels)
 				height: 630, // height to generate with (in pixels)
 				excludeRoot: false, // wether to exclude "/" index path to be excluded from auto generated images (false = use auto, true = use default og image)
@@ -92,42 +92,42 @@ export const myImage: SocialImageOptions["imageStructure"] = (...) => {
 >
 > ```scss title="custom.scss"
 > @font-face {
-> 	font-family: "Newsreader";
+> 	font-family: 'Newsreader';
 > 	font-style: normal;
 > 	font-weight: normal;
 > 	font-display: swap;
-> 	src: url("/static/Newsreader.woff2") format("woff2");
+> 	src: url('/static/Newsreader.woff2') format('woff2');
 > }
 > ```
 >
 > Then in `quartz/util/og.tsx`, you can load the Satori fonts like so:
 >
 > ```tsx title="quartz/util/og.tsx"
-> import { joinSegments, QUARTZ } from "../path"
-> import fs from "fs"
-> import path from "path"
+> import { joinSegments, QUARTZ } from '../path'
+> import fs from 'fs'
+> import path from 'path'
 >
-> const newsreaderFontPath = joinSegments(QUARTZ, "static", "Newsreader.woff2")
+> const newsreaderFontPath = joinSegments(QUARTZ, 'static', 'Newsreader.woff2')
 > export async function getSatoriFonts(headerFont: FontSpecification, bodyFont: FontSpecification) {
 > 	// ... rest of implementation remains same
-> 	const fonts: SatoriOptions["fonts"] = [
+> 	const fonts: SatoriOptions['fonts'] = [
 > 		...headerFontData.map((data, idx) => ({
 > 			name: headerFontName,
 > 			data,
 > 			weight: headerWeights[idx],
-> 			style: "normal" as const,
+> 			style: 'normal' as const,
 > 		})),
 > 		...bodyFontData.map((data, idx) => ({
 > 			name: bodyFontName,
 > 			data,
 > 			weight: bodyWeights[idx],
-> 			style: "normal" as const,
+> 			style: 'normal' as const,
 > 		})),
 > 		{
-> 			name: "Newsreader",
+> 			name: 'Newsreader',
 > 			data: await fs.promises.readFile(path.resolve(newsreaderFontPath)),
 > 			weight: 400,
-> 			style: "normal" as const,
+> 			style: 'normal' as const,
 > 		},
 > 	]
 >
@@ -150,17 +150,17 @@ This example will generate images that look as follows:
 | ![[custom-social-image-preview-light.png]] | ![[custom-social-image-preview-dark.png]] |
 
 ```tsx
-import { SatoriOptions } from "satori/wasm"
-import { GlobalConfiguration } from "../cfg"
-import { SocialImageOptions, UserOpts } from "./imageHelper"
-import { QuartzPluginData } from "../plugins/vfile"
+import { SatoriOptions } from 'satori/wasm'
+import { GlobalConfiguration } from '../cfg'
+import { SocialImageOptions, UserOpts } from './imageHelper'
+import { QuartzPluginData } from '../plugins/vfile'
 
-export const customImage: SocialImageOptions["imageStructure"] = (
+export const customImage: SocialImageOptions['imageStructure'] = (
 	cfg: GlobalConfiguration,
 	userOpts: UserOpts,
 	title: string,
 	description: string,
-	fonts: SatoriOptions["fonts"],
+	fonts: SatoriOptions['fonts'],
 	fileData: QuartzPluginData,
 ) => {
 	// How many characters are allowed before switching to smaller font
@@ -171,35 +171,35 @@ export const customImage: SocialImageOptions["imageStructure"] = (
 	return (
 		<div
 			style={{
-				display: "flex",
-				flexDirection: "row",
-				justifyContent: "flex-start",
-				alignItems: "center",
-				height: "100%",
-				width: "100%",
+				display: 'flex',
+				flexDirection: 'row',
+				justifyContent: 'flex-start',
+				alignItems: 'center',
+				height: '100%',
+				width: '100%',
 			}}
 		>
 			<div
 				style={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					height: "100%",
-					width: "100%",
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					height: '100%',
+					width: '100%',
 					backgroundColor: cfg.theme.colors[colorScheme].light,
-					flexDirection: "column",
-					gap: "2.5rem",
-					paddingTop: "2rem",
-					paddingBottom: "2rem",
+					flexDirection: 'column',
+					gap: '2.5rem',
+					paddingTop: '2rem',
+					paddingBottom: '2rem',
 				}}
 			>
 				<p
 					style={{
 						color: cfg.theme.colors[colorScheme].dark,
 						fontSize: useSmallerFont ? 70 : 82,
-						marginLeft: "4rem",
-						textAlign: "center",
-						marginRight: "4rem",
+						marginLeft: '4rem',
+						textAlign: 'center',
+						marginRight: '4rem',
 						fontFamily: fonts[0].name,
 					}}
 				>
@@ -209,8 +209,8 @@ export const customImage: SocialImageOptions["imageStructure"] = (
 					style={{
 						color: cfg.theme.colors[colorScheme].dark,
 						fontSize: 44,
-						marginLeft: "8rem",
-						marginRight: "8rem",
+						marginLeft: '8rem',
+						marginRight: '8rem',
 						lineClamp: 3,
 						fontFamily: fonts[1].name,
 					}}
@@ -220,9 +220,9 @@ export const customImage: SocialImageOptions["imageStructure"] = (
 			</div>
 			<div
 				style={{
-					height: "100%",
-					width: "2vw",
-					position: "absolute",
+					height: '100%',
+					width: '2vw',
+					position: 'absolute',
 					backgroundColor: cfg.theme.colors[colorScheme].tertiary,
 					opacity: 0.85,
 				}}

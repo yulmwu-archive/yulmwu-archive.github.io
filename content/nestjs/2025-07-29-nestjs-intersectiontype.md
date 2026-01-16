@@ -1,12 +1,12 @@
 ---
-title: "[NestJS] IntersectionType: @nestjs/mapped-types vs @nestjs/swagger"
-description: "NestJS DTO 상속(IntersectionType)에서 @nestjs/mapped-types vs @nestjs/swagger 라이브러리 차이"
-slug: "2025-07-29-nestjs-intersectiontype"
+title: '[NestJS] IntersectionType: @nestjs/mapped-types vs @nestjs/swagger'
+description: 'NestJS DTO 상속(IntersectionType)에서 @nestjs/mapped-types vs @nestjs/swagger 라이브러리 차이'
+slug: '2025-07-29-nestjs-intersectiontype'
 author: yulmwu
 date: 2025-07-29T04:31:52.248Z
 updated_at: 2026-01-14T19:27:10.148Z
-categories: ["NestJS"]
-tags: ["NestJS"]
+categories: ['NestJS']
+tags: ['NestJS']
 series:
     name: NestJS
     slug: nestjs
@@ -26,12 +26,12 @@ NestJS에서 DTO(Data Transfer Object)를 만들 때 부모 클래스로 부터 
 ```ts
 export class TopicNameDto {
 	@ApiProperty({
-		description: "The topic name associated with the post.",
-		example: "programming",
+		description: 'The topic name associated with the post.',
+		example: 'programming',
 	})
 	@IsString()
 	@IsNotEmpty()
-	@Matches(/^[a-z]+$/, { message: "The topic name must be in lowercase letters." })
+	@Matches(/^[a-z]+$/, { message: 'The topic name must be in lowercase letters.' })
 	topicName: string
 }
 ```
@@ -43,16 +43,16 @@ export class TopicNameDto {
 ```ts
 export class CreatePostDto extends TopicNameDto {
 	@ApiProperty({
-		description: "The title of the post.",
-		example: "My First Post",
+		description: 'The title of the post.',
+		example: 'My First Post',
 	})
 	@IsString()
 	@IsNotEmpty()
 	title: string
 
 	@ApiProperty({
-		description: "The content of the post.",
-		example: "This is the content of my first post.",
+		description: 'The content of the post.',
+		example: 'This is the content of my first post.',
 	})
 	@IsString()
 	@IsNotEmpty()
@@ -78,12 +78,12 @@ NestJS에선 이러한 상황을 위해 `IntersectionType` 함수를 제공한�
 아래와 같이 사용할 수 있다.
 
 ```ts
-import { IntersectionType } from "@nestjs/mapped-types"
+import { IntersectionType } from '@nestjs/mapped-types'
 
 export class CreatePostDto extends IntersectionType(TitleDto, TopicNameDto) {
 	@ApiProperty({
-		description: "The content of the post.",
-		example: "This is the content of my first post.",
+		description: 'The content of the post.',
+		example: 'This is the content of my first post.',
 	})
 	@IsString()
 	@IsNotEmpty()

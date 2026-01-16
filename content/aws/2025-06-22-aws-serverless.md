@@ -1,12 +1,12 @@
 ---
-title: "[AWS Serverless] Lambda Serverless API With Cognito Authentication"
-description: "AWS Lambda를 통한 서버리스 아키텍처 배포 (with API Gateway, Cognito, etc)"
-slug: "2025-06-22-aws-serverless"
+title: '[AWS Serverless] Lambda Serverless API With Cognito Authentication'
+description: 'AWS Lambda를 통한 서버리스 아키텍처 배포 (with API Gateway, Cognito, etc)'
+slug: '2025-06-22-aws-serverless'
 author: yulmwu
 date: 2025-06-22T13:29:13.135Z
 updated_at: 2026-01-14T15:47:19.278Z
-categories: ["AWS"]
-tags: ["aws", "serverless"]
+categories: ['AWS']
+tags: ['aws', 'serverless']
 series:
     name: AWS
     slug: aws
@@ -317,16 +317,16 @@ REST API를 통해 적절한 CRUD를 구현하고, 인증 시스템까지 있으
 다음은 타입스크립트로 작성된 람다 함수 코드의 예시이다.
 
 ```ts
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
-import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb"
-import { APIGatewayProxyResultV2 } from "aws-lambda"
-import { error, internalServerError } from "../../utils/httpError"
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyResultV2 } from 'aws-lambda'
+import { error, internalServerError } from '../../utils/httpError'
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 export const handler = async (): Promise<APIGatewayProxyResultV2> => {
 	try {
-		const command = new ScanCommand({ TableName: "Posts" })
+		const command = new ScanCommand({ TableName: 'Posts' })
 		const result = await dynamoDB.send(command)
 
 		return {
@@ -334,7 +334,7 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
 			body: JSON.stringify(result.Items),
 		}
 	} catch (err) {
-		return error(internalServerError((err as Error).message), "ERR_GET_POSTS_INTERNAL_SERVER_ERROR")
+		return error(internalServerError((err as Error).message), 'ERR_GET_POSTS_INTERNAL_SERVER_ERROR')
 	}
 }
 ```
@@ -374,7 +374,7 @@ const db = connectToDatabase()
 const config = loadConfig()
 
 export const handler = async (event) => {
-	return await db.query("SELECT * FROM users")
+	return await db.query('SELECT * FROM users')
 }
 ```
 
@@ -978,8 +978,8 @@ YAML이나 JSON 형태로 코드를 작성할 수 있는데, 이 포스팅에선
 실습을 해보자, 아래와 같은 AWS CloudFormation 템플릿 YAML 코드를 사용하면 S3 버킷을 코드를 사용하여 생성할 수 있다.
 
 ```yaml
-AWSTemplateFormatVersion: "2010-09-09" # 템플릿 버전 (현재까진 2010-09-09가 유일함)
-Description: "Example Cloudformation Template" # 설명
+AWSTemplateFormatVersion: '2010-09-09' # 템플릿 버전 (현재까진 2010-09-09가 유일함)
+Description: 'Example Cloudformation Template' # 설명
 Resources: # 리소스 목록
     TestBucket: # 논리적인 리소스 이름: TestBucket
         Type: AWS::S3::Bucket # 서비스 이름: S3
@@ -1092,11 +1092,11 @@ custom:
     esbuild:
         bundle: true # 번들링
         minify: true # 코드 간소화
-        target: "node20" # NodeJS 20버전 사용 (람다에서 지원하는 최신 버전)
-        platform: "node"
+        target: 'node20' # NodeJS 20버전 사용 (람다에서 지원하는 최신 버전)
+        platform: 'node'
         treeShaking: true # 사용하지 않는 코드 삭제
         packager: npm # npm 패키지 메니저 사용
-        format: "cjs" # CommonJS 사용
+        format: 'cjs' # CommonJS 사용
 ```
 
 단점이라 하면 요즘 들어와서 어느정도 유료화가 됐다는 점, AWS 외의 리소스를 다루기엔 어렵다는 점 등이 있으나 AWS만 쓴다면 큰 단점이 되진 못한다.
@@ -1339,14 +1339,14 @@ v2와 v3의 가장 큰 차이점이라 하면 기존엔 `aws-sdk` 라이브러�
 예를 들어, DynamoDB 연결을 위한 Client를 생성하기 위해선 아래와 같은 AWS SDK v2를 사용해야 했다. (ESModule 기준)
 
 ```ts
-import AWS from "aws-sdk"
+import AWS from 'aws-sdk'
 const dynamoDB = new AWS.DynamoDB()
 
 dynamoDB.getItem(
 	{
-		TableName: "Users",
+		TableName: 'Users',
 		Key: {
-			userId: { S: "123" },
+			userId: { S: '123' },
 		},
 	},
 	(err, data) => {
@@ -1390,25 +1390,25 @@ SDK의 서비스별 사용 방법은 아래에서 차근차근 설명하도록 �
 그 응답으로 엑세스 토큰과 ID 토큰, 그리고 `Set-Cookie`를 통해 HTTPOnly 쿠키로 리프레시 토큰을 응답한다.
 
 ```ts
-import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda"
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from '@aws-sdk/client-cognito-identity-provider'
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 
 const cognitoClient = new CognitoIdentityProviderClient({})
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
 	try {
-		const { username, password } = JSON.parse(event.body ?? "{}")
+		const { username, password } = JSON.parse(event.body ?? '{}')
 		if (!username || !password)
 			return {
 				statusCode: 400,
 				body: JSON.stringify({
-					error: "Bad Request",
-					message: "Username and password are required",
+					error: 'Bad Request',
+					message: 'Username and password are required',
 				}),
 			}
 
 		const command = new InitiateAuthCommand({
-			AuthFlow: "USER_PASSWORD_AUTH",
+			AuthFlow: 'USER_PASSWORD_AUTH',
 			ClientId: process.env.COGNITO_CLIENT_ID!,
 			AuthParameters: {
 				USERNAME: username,
@@ -1427,7 +1427,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 		return {
 			statusCode: 200,
 			headers: {
-				"Set-Cookie": `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
+				'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
 			},
 			body: JSON.stringify({
 				accessToken,
@@ -1438,7 +1438,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 		return {
 			statusCode: 500,
 			body: JSON.stringify({
-				error: "Internal Server Error",
+				error: 'Internal Server Error',
 				message: (err as Error).message,
 			}),
 		}
@@ -1489,13 +1489,13 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 이후 해당 요청의 Body에 `username`과 `password` 항목이 있는지 검사한다.
 
 ```ts
-const { username, password } = JSON.parse(event.body ?? "{}")
+const { username, password } = JSON.parse(event.body ?? '{}')
 if (!username || !password)
 	return {
 		statusCode: 400,
 		body: JSON.stringify({
-			error: "Bad Request",
-			message: "Username and password are required",
+			error: 'Bad Request',
+			message: 'Username and password are required',
 		}),
 	}
 ```
@@ -1506,7 +1506,7 @@ if (!username || !password)
 
 ```ts
 const command = new InitiateAuthCommand({
-	AuthFlow: "USER_PASSWORD_AUTH",
+	AuthFlow: 'USER_PASSWORD_AUTH',
 	ClientId: process.env.COGNITO_CLIENT_ID!,
 	AuthParameters: {
 		USERNAME: username,
@@ -1535,7 +1535,7 @@ const maxAge = 30 * 24 * 60 * 60 // 30 days
 return {
 	statusCode: 200,
 	headers: {
-		"Set-Cookie": `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
+		'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
 	},
 	body: JSON.stringify({
 		accessToken,
@@ -1556,13 +1556,13 @@ return {
 > 아래와 같이 코드 추가하고 수정해주자.
 >
 > ```ts
-> import { createHmac } from "crypto"
+> import { createHmac } from 'crypto'
 >
 > const clientSecretHashGenerator = (username, clientId, clientSecretKey) => {
 > 	// Base64 ( HMAC_SHA256 ( "Client Secret Key", "Username" + "Client Id" ) )
-> 	const hmac = createHmac("sha256", clientSecretKey)
+> 	const hmac = createHmac('sha256', clientSecretKey)
 > 	hmac.update(username + clientId)
-> 	return hmac.digest("base64")
+> 	return hmac.digest('base64')
 > }
 > ```
 >
@@ -1579,20 +1579,20 @@ return {
 > 앞서 Body의 페이로드가 있는지 확인하는 로직, `handler()` 함수의 `event` 파라미터 등은 이미 설명하였으니 생략하고, AWS SDK 중심으로 다룬다.
 
 ```ts
-import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda"
+import { CognitoIdentityProviderClient, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider'
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 
 const cognitoClient = new CognitoIdentityProviderClient({})
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
 	try {
-		const { username, password, email } = JSON.parse(event.body ?? "{}")
+		const { username, password, email } = JSON.parse(event.body ?? '{}')
 		if (!username || !password || !email)
 			return {
 				statusCode: 400,
 				body: JSON.stringify({
-					error: "Bad Request",
-					message: "Username, password, and email are required",
+					error: 'Bad Request',
+					message: 'Username, password, and email are required',
 				}),
 			}
 
@@ -1600,20 +1600,20 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 			ClientId: process.env.COGNITO_CLIENT_ID!,
 			Username: username,
 			Password: password,
-			UserAttributes: [{ Name: "email", Value: email }],
+			UserAttributes: [{ Name: 'email', Value: email }],
 		})
 
 		await cognitoClient.send(command)
 
 		return {
 			statusCode: 200,
-			body: JSON.stringify({ message: "Signup successful, please check your email for confirmation." }),
+			body: JSON.stringify({ message: 'Signup successful, please check your email for confirmation.' }),
 		}
 	} catch (err) {
 		return {
 			statusCode: 500,
 			body: JSON.stringify({
-				error: "Internal Server Error",
+				error: 'Internal Server Error',
 				message: (err as Error).message,
 			}),
 		}
@@ -1630,7 +1630,7 @@ const command = new SignUpCommand({
 	ClientId: process.env.COGNITO_CLIENT_ID!,
 	Username: username,
 	Password: password,
-	UserAttributes: [{ Name: "email", Value: email }],
+	UserAttributes: [{ Name: 'email', Value: email }],
 })
 
 await cognitoClient.send(command)
@@ -1647,23 +1647,23 @@ await cognitoClient.send(command)
 ## 5-4. `createPost.ts`
 
 ```ts
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
-import { DynamoDBDocumentClient, UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb"
-import { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyResultV2 } from "aws-lambda"
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, UpdateCommand, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyResultV2 } from 'aws-lambda'
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 const getNextId = async (): Promise<number> => {
 	const command = new UpdateCommand({
-		TableName: "Counter",
-		Key: { name: "post" },
-		UpdateExpression: "SET #v = if_not_exists(#v, :init) + :inc",
-		ExpressionAttributeNames: { "#v": "value" },
+		TableName: 'Counter',
+		Key: { name: 'post' },
+		UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
+		ExpressionAttributeNames: { '#v': 'value' },
 		ExpressionAttributeValues: {
-			":inc": 1,
-			":init": 0,
+			':inc': 1,
+			':init': 0,
 		},
-		ReturnValues: "UPDATED_NEW",
+		ReturnValues: 'UPDATED_NEW',
 	})
 
 	const result = await dynamoDB.send(command)
@@ -1672,13 +1672,13 @@ const getNextId = async (): Promise<number> => {
 
 export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer): Promise<APIGatewayProxyResultV2> => {
 	try {
-		const { title, content } = JSON.parse(event.body ?? "{}")
+		const { title, content } = JSON.parse(event.body ?? '{}')
 		if (!title || !content)
 			return {
 				statusCode: 400,
 				body: JSON.stringify({
-					error: "Bad Request",
-					message: "Title and content are required",
+					error: 'Bad Request',
+					message: 'Title and content are required',
 				}),
 			}
 
@@ -1687,8 +1687,8 @@ export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer): P
 			return {
 				statusCode: 401,
 				body: JSON.stringify({
-					error: "Unauthorized",
-					message: "User is not authenticated",
+					error: 'Unauthorized',
+					message: 'User is not authenticated',
 				}),
 			}
 
@@ -1702,7 +1702,7 @@ export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer): P
 		}
 
 		const command = new PutCommand({
-			TableName: "Posts",
+			TableName: 'Posts',
 			Item: item,
 		})
 
@@ -1716,7 +1716,7 @@ export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer): P
 		return {
 			statusCode: 500,
 			body: JSON.stringify({
-				error: "Internal Server Error",
+				error: 'Internal Server Error',
 				message: (err as Error).message,
 			}),
 		}
@@ -1742,15 +1742,15 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 ```ts
 const getNextId = async (): Promise<number> => {
 	const command = new UpdateCommand({
-		TableName: "Counter",
-		Key: { name: "post" },
-		UpdateExpression: "SET #v = if_not_exists(#v, :init) + :inc",
-		ExpressionAttributeNames: { "#v": "value" },
+		TableName: 'Counter',
+		Key: { name: 'post' },
+		UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
+		ExpressionAttributeNames: { '#v': 'value' },
 		ExpressionAttributeValues: {
-			":inc": 1,
-			":init": 0,
+			':inc': 1,
+			':init': 0,
 		},
-		ReturnValues: "UPDATED_NEW",
+		ReturnValues: 'UPDATED_NEW',
 	})
 
 	const result = await dynamoDB.send(command)
@@ -1792,7 +1792,7 @@ const item = {
 }
 
 const command = new PutCommand({
-	TableName: "Posts",
+	TableName: 'Posts',
 	Item: item,
 })
 ```
@@ -1806,9 +1806,9 @@ const command = new PutCommand({
 ## 5-5. `getPost.ts`
 
 ```ts
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb"
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda"
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
@@ -1818,11 +1818,11 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 		if (!id)
 			return {
 				statusCode: 400,
-				body: JSON.stringify({ message: "Missing id parameter" }),
+				body: JSON.stringify({ message: 'Missing id parameter' }),
 			}
 
 		const command = new GetCommand({
-			TableName: "Posts",
+			TableName: 'Posts',
 			Key: { id },
 		})
 
@@ -1830,7 +1830,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 		if (!result.Item)
 			return {
 				statusCode: 404,
-				body: JSON.stringify({ message: "Not found post" }),
+				body: JSON.stringify({ message: 'Not found post' }),
 			}
 
 		return {
@@ -1853,7 +1853,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
 ```ts
 const command = new GetCommand({
-	TableName: "Posts",
+	TableName: 'Posts',
 	Key: { id },
 })
 
@@ -1861,7 +1861,7 @@ const result = await dynamoDB.send(command)
 if (!result.Item)
 	return {
 		statusCode: 404,
-		body: JSON.stringify({ message: "Not found post" }),
+		body: JSON.stringify({ message: 'Not found post' }),
 	}
 ```
 
@@ -1882,8 +1882,8 @@ if (!result.Item)
 `/user/myInfo`(`/myInfo` 엔드포인트)는 현재 유저의 자세한 정보(이메일, 이메일 인증 여부 등의 속성 포함)를 반환하는데, 그 기준으로 `Authorization` 헤더에 JWT 엑세스 토큰을 전달한다.
 
 ```ts
-import { CognitoIdentityProviderClient, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda"
+import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider'
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 
 const cognitoClient = new CognitoIdentityProviderClient({})
 
@@ -1891,16 +1891,16 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 	try {
 		const authHeader = event.headers?.Authorization ?? event.headers?.authorization
 
-		if (!authHeader || !authHeader.startsWith("Bearer "))
+		if (!authHeader || !authHeader.startsWith('Bearer '))
 			return {
 				statusCode: 401,
 				body: JSON.stringify({
-					error: "Unauthorized",
-					message: "No valid authorization header provided",
+					error: 'Unauthorized',
+					message: 'No valid authorization header provided',
 				}),
 			}
 
-		const accessToken = authHeader.substring("Bearer ".length)
+		const accessToken = authHeader.substring('Bearer '.length)
 
 		const getUserCommand = new GetUserCommand({ AccessToken: accessToken })
 		const result = await cognitoClient.send(getUserCommand)
@@ -1918,7 +1918,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 		return {
 			statusCode: 500,
 			body: JSON.stringify({
-				error: "Internal Server Error",
+				error: 'Internal Server Error',
 				message: (err as Error).message,
 			}),
 		}
@@ -1931,16 +1931,16 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 ```ts
 const authHeader = event.headers?.Authorization ?? event.headers?.authorization
 
-if (!authHeader || !authHeader.startsWith("Bearer "))
+if (!authHeader || !authHeader.startsWith('Bearer '))
 	return {
 		statusCode: 401,
 		body: JSON.stringify({
-			error: "Unauthorized",
-			message: "No valid authorization header provided",
+			error: 'Unauthorized',
+			message: 'No valid authorization header provided',
 		}),
 	}
 
-const accessToken = authHeader.substring("Bearer ".length)
+const accessToken = authHeader.substring('Bearer '.length)
 ```
 
 그런 후, Cognito 클라이언트에 `GetUserCommand` 명령어를 보내는데, 이 명령어는 엑세스 토큰을 바탕으로 해당 유저의 자세한 정보(속성)을 가져올 수 있는 명령어이다.
@@ -2010,7 +2010,7 @@ const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((att
 // index.mjs
 export const handler = async (event) => {
 	try {
-		const body = JSON.parse(event.body ?? "{}")
+		const body = JSON.parse(event.body ?? '{}')
 
 		const num1 = Number(body.num1)
 		const num2 = Number(body.num2)
@@ -2018,7 +2018,7 @@ export const handler = async (event) => {
 		if (isNaN(num1) || isNaN(num2))
 			return {
 				statusCode: 400,
-				body: JSON.stringify({ error: "Both num1 and num2 must be numbers" }),
+				body: JSON.stringify({ error: 'Both num1 and num2 must be numbers' }),
 			}
 
 		const sum = num1 + num2
@@ -2031,7 +2031,7 @@ export const handler = async (event) => {
 	} catch (error) {
 		return {
 			statusCode: 500,
-			body: JSON.stringify({ error: "Internal server error", details: error.message }),
+			body: JSON.stringify({ error: 'Internal server error', details: error.message }),
 		}
 	}
 }
@@ -2267,15 +2267,15 @@ AWS Console에서 DynamoDB에 접속한 후 Posts 테이블을 만들자. Posts 
 ```ts
 const getNextId = async (): Promise<number> => {
 	const command = new UpdateCommand({
-		TableName: "Counter",
-		Key: { name: "post" },
-		UpdateExpression: "SET #v = if_not_exists(#v, :init) + :inc",
-		ExpressionAttributeNames: { "#v": "value" },
+		TableName: 'Counter',
+		Key: { name: 'post' },
+		UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
+		ExpressionAttributeNames: { '#v': 'value' },
 		ExpressionAttributeValues: {
-			":inc": 1,
-			":init": 0,
+			':inc': 1,
+			':init': 0,
 		},
-		ReturnValues: "UPDATED_NEW",
+		ReturnValues: 'UPDATED_NEW',
 	})
 
 	const result = await dynamoDB.send(command)
@@ -2358,31 +2358,31 @@ arn:aws:dynamodb:[Region]:[Account_ID]:table/[Table_Name]
 변경 사항 저장을 클릭하여 권한을 저장하자. 그리고 DynamoDB에 대한 읽기/쓰기 권한을 테스트하기 위해 아래의 람다 함수 코드를 람다에 넣고 수정한 뒤 테스트해보자.
 
 ```js
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
-import { DynamoDBDocumentClient, PutCommand, GetCommand } from "@aws-sdk/lib-dynamodb"
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb'
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient())
 
 export const handler = async () => {
 	const item = {
-		id: "1",
-		title: "Hello World",
-		content: "This is a test post.",
+		id: '1',
+		title: 'Hello World',
+		content: 'This is a test post.',
 		createdAt: new Date().toISOString(),
-		userId: "TestUserID",
-		userName: "Foo",
+		userId: 'TestUserID',
+		userName: 'Foo',
 	}
 
 	await dynamoDB.send(
 		new PutCommand({
-			TableName: "Posts",
+			TableName: 'Posts',
 			Item: item,
 		}),
 	)
 
 	const result = await dynamoDB.send(
 		new GetCommand({
-			TableName: "Posts",
+			TableName: 'Posts',
 			Key: {
 				id: item.id,
 			},
@@ -2392,7 +2392,7 @@ export const handler = async () => {
 	return {
 		statusCode: 200,
 		body: JSON.stringify({
-			message: "Post created successfully",
+			message: 'Post created successfully',
 			post: result.Item,
 		}),
 	}
@@ -2532,8 +2532,8 @@ CORS에 대한 내용은 위에서 설명하였으며, API Gateway의 라우팅 
 authorizers:
     cognitoAuthorizer:
         type: jwt
-        identitySource: "$request.header.Authorization"
-        issuerUrl: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
+        identitySource: '$request.header.Authorization'
+        issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
         audience: !Ref CognitoClient
 ```
 
@@ -2544,7 +2544,7 @@ authorizers:
 권한 부여자의 이름은 `cognitoAuthorizer`이며, 타입은 `JWT`, 인증 방법은 `Authorization` 헤더, 발급자(issuer) URL은 Cognito IDP(JWT 제공자) URL, 대상은 Cognito Client ID를 설정한다.
 
 ```yaml
-issuerUrl: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
+issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
 ```
 
 위 코드에서 `Sub` 함수는 문자열을 치환하는 함수이다.
@@ -2748,12 +2748,12 @@ custom:
         bundle: true
         minify: true
         sourcemap: false
-        target: "node20"
-        platform: "node"
+        target: 'node20'
+        platform: 'node'
         concurrency: 10
         treeShaking: true
         packager: npm
-        format: "cjs"
+        format: 'cjs'
 ```
 
 번들링을 위한 `bundle: true`, 경량화를 위한 `minify: true`, 트리 쉐이킹을 위한 `treeShaking: true` 옵션 등을 사용할 수 있으며, 그 외에 병렬 처리나 타켓 NodeJS 버전 등을 설정할 수 있다. (CommonJS 사용)
@@ -2830,8 +2830,8 @@ on:
         branches:
             - main
         paths:
-            - "backend/**"
-            - ".github/workflows/aws-deploy-be.yaml"
+            - 'backend/**'
+            - '.github/workflows/aws-deploy-be.yaml'
 ```
 
 이벤트에서 `main` 브랜치에 push될때, 거기에 추가로 프론트엔드와 백엔드를 디렉토리로 구분해뒀으니 `backend` 디렉토리에서 수정이 발생했을 때 워크플로우가 실행되도록 하였다.
@@ -3069,17 +3069,17 @@ OAC를 만드는데 기본 설정을 유지하자.
 
 ```yaml
 {
-    "Version": "2008-10-17",
-    "Id": "PolicyForCloudFrontPrivateContent",
-    "Statement":
+    'Version': '2008-10-17',
+    'Id': 'PolicyForCloudFrontPrivateContent',
+    'Statement':
         [
             {
-                "Sid": "AllowCloudFrontServicePrincipal",
-                "Effect": "Allow",
-                "Principal": { "Service": "cloudfront.amazonaws.com" },
-                "Action": "s3:GetObject",
-                "Resource": "arn:aws:s3:::actions-frontend-bucket/*",
-                "Condition": { "StringEquals": { "AWS:SourceArn": "[CloudFront_Distribution_ARN]" } },
+                'Sid': 'AllowCloudFrontServicePrincipal',
+                'Effect': 'Allow',
+                'Principal': { 'Service': 'cloudfront.amazonaws.com' },
+                'Action': 's3:GetObject',
+                'Resource': 'arn:aws:s3:::actions-frontend-bucket/*',
+                'Condition': { 'StringEquals': { 'AWS:SourceArn': '[CloudFront_Distribution_ARN]' } },
             },
         ],
 }
@@ -3147,8 +3147,8 @@ on:
         branches:
             - main
         paths:
-            - "frontend/**"
-            - ".github/workflows/aws-deploy-fe.yaml"
+            - 'frontend/**'
+            - '.github/workflows/aws-deploy-fe.yaml'
 ```
 
 그리고 Jobs를 작성하고 스텝들을 작성할건데, 먼저 코드 Checkout과 AWS 자격 증명을 설정해주고 NodeJS를 설치해주자. 여기까진 백엔드 워크플로우와 동일하다.
@@ -3172,7 +3172,7 @@ jobs:
             - name: Setup NodeJS
               uses: actions/setup-node@v4
               with:
-                  node-version: "22"
+                  node-version: '22'
 ```
 
 시크릿 키 또한 백엔드 워크플로우를 작성할 때 설정해뒀으니 따로 설정하지 않아도 된다.

@@ -1,12 +1,12 @@
 ---
-title: "[AWS Misc] Image Resizing with AWS CloudFront + Lambda@Edge"
-description: "AWS S3 + CloudFront + Lambda@Edge을 통한 이미지 리사이징 및 LCP 최적화"
-slug: "2025-08-22-aws-cloudfront-lambda-image-resizing"
+title: '[AWS Misc] Image Resizing with AWS CloudFront + Lambda@Edge'
+description: 'AWS S3 + CloudFront + Lambda@Edge을 통한 이미지 리사이징 및 LCP 최적화'
+slug: '2025-08-22-aws-cloudfront-lambda-image-resizing'
 author: yulmwu
 date: 2025-08-22T01:58:08.671Z
 updated_at: 2026-01-07T02:06:01.137Z
-categories: ["AWS"]
-tags: ["Misc", "aws"]
+categories: ['AWS']
+tags: ['Misc', 'aws']
 series:
     name: AWS
     slug: aws
@@ -140,14 +140,14 @@ Origin Request를 Lambda@Edge로 보낸 다음, 이미지를 S3 버킷에서 가
 코드는 아래와 같다.
 
 ```ts
-import type { CloudFrontRequestEvent, CloudFrontRequest, CloudFrontResultResponse, CloudFrontHeaders } from "aws-lambda"
-import { S3Client, GetObjectCommand, type GetObjectCommandOutput } from "@aws-sdk/client-s3"
-import sharp from "sharp"
-import { Readable } from "stream"
-import { ReadableStream as WebReadableStream } from "stream/web"
-import { StreamingBlobPayloadOutputTypes } from "@smithy/types"
+import type { CloudFrontRequestEvent, CloudFrontRequest, CloudFrontResultResponse, CloudFrontHeaders } from 'aws-lambda'
+import { S3Client, GetObjectCommand, type GetObjectCommandOutput } from '@aws-sdk/client-s3'
+import sharp from 'sharp'
+import { Readable } from 'stream'
+import { ReadableStream as WebReadableStream } from 'stream/web'
+import { StreamingBlobPayloadOutputTypes } from '@smithy/types'
 
-type ImageExtension = "png" | "jpg" | "jpeg" | "webp" | "gif"
+type ImageExtension = 'png' | 'jpg' | 'jpeg' | 'webp' | 'gif'
 interface ParsedParams {
 	width?: number
 	height?: number
@@ -155,12 +155,12 @@ interface ParsedParams {
 	extension?: ImageExtension
 }
 
-const S3_BUCKET = "cf-image-resize-test-bucket"
-const S3_BUCKET_REGION = "ap-northeast-2"
+const S3_BUCKET = 'cf-image-resize-test-bucket'
+const S3_BUCKET_REGION = 'ap-northeast-2'
 const S3_OBJECT_MAX_BYTES = 1000 * 1000 * 3 // 3MB
 
 const OUTPUT_MAX_BYTES = 1000 * 1000 // 1MB
-const ALLOWED_EXTENSIONS: ImageExtension[] = ["png", "jpg", "jpeg", "webp", "gif"]
+const ALLOWED_EXTENSIONS: ImageExtension[] = ['png', 'jpg', 'jpeg', 'webp', 'gif']
 
 class ImageResizeEdge {
 	private readonly s3: S3Client
@@ -179,7 +179,7 @@ class ImageResizeEdge {
 
 		const key = this.keyFromUri(request.uri)
 		if (!key) {
-			return this.badRequest("Invalid path.")
+			return this.badRequest('Invalid path.')
 		}
 
 		let s3object: GetObjectCommandOutput
@@ -187,13 +187,13 @@ class ImageResizeEdge {
 		try {
 			s3object = await this.getObject(key)
 		} catch (e: any) {
-			if (e.name === "NoSuchKey") return this.notFound("Original image not found")
+			if (e.name === 'NoSuchKey') return this.notFound('Original image not found')
 
-			return this.serverError("Error fetching image from S3", e)
+			return this.serverError('Error fetching image from S3', e)
 		}
 
-		if (typeof s3object.ContentLength === "number" && s3object.ContentLength > S3_OBJECT_MAX_BYTES) {
-			return this.payloadTooLarge("Original image too large.")
+		if (typeof s3object.ContentLength === 'number' && s3object.ContentLength > S3_OBJECT_MAX_BYTES) {
+			return this.payloadTooLarge('Original image too large.')
 		}
 
 		try {
@@ -201,22 +201,22 @@ class ImageResizeEdge {
 			const output = await this.transform(buffer, params)
 
 			if (output.byteLength > OUTPUT_MAX_BYTES) {
-				return this.payloadTooLarge("Image exceeds 1MB limit.")
+				return this.payloadTooLarge('Image exceeds 1MB limit.')
 			}
 
 			return this.ok(output, this.contentTypeByExt(params.extension!))
 		} catch (e) {
-			return this.serverError("Image processing failed", e)
+			return this.serverError('Image processing failed', e)
 		}
 	}
 
 	private parseParams(req: CloudFrontRequest): ParsedParams {
-		const query = new URLSearchParams(req.querystring ?? "")
+		const query = new URLSearchParams(req.querystring ?? '')
 
 		return {
-			width: this.toInt(query.get("w") ?? undefined),
-			height: this.toInt(query.get("h") ?? undefined),
-			quality: this.toInt(query.get("q") ?? undefined, 1, 100),
+			width: this.toInt(query.get('w') ?? undefined),
+			height: this.toInt(query.get('h') ?? undefined),
+			quality: this.toInt(query.get('q') ?? undefined, 1, 100),
 			extension: this.extensionFromUri(req.uri),
 		}
 	}
@@ -228,16 +228,16 @@ class ImageResizeEdge {
 
 	private extensionFromUri(uri: string): ImageExtension | undefined {
 		const match = uri.match(/\.([a-zA-Z0-9]+)$/)
-		const raw = (match?.[1] || "").toLowerCase()
+		const raw = (match?.[1] || '').toLowerCase()
 
 		return ALLOWED_EXTENSIONS.includes(raw as ImageExtension) ? (raw as ImageExtension) : undefined
 	}
 
 	private keyFromUri(uri: string): string | null {
 		let key = decodeURIComponent(uri)
-		if (key.startsWith("/")) key = key.slice(1)
-		if (key.includes("..")) return null
-		key = key.replace(/\/{2,}/g, "/")
+		if (key.startsWith('/')) key = key.slice(1)
+		if (key.includes('..')) return null
+		key = key.replace(/\/{2,}/g, '/')
 		return key.length ? key : null
 	}
 
@@ -246,28 +246,28 @@ class ImageResizeEdge {
 	}
 
 	private async transform(input: Buffer, p: ParsedParams): Promise<Buffer> {
-		const img = sharp(input, { animated: p.extension === "gif", limitInputPixels: 100_000_000 })
+		const img = sharp(input, { animated: p.extension === 'gif', limitInputPixels: 100_000_000 })
 
 		let stream = img
 		if (p.width || p.height) {
-			stream = stream.resize({ width: p.width, height: p.height, fit: "inside", withoutEnlargement: true })
+			stream = stream.resize({ width: p.width, height: p.height, fit: 'inside', withoutEnlargement: true })
 		}
 
 		switch (p.extension) {
-			case "jpg":
-			case "jpeg":
+			case 'jpg':
+			case 'jpeg':
 				stream = p.quality ? stream.jpeg({ quality: p.quality }) : stream.jpeg()
 				break
-			case "png": {
+			case 'png': {
 				stream = p.quality
 					? stream.png({ compressionLevel: this.pngCompressionLevel(p.quality) })
 					: stream.png()
 				break
 			}
-			case "webp":
+			case 'webp':
 				stream = p.quality ? stream.webp({ quality: p.quality }) : stream.webp()
 				break
-			case "gif":
+			case 'gif':
 				stream = stream.gif()
 				break
 		}
@@ -276,7 +276,7 @@ class ImageResizeEdge {
 	}
 
 	private pngCompressionLevel(quality?: number): number {
-		if (typeof quality !== "number") return 6
+		if (typeof quality !== 'number') return 6
 
 		return Math.max(0, Math.min(9, Math.round((100 - quality) / 11)))
 	}
@@ -292,15 +292,15 @@ class ImageResizeEdge {
 
 	private contentTypeByExt(ext: ImageExtension): string {
 		switch (ext) {
-			case "jpg":
-			case "jpeg":
-				return "image/jpeg"
-			case "png":
-				return "image/png"
-			case "webp":
-				return "image/webp"
-			case "gif":
-				return "image/gif"
+			case 'jpg':
+			case 'jpeg':
+				return 'image/jpeg'
+			case 'png':
+				return 'image/png'
+			case 'webp':
+				return 'image/webp'
+			case 'gif':
+				return 'image/gif'
 		}
 	}
 
@@ -317,66 +317,66 @@ class ImageResizeEdge {
 	}
 
 	private isBlobLike(x: unknown): x is Blob {
-		return typeof x === "object" && x !== null && "arrayBuffer" in (x as Record<string, unknown>)
+		return typeof x === 'object' && x !== null && 'arrayBuffer' in (x as Record<string, unknown>)
 	}
 
 	private isWebReadableStream(x: unknown): x is WebReadableStream {
-		return typeof x === "object" && x !== null && "getReader" in (x as Record<string, unknown>)
+		return typeof x === 'object' && x !== null && 'getReader' in (x as Record<string, unknown>)
 	}
 
 	private async streamToBuffer(stream: Readable): Promise<Buffer> {
 		return new Promise<Buffer>((resolve, reject) => {
 			const chunks: Buffer[] = []
-			stream.on("data", (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c as ArrayBufferLike)))
-			stream.on("end", () => resolve(Buffer.concat(chunks)))
-			stream.on("error", reject)
+			stream.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c as ArrayBufferLike)))
+			stream.on('end', () => resolve(Buffer.concat(chunks)))
+			stream.on('error', reject)
 		})
 	}
 
 	private headers(contentType?: string): CloudFrontHeaders {
 		const maxAge = 30 * 24 * 60 * 60
 		const h: CloudFrontHeaders = {
-			"cache-control": [{ value: `public, max-age=${maxAge}, immutable` }],
-			vary: [{ value: "Accept,Accept-Encoding" }],
+			'cache-control': [{ value: `public, max-age=${maxAge}, immutable` }],
+			vary: [{ value: 'Accept,Accept-Encoding' }],
 		}
-		if (contentType) h["content-type"] = [{ value: contentType }]
+		if (contentType) h['content-type'] = [{ value: contentType }]
 		return h
 	}
 
 	private ok(body: Buffer, contentType: string): CloudFrontResultResponse {
 		return {
-			status: "200",
-			statusDescription: "OK",
-			bodyEncoding: "base64",
-			body: body.toString("base64"),
+			status: '200',
+			statusDescription: 'OK',
+			bodyEncoding: 'base64',
+			body: body.toString('base64'),
 			headers: this.headers(contentType),
 		}
 	}
 
 	private badRequest(msg: string): CloudFrontResultResponse {
 		return {
-			status: "400",
-			statusDescription: "Bad Request",
+			status: '400',
+			statusDescription: 'Bad Request',
 			body: msg,
-			headers: this.headers("text/plain; charset=utf-8"),
+			headers: this.headers('text/plain; charset=utf-8'),
 		}
 	}
 
 	private notFound(msg: string): CloudFrontResultResponse {
 		return {
-			status: "404",
-			statusDescription: "Not Found",
+			status: '404',
+			statusDescription: 'Not Found',
 			body: msg,
-			headers: this.headers("text/plain; charset=utf-8"),
+			headers: this.headers('text/plain; charset=utf-8'),
 		}
 	}
 
 	private payloadTooLarge(msg: string): CloudFrontResultResponse {
 		return {
-			status: "413",
-			statusDescription: "Payload Too Large",
+			status: '413',
+			statusDescription: 'Payload Too Large',
 			body: msg,
-			headers: this.headers("text/plain; charset=utf-8"),
+			headers: this.headers('text/plain; charset=utf-8'),
 		}
 	}
 
@@ -384,10 +384,10 @@ class ImageResizeEdge {
 		console.error(msg, error)
 
 		return {
-			status: "500",
-			statusDescription: "Server Error",
+			status: '500',
+			statusDescription: 'Server Error',
 			body: msg,
-			headers: this.headers("text/plain; charset=utf-8"),
+			headers: this.headers('text/plain; charset=utf-8'),
 		}
 	}
 

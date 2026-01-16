@@ -1,5 +1,5 @@
 ---
-title: "Latex"
+title: 'Latex'
 tags:
     - plugin/transformer
 ---

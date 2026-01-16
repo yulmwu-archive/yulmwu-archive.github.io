@@ -1,12 +1,12 @@
 ---
-title: "[Tools] AWS 다이어그램 만드는 방법 (draw.io)"
-description: "다이어그램 도구, draw.io 사용법 (AWS 다이어그램 만드는 방법)"
-slug: "2025-07-19-how-to-use-draw-io"
+title: '[Tools] AWS 다이어그램 만드는 방법 (draw.io)'
+description: '다이어그램 도구, draw.io 사용법 (AWS 다이어그램 만드는 방법)'
+slug: '2025-07-19-how-to-use-draw-io'
 author: yulmwu
 date: 2025-07-19T06:05:51.558Z
 updated_at: 2026-01-12T11:42:45.594Z
-categories: ["Misc"]
-tags: ["aws"]
+categories: ['Misc']
+tags: ['aws']
 series:
     name: Misc
     slug: misc

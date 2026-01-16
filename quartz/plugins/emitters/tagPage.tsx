@@ -1,17 +1,17 @@
-import { QuartzEmitterPlugin } from "../types"
-import { QuartzComponentProps } from "../../components/types"
-import HeaderConstructor from "../../components/Header"
-import BodyConstructor from "../../components/Body"
-import { pageResources, renderPage } from "../../components/renderPage"
-import { ProcessedContent, QuartzPluginData, defaultProcessedContent } from "../vfile"
-import { FullPageLayout } from "../../cfg"
-import { FullSlug, getAllSegmentPrefixes, joinSegments, pathToRoot } from "../../util/path"
-import { defaultListPageLayout, sharedPageComponents } from "../../../quartz.layout"
-import { TagContent } from "../../components"
-import { write } from "./helpers"
-import { i18n, TRANSLATIONS } from "../../i18n"
-import { BuildCtx } from "../../util/ctx"
-import { StaticResources } from "../../util/resources"
+import { QuartzEmitterPlugin } from '../types'
+import { QuartzComponentProps } from '../../components/types'
+import HeaderConstructor from '../../components/Header'
+import BodyConstructor from '../../components/Body'
+import { pageResources, renderPage } from '../../components/renderPage'
+import { ProcessedContent, QuartzPluginData, defaultProcessedContent } from '../vfile'
+import { FullPageLayout } from '../../cfg'
+import { FullSlug, getAllSegmentPrefixes, joinSegments, pathToRoot } from '../../util/path'
+import { defaultListPageLayout, sharedPageComponents } from '../../../quartz.layout'
+import { TagContent } from '../../components'
+import { write } from './helpers'
+import { i18n, TRANSLATIONS } from '../../i18n'
+import { BuildCtx } from '../../util/ctx'
+import { StaticResources } from '../../util/resources'
 
 interface TagPageOptions extends FullPageLayout {
 	sort?: (f1: QuartzPluginData, f2: QuartzPluginData) => number
@@ -27,18 +27,18 @@ function computeTagInfo(
 	)
 
 	// add base tag
-	tags.add("index")
+	tags.add('index')
 
 	const tagDescriptions: Record<string, ProcessedContent> = Object.fromEntries(
 		[...tags].map((tag) => {
 			const title =
-				tag === "index"
+				tag === 'index'
 					? i18n(locale).pages.tagContent.tagIndex
 					: `${i18n(locale).pages.tagContent.tag}: ${tag}`
 			return [
 				tag,
 				defaultProcessedContent({
-					slug: joinSegments("tags", tag) as FullSlug,
+					slug: joinSegments('tags', tag) as FullSlug,
 					frontmatter: { title, tags: [] },
 				}),
 			]
@@ -48,8 +48,8 @@ function computeTagInfo(
 	// Update with actual content if available
 	for (const [tree, file] of content) {
 		const slug = file.data.slug!
-		if (slug.startsWith("tags/")) {
-			const tag = slug.slice("tags/".length)
+		if (slug.startsWith('tags/')) {
+			const tag = slug.slice('tags/'.length)
 			if (tags.has(tag)) {
 				tagDescriptions[tag] = [tree, file]
 				if (file.data.frontmatter?.title === tag) {
@@ -70,7 +70,7 @@ async function processTagPage(
 	opts: FullPageLayout,
 	resources: StaticResources,
 ) {
-	const slug = joinSegments("tags", tag) as FullSlug
+	const slug = joinSegments('tags', tag) as FullSlug
 	const [tree, file] = tagContent
 	const cfg = ctx.cfg.configuration
 	const externalResources = pageResources(pathToRoot(slug), resources)
@@ -89,7 +89,7 @@ async function processTagPage(
 		ctx,
 		content,
 		slug: file.data.slug!,
-		ext: ".html",
+		ext: '.html',
 	})
 }
 
@@ -106,7 +106,7 @@ export const TagPage: QuartzEmitterPlugin<Partial<TagPageOptions>> = (userOpts) 
 	const Body = BodyConstructor()
 
 	return {
-		name: "TagPage",
+		name: 'TagPage',
 		getQuartzComponents() {
 			return [Head, Header, Body, ...header, ...beforeBody, pageBody, ...afterBody, ...left, ...right, Footer]
 		},
@@ -130,8 +130,8 @@ export const TagPage: QuartzEmitterPlugin<Partial<TagPageOptions>> = (userOpts) 
 				const slug = changeEvent.file.data.slug!
 
 				// If it's a tag page itself that changed
-				if (slug.startsWith("tags/")) {
-					const tag = slug.slice("tags/".length)
+				if (slug.startsWith('tags/')) {
+					const tag = slug.slice('tags/'.length)
 					affectedTags.add(tag)
 				}
 
@@ -140,7 +140,7 @@ export const TagPage: QuartzEmitterPlugin<Partial<TagPageOptions>> = (userOpts) 
 				fileTags.flatMap(getAllSegmentPrefixes).forEach((tag) => affectedTags.add(tag))
 
 				// Always update the index tag page if any file changes
-				affectedTags.add("index")
+				affectedTags.add('index')
 			}
 
 			// If there are affected tags, rebuild their pages

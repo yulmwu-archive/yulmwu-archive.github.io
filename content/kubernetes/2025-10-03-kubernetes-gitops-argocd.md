@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes CI/CD] GitOps with ArgoCD (Kustomize Demo) "
-description: "ArgoCD를 통한 쿠버네티스 GitOps 구성 및 Kustomize 배포"
-slug: "2025-10-03-kubernetes-gitops-argocd"
+title: '[Kubernetes CI/CD] GitOps with ArgoCD (Kustomize Demo) '
+description: 'ArgoCD를 통한 쿠버네티스 GitOps 구성 및 Kustomize 배포'
+slug: '2025-10-03-kubernetes-gitops-argocd'
 author: yulmwu
 date: 2025-10-03T12:07:32.658Z
 updated_at: 2026-01-14T19:37:48.649Z
-categories: ["Kubernetes"]
-tags: ["CI/CD", "argocd", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['CI/CD', 'argocd', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -135,17 +135,17 @@ metadata:
     name: demo-proj
     namespace: argocd
 spec:
-    description: "Demo project"
+    description: 'Demo project'
     sourceRepos:
-        - "*"
+        - '*'
     destinations:
         - namespace: dev
           server: https://kubernetes.default.svc
         - namespace: prod
           server: https://kubernetes.default.svc
     clusterResourceWhitelist:
-        - group: "*"
-          kind: "*"
+        - group: '*'
+          kind: '*'
 ```
 
 AppProject를 만들지 않으면 default 프로젝트에 애플리케이션이 만들어지는데, 프로젝트를 따로 만들 수 있다.
@@ -197,9 +197,9 @@ spec:
                       - containerPort: 3030
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "3030"
+                        value: '3030'
 ---
 apiVersion: v1
 kind: Service

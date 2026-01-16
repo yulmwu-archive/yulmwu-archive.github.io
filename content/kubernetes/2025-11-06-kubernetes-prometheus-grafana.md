@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Observability with Prometheus + Grafana "
-description: "Prometheus와 Grafana를 통한 쿠버네티스 Observability 확보하기"
-slug: "2025-11-06-kubernetes-prometheus-grafana"
+title: '[Kubernetes] Observability with Prometheus + Grafana '
+description: 'Prometheus와 Grafana를 통한 쿠버네티스 Observability 확보하기'
+slug: '2025-11-06-kubernetes-prometheus-grafana'
 author: yulmwu
 date: 2025-11-06T12:42:55.584Z
 updated_at: 2025-12-09T15:19:51.260Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -428,8 +428,8 @@ npm install express prom-client
 그리고 아래의 `index.js`와 Dockerfile을 작성하겠다.
 
 ```js
-const express = require("express")
-const client = require("prom-client")
+const express = require('express')
+const client = require('prom-client')
 
 const app = express()
 const register = new client.Registry()
@@ -437,19 +437,19 @@ const register = new client.Registry()
 client.collectDefaultMetrics({ register })
 
 const httpRequestCounter = new client.Counter({
-	name: "http_requests_total",
-	help: "Total number of HTTP requests",
-	labelNames: ["method", "route", "status_code"],
+	name: 'http_requests_total',
+	help: 'Total number of HTTP requests',
+	labelNames: ['method', 'route', 'status_code'],
 })
 register.registerMetric(httpRequestCounter)
 
-app.get("/", (req, res) => {
-	httpRequestCounter.inc({ method: "GET", route: "/", status_code: 200 })
-	res.send("Hello Metrics!")
+app.get('/', (req, res) => {
+	httpRequestCounter.inc({ method: 'GET', route: '/', status_code: 200 })
+	res.send('Hello Metrics!')
 })
 
-app.get("/metrics", async (req, res) => {
-	res.set("Content-Type", register.contentType)
+app.get('/metrics', async (req, res) => {
+	res.set('Content-Type', register.contentType)
 	res.end(await register.metrics())
 })
 

@@ -1,8 +1,8 @@
-import { FullSlug, isFolderPath, resolveRelative } from "../util/path"
-import { QuartzPluginData } from "../plugins/vfile"
-import { Date, getDate } from "./Date"
-import { QuartzComponent, QuartzComponentProps } from "./types"
-import { GlobalConfiguration } from "../cfg"
+import { FullSlug, isFolderPath, resolveRelative } from '../util/path'
+import { QuartzPluginData } from '../plugins/vfile'
+import { Date, getDate } from './Date'
+import { QuartzComponent, QuartzComponentProps } from './types'
+import { GlobalConfiguration } from '../cfg'
 
 export type SortFn = (f1: QuartzPluginData, f2: QuartzPluginData) => number
 
@@ -20,8 +20,8 @@ export function byDateAndAlphabetical(cfg: GlobalConfiguration): SortFn {
 		}
 
 		// otherwise, sort lexographically by title
-		const f1Title = f1.frontmatter?.title.toLowerCase() ?? ""
-		const f2Title = f2.frontmatter?.title.toLowerCase() ?? ""
+		const f1Title = f1.frontmatter?.title.toLowerCase() ?? ''
+		const f2Title = f2.frontmatter?.title.toLowerCase() ?? ''
 		return f1Title.localeCompare(f2Title)
 	}
 }
@@ -29,8 +29,8 @@ export function byDateAndAlphabetical(cfg: GlobalConfiguration): SortFn {
 export function byDateAndAlphabeticalFolderFirst(cfg: GlobalConfiguration): SortFn {
 	return (f1, f2) => {
 		// Sort folders first
-		const f1IsFolder = isFolderPath(f1.slug ?? "")
-		const f2IsFolder = isFolderPath(f2.slug ?? "")
+		const f1IsFolder = isFolderPath(f1.slug ?? '')
+		const f2IsFolder = isFolderPath(f2.slug ?? '')
 		if (f1IsFolder && !f2IsFolder) return -1
 		if (!f1IsFolder && f2IsFolder) return 1
 
@@ -46,8 +46,8 @@ export function byDateAndAlphabeticalFolderFirst(cfg: GlobalConfiguration): Sort
 		}
 
 		// otherwise, sort lexographically by title
-		const f1Title = f1.frontmatter?.title.toLowerCase() ?? ""
-		const f2Title = f2.frontmatter?.title.toLowerCase() ?? ""
+		const f1Title = f1.frontmatter?.title.toLowerCase() ?? ''
+		const f2Title = f2.frontmatter?.title.toLowerCase() ?? ''
 		return f1Title.localeCompare(f2Title)
 	}
 }

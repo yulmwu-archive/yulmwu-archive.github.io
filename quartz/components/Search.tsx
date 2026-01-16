@@ -1,9 +1,9 @@
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
-import style from "./styles/search.scss"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from './types'
+import style from './styles/search.scss'
 // @ts-ignore
-import script from "./scripts/search.inline"
-import { classNames } from "../util/lang"
-import { i18n } from "../i18n"
+import script from './scripts/search.inline'
+import { classNames } from '../util/lang'
+import { i18n } from '../i18n'
 
 export interface SearchOptions {
 	enablePreview: boolean
@@ -18,7 +18,7 @@ export default ((userOpts?: Partial<SearchOptions>) => {
 		const opts = { ...defaultOptions, ...userOpts }
 		const searchPlaceholder = i18n(cfg.locale).components.search.searchBarPlaceholder
 		return (
-			<div class={classNames(displayClass, "search")}>
+			<div class={classNames(displayClass, 'search')}>
 				<button class="search-button">
 					<svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7">
 						<title>Search</title>

@@ -1,14 +1,14 @@
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../types"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from '../types'
 
-import style from "../styles/listPage.scss"
-import { PageList, SortFn } from "../PageList"
-import { Root } from "hast"
-import { htmlToJsx } from "../../util/jsx"
-import { i18n } from "../../i18n"
-import { QuartzPluginData } from "../../plugins/vfile"
-import { ComponentChildren } from "preact"
-import { concatenateResources } from "../../util/resources"
-import { trieFromAllFiles } from "../../util/ctx"
+import style from '../styles/listPage.scss'
+import { PageList, SortFn } from '../PageList'
+import { Root } from 'hast'
+import { htmlToJsx } from '../../util/jsx'
+import { i18n } from '../../i18n'
+import { QuartzPluginData } from '../../plugins/vfile'
+import { ComponentChildren } from 'preact'
+import { concatenateResources } from '../../util/resources'
+import { trieFromAllFiles } from '../../util/ctx'
 
 interface FolderContentOptions {
 	/**
@@ -31,7 +31,7 @@ export default ((opts?: Partial<FolderContentOptions>) => {
 		const { tree, fileData, allFiles, cfg } = props
 
 		const trie = (props.ctx.trie ??= trieFromAllFiles(allFiles))
-		const folder = trie.findNode(fileData.slug!.split("/"))
+		const folder = trie.findNode(fileData.slug!.split('/'))
 		if (!folder) {
 			return null
 		}
@@ -46,8 +46,8 @@ export default ((opts?: Partial<FolderContentOptions>) => {
 
 					if (node.isFolder && options.showSubfolders) {
 						// folders that dont have data need synthetic files
-						const getMostRecentDates = (): QuartzPluginData["dates"] => {
-							let maybeDates: QuartzPluginData["dates"] | undefined = undefined
+						const getMostRecentDates = (): QuartzPluginData['dates'] => {
+							let maybeDates: QuartzPluginData['dates'] | undefined = undefined
 							for (const child of node.children) {
 								if (child.data?.dates) {
 									// compare all dates and assign to maybeDates if its more recent or its not set
@@ -89,7 +89,7 @@ export default ((opts?: Partial<FolderContentOptions>) => {
 				})
 				.filter((page) => page !== undefined) ?? []
 		const cssClasses: string[] = fileData.frontmatter?.cssclasses ?? []
-		const classes = cssClasses.join(" ")
+		const classes = cssClasses.join(' ')
 		const listProps = {
 			...props,
 			sort: options.sort,

@@ -1,12 +1,12 @@
 ---
 title: "[Kafka Producer] About Producer's Message Delivery Time "
-description: "Kafka 프로듀서의 send(ProducerRecord) 호출 부터 브로커의 응답까지의 전송 시간에 대하여"
-slug: "2025-12-01-kafka-producer-message-delivery-time"
+description: 'Kafka 프로듀서의 send(ProducerRecord) 호출 부터 브로커의 응답까지의 전송 시간에 대하여'
+slug: '2025-12-01-kafka-producer-message-delivery-time'
 author: yulmwu
 date: 2025-12-01T01:34:12.283Z
 updated_at: 2026-01-14T08:53:22.077Z
-categories: ["Kafka"]
-tags: ["kafka"]
+categories: ['Kafka']
+tags: ['kafka']
 series:
     name: Kafka
     slug: kafka

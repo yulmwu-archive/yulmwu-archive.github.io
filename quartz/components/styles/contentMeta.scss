@@ -2,12 +2,12 @@
 	margin-top: 1rem;
 	color: var(--darkgray);
 
-	&[show-comma="true"] {
+	&[show-comma='true'] {
 		> *:not(:last-child) {
 			margin-right: 8px;
 
 			&::after {
-				content: ",";
+				content: ',';
 			}
 		}
 	}

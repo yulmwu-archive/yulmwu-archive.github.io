@@ -1,9 +1,9 @@
-import { QuartzTransformerPlugin } from "../types"
-import { PluggableList } from "unified"
-import { visit } from "unist-util-visit"
-import { ReplaceFunction, findAndReplace as mdastFindReplace } from "mdast-util-find-and-replace"
-import { Root, Html, Paragraph, Text, Link, Parent } from "mdast"
-import { BuildVisitor } from "unist-util-visit"
+import { QuartzTransformerPlugin } from '../types'
+import { PluggableList } from 'unified'
+import { visit } from 'unist-util-visit'
+import { ReplaceFunction, findAndReplace as mdastFindReplace } from 'mdast-util-find-and-replace'
+import { Root, Html, Paragraph, Text, Link, Parent } from 'mdast'
+import { BuildVisitor } from 'unist-util-visit'
 
 export interface Options {
 	orComponent: boolean
@@ -29,24 +29,24 @@ const defaultOptions: Options = {
 	attributeComponent: true,
 }
 
-const orRegex = new RegExp(/{{or:(.*?)}}/, "g")
-const TODORegex = new RegExp(/{{.*?\bTODO\b.*?}}/, "g")
-const DONERegex = new RegExp(/{{.*?\bDONE\b.*?}}/, "g")
+const orRegex = new RegExp(/{{or:(.*?)}}/, 'g')
+const TODORegex = new RegExp(/{{.*?\bTODO\b.*?}}/, 'g')
+const DONERegex = new RegExp(/{{.*?\bDONE\b.*?}}/, 'g')
 
-const blockquoteRegex = new RegExp(/(\[\[>\]\])\s*(.*)/, "g")
-const roamHighlightRegex = new RegExp(/\^\^(.+)\^\^/, "g")
-const roamItalicRegex = new RegExp(/__(.+)__/, "g")
+const blockquoteRegex = new RegExp(/(\[\[>\]\])\s*(.*)/, 'g')
+const roamHighlightRegex = new RegExp(/\^\^(.+)\^\^/, 'g')
+const roamItalicRegex = new RegExp(/__(.+)__/, 'g')
 
 function isSpecialEmbed(node: Paragraph): boolean {
 	if (node.children.length !== 2) return false
 
 	const [textNode, linkNode] = node.children
 	return (
-		textNode.type === "text" &&
-		textNode.value.startsWith("{{[[") &&
-		linkNode.type === "link" &&
-		linkNode.children[0].type === "text" &&
-		linkNode.children[0].value.endsWith("}}")
+		textNode.type === 'text' &&
+		textNode.value.startsWith('{{[[') &&
+		linkNode.type === 'link' &&
+		linkNode.children[0].type === 'text' &&
+		linkNode.children[0].value.endsWith('}}')
 	)
 }
 
@@ -56,10 +56,10 @@ function transformSpecialEmbed(node: Paragraph, opts: Options): Html | null {
 	const url = linkNode.url.slice(0, -2) // Remove the trailing '}}'
 
 	switch (embedType) {
-		case "audio":
+		case 'audio':
 			return opts.audioComponent
 				? {
-						type: "html",
+						type: 'html',
 						value: `<audio controls>
           <source src="${url}" type="audio/mpeg">
           <source src="${url}" type="audio/ogg">
@@ -67,29 +67,29 @@ function transformSpecialEmbed(node: Paragraph, opts: Options): Html | null {
         </audio>`,
 					}
 				: null
-		case "video":
+		case 'video':
 			if (!opts.videoComponent) return null
 			// Check if it's a YouTube video
 			const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/)
 			if (youtubeMatch) {
-				const videoId = youtubeMatch[1].split("&")[0] // Remove additional parameters
+				const videoId = youtubeMatch[1].split('&')[0] // Remove additional parameters
 				const playlistMatch = url.match(/[?&]list=([^#\&\?]*)/)
 				const playlistId = playlistMatch ? playlistMatch[1] : null
 
 				return {
-					type: "html",
+					type: 'html',
 					value: `<iframe 
             class="external-embed youtube"
             width="600px"
             height="350px"
-            src="https://www.youtube.com/embed/${videoId}${playlistId ? `?list=${playlistId}` : ""}"
+            src="https://www.youtube.com/embed/${videoId}${playlistId ? `?list=${playlistId}` : ''}"
             frameborder="0"
             allow="fullscreen"
           ></iframe>`,
 				}
 			} else {
 				return {
-					type: "html",
+					type: 'html',
 					value: `<video controls>
             <source src="${url}" type="video/mp4">
             <source src="${url}" type="video/webm">
@@ -97,10 +97,10 @@ function transformSpecialEmbed(node: Paragraph, opts: Options): Html | null {
           </video>`,
 				}
 			}
-		case "pdf":
+		case 'pdf':
 			return opts.pdfComponent
 				? {
-						type: "html",
+						type: 'html',
 						value: `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`,
 					}
 				: null
@@ -113,7 +113,7 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 	const opts = { ...defaultOptions, ...userOpts }
 
 	return {
-		name: "RoamFlavoredMarkdown",
+		name: 'RoamFlavoredMarkdown',
 		markdownPlugins() {
 			const plugins: PluggableList = []
 
@@ -123,22 +123,22 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 
 					// Handle special embeds (audio, video, PDF)
 					if (opts.audioComponent || opts.videoComponent || opts.pdfComponent) {
-						visit(tree, "paragraph", ((node: Paragraph, index: number, parent: Parent | null) => {
+						visit(tree, 'paragraph', ((node: Paragraph, index: number, parent: Parent | null) => {
 							if (isSpecialEmbed(node)) {
 								const transformedNode = transformSpecialEmbed(node, opts)
 								if (transformedNode && parent) {
 									parent.children[index] = transformedNode
 								}
 							}
-						}) as BuildVisitor<Root, "paragraph">)
+						}) as BuildVisitor<Root, 'paragraph'>)
 					}
 
 					// Roam italic syntax
 					replacements.push([
 						roamItalicRegex,
 						(_value: string, match: string) => ({
-							type: "emphasis",
-							children: [{ type: "text", value: match }],
+							type: 'emphasis',
+							children: [{ type: 'text', value: match }],
 						}),
 					])
 
@@ -146,7 +146,7 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 					replacements.push([
 						roamHighlightRegex,
 						(_value: string, inner: string) => ({
-							type: "html",
+							type: 'html',
 							value: `<span class="text-highlight">${inner}</span>`,
 						}),
 					])
@@ -157,12 +157,12 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 							(match: string) => {
 								const matchResult = match.match(/{{or:(.*?)}}/)
 								if (matchResult === null) {
-									return { type: "html", value: "" }
+									return { type: 'html', value: '' }
 								}
 								const optionsString: string = matchResult[1]
-								const options: string[] = optionsString.split("|")
-								const selectHtml: string = `<select>${options.map((option: string) => `<option value="${option}">${option}</option>`).join("")}</select>`
-								return { type: "html", value: selectHtml }
+								const options: string[] = optionsString.split('|')
+								const selectHtml: string = `<select>${options.map((option: string) => `<option value="${option}">${option}</option>`).join('')}</select>`
+								return { type: 'html', value: selectHtml }
 							},
 						])
 					}
@@ -171,7 +171,7 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 						replacements.push([
 							TODORegex,
 							() => ({
-								type: "html",
+								type: 'html',
 								value: `<input type="checkbox" disabled>`,
 							}),
 						])
@@ -181,7 +181,7 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 						replacements.push([
 							DONERegex,
 							() => ({
-								type: "html",
+								type: 'html',
 								value: `<input type="checkbox" checked disabled>`,
 							}),
 						])
@@ -191,7 +191,7 @@ export const RoamFlavoredMarkdown: QuartzTransformerPlugin<Partial<Options> | un
 						replacements.push([
 							blockquoteRegex,
 							(_match: string, _marker: string, content: string) => ({
-								type: "html",
+								type: 'html',
 								value: `<blockquote>${content.trim()}</blockquote>`,
 							}),
 						])

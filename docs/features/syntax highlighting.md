@@ -32,8 +32,8 @@ export function trimPathSuffix(fp: string): string {
 ```ts
 export function trimPathSuffix(fp: string): string {
 	fp = clientSideSlug(fp)
-	let [cleanPath, anchor] = fp.split("#", 2)
-	anchor = anchor === undefined ? "" : "#" + anchor
+	let [cleanPath, anchor] = fp.split('#', 2)
+	anchor = anchor === undefined ? '' : '#' + anchor
 
 	return cleanPath + anchor
 }
@@ -52,8 +52,8 @@ Add a file title to your code block, with text inside double quotes (`""`):
 ```ts title="quartz/path.ts"
 export function trimPathSuffix(fp: string): string {
 	fp = clientSideSlug(fp)
-	let [cleanPath, anchor] = fp.split("#", 2)
-	anchor = anchor === undefined ? "" : "#" + anchor
+	let [cleanPath, anchor] = fp.split('#', 2)
+	anchor = anchor === undefined ? '' : '#' + anchor
 
 	return cleanPath + anchor
 }
@@ -72,8 +72,8 @@ Place a numeric range inside `{}`.
 ```ts {2-3,6}
 export function trimPathSuffix(fp: string): string {
 	fp = clientSideSlug(fp)
-	let [cleanPath, anchor] = fp.split("#", 2)
-	anchor = anchor === undefined ? "" : "#" + anchor
+	let [cleanPath, anchor] = fp.split('#', 2)
+	anchor = anchor === undefined ? '' : '#' + anchor
 
 	return cleanPath + anchor
 }
@@ -92,7 +92,7 @@ const [name, setName] = useState('Taylor');
 
 ```js /useState/
 const [age, setAge] = useState(50)
-const [name, setName] = useState("Taylor")
+const [name, setName] = useState('Taylor')
 ```
 
 ### Inline Highlighting
@@ -118,8 +118,8 @@ Syntax highlighting has line numbers configured automatically. If you want to st
 ```ts showLineNumbers{20}
 export function trimPathSuffix(fp: string): string {
 	fp = clientSideSlug(fp)
-	let [cleanPath, anchor] = fp.split("#", 2)
-	anchor = anchor === undefined ? "" : "#" + anchor
+	let [cleanPath, anchor] = fp.split('#', 2)
+	anchor = anchor === undefined ? '' : '#' + anchor
 
 	return cleanPath + anchor
 }

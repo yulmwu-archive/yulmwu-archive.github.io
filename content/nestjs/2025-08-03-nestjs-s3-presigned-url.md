@@ -1,12 +1,12 @@
 ---
-title: "[NestJS] Using AWS S3 Presigned URL"
-description: "NestJS에서 AWS S3 Presigned URL 사용하기"
-slug: "2025-08-03-nestjs-s3-presigned-url"
+title: '[NestJS] Using AWS S3 Presigned URL'
+description: 'NestJS에서 AWS S3 Presigned URL 사용하기'
+slug: '2025-08-03-nestjs-s3-presigned-url'
 author: yulmwu
 date: 2025-08-03T05:36:07.088Z
 updated_at: 2026-01-13T04:05:06.996Z
-categories: ["NestJS"]
-tags: ["NestJS", "aws"]
+categories: ['NestJS']
+tags: ['NestJS', 'aws']
 series:
     name: NestJS
     slug: nestjs
@@ -72,24 +72,24 @@ AWS_S3_BUCKET_NAME=bucket_name
 ```ts
 // upload.module.ts
 
-import { Module } from "@nestjs/common"
-import { UploadController } from "./upload.controller"
-import { UploadService } from "./upload.service"
-import { ConfigService } from "@nestjs/config"
-import { S3Client } from "@aws-sdk/client-s3"
+import { Module } from '@nestjs/common'
+import { UploadController } from './upload.controller'
+import { UploadService } from './upload.service'
+import { ConfigService } from '@nestjs/config'
+import { S3Client } from '@aws-sdk/client-s3'
 
 @Module({
 	controllers: [UploadController],
 	providers: [
 		{
-			provide: "S3_CLIENT",
+			provide: 'S3_CLIENT',
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => {
 				return new S3Client({
-					region: configService.get<string>("AWS_REGION") ?? "ap-northeast-2",
+					region: configService.get<string>('AWS_REGION') ?? 'ap-northeast-2',
 					credentials: {
-						accessKeyId: configService.get("AWS_ACCESS_KEY_ID") ?? "",
-						secretAccessKey: configService.get("AWS_SECRET_ACCESS_KEY") ?? "",
+						accessKeyId: configService.get('AWS_ACCESS_KEY_ID') ?? '',
+						secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY') ?? '',
 					},
 				})
 			},
@@ -113,17 +113,17 @@ private readonly s3: S3Client
 ```ts
 // upload.service.ts
 
-import { Inject, Injectable } from "@nestjs/common"
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { ConfigService } from "@nestjs/config"
-import { GeneratePresignedUrlRequestDto, PresignedUrlResponseDto } from "./dto"
-import { v4 as uuidv4 } from "uuid"
+import { Inject, Injectable } from '@nestjs/common'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { ConfigService } from '@nestjs/config'
+import { GeneratePresignedUrlRequestDto, PresignedUrlResponseDto } from './dto'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UploadService {
 	constructor(
-		@Inject("S3_CLIENT")
+		@Inject('S3_CLIENT')
 		private readonly s3: S3Client,
 		private readonly configService: ConfigService,
 	) {}
@@ -132,7 +132,7 @@ export class UploadService {
 		const key = `uploads/${uuidv4()}/${dto.filename}`
 
 		const command = new PutObjectCommand({
-			Bucket: this.configService.get<string>("AWS_S3_BUCKET_NAME"),
+			Bucket: this.configService.get<string>('AWS_S3_BUCKET_NAME'),
 			Key: key,
 			ContentType: dto.contentType,
 		})
@@ -158,20 +158,20 @@ export class UploadService {
 ```ts
 // upload.controller.ts
 
-import { Controller, Post, Body } from "@nestjs/common"
-import { UploadService } from "./upload.service"
-import { GeneratePresignedUrlRequestDto, PresignedUrlResponseDto } from "./dto"
-import { ApiBadRequestResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger"
+import { Controller, Post, Body } from '@nestjs/common'
+import { UploadService } from './upload.service'
+import { GeneratePresignedUrlRequestDto, PresignedUrlResponseDto } from './dto'
+import { ApiBadRequestResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 
-@Controller("upload")
-@ApiTags("Upload")
+@Controller('upload')
+@ApiTags('Upload')
 export class UploadController {
 	constructor(private readonly uploadService: UploadService) {}
 
-	@Post("presigned-url")
-	@ApiOperation({ summary: "Generate a presigned URL for file upload" })
-	@ApiResponse({ status: 201, description: "Presigned URL generated successfully", type: PresignedUrlResponseDto })
-	@ApiBadRequestResponse({ description: "Invalid request" })
+	@Post('presigned-url')
+	@ApiOperation({ summary: 'Generate a presigned URL for file upload' })
+	@ApiResponse({ status: 201, description: 'Presigned URL generated successfully', type: PresignedUrlResponseDto })
+	@ApiBadRequestResponse({ description: 'Invalid request' })
 	getPresignedUrl(@Body() dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
 		return this.uploadService.generatePresignedUrl(dto)
 	}
@@ -181,16 +181,16 @@ export class UploadController {
 ```ts
 // dto/request.dto.ts
 
-import { ApiProperty } from "@nestjs/swagger"
-import { IsString, IsNotEmpty } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger'
+import { IsString, IsNotEmpty } from 'class-validator'
 
 export class GeneratePresignedUrlRequestDto {
-	@ApiProperty({ description: "The name of the file to be uploaded.", example: "example.jpg" })
+	@ApiProperty({ description: 'The name of the file to be uploaded.', example: 'example.jpg' })
 	@IsString()
 	@IsNotEmpty()
 	filename: string
 
-	@ApiProperty({ description: "The content type of the file to be uploaded. (MIME type)", example: "image/jpeg" })
+	@ApiProperty({ description: 'The content type of the file to be uploaded. (MIME type)', example: 'image/jpeg' })
 	@IsString()
 	@IsNotEmpty()
 	contentType: string
@@ -200,21 +200,21 @@ export class GeneratePresignedUrlRequestDto {
 ```ts
 // dto/response.dto.ts
 
-import { ApiProperty } from "@nestjs/swagger"
-import { IsString, IsNotEmpty } from "class-validator"
+import { ApiProperty } from '@nestjs/swagger'
+import { IsString, IsNotEmpty } from 'class-validator'
 
 export class PresignedUrlResponseDto {
 	@ApiProperty({
-		description: "The presigned URL for uploading the file.",
-		example: "https://BUCKET.s3.amazonaws.com/uploads/UUID/example.jpg?AWSAccessKeyId=...",
+		description: 'The presigned URL for uploading the file.',
+		example: 'https://BUCKET.s3.amazonaws.com/uploads/UUID/example.jpg?AWSAccessKeyId=...',
 	})
 	@IsString()
 	@IsNotEmpty()
 	url: string
 
 	@ApiProperty({
-		description: "The key under which the file will be stored in S3.",
-		example: "uploads/UUID/example.jpg",
+		description: 'The key under which the file will be stored in S3.',
+		example: 'uploads/UUID/example.jpg',
 	})
 	key: string
 }
@@ -223,8 +223,8 @@ export class PresignedUrlResponseDto {
 ```ts
 // dto/index.ts
 
-export * from "./request.dto"
-export * from "./response.dto"
+export * from './request.dto'
+export * from './response.dto'
 ```
 
 필자는 업로드 시 UUID를 포함하게 하였기 때문에 응답 DTO에 해당 객체의 키를 반환하도록 하였다.

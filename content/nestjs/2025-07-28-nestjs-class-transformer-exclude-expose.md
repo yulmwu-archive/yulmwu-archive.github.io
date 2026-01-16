@@ -1,12 +1,12 @@
 ---
-title: "[NestJS] class-transformer @Exclude(), @Expose() Decorators and NestJS Interceptor"
-description: "NestJS Response DTO에서 특정 필드만 제외시킬 수 있을까? (Class Transformer)"
-slug: "2025-07-28-nestjs-class-transformer-exclude-expose"
+title: '[NestJS] class-transformer @Exclude(), @Expose() Decorators and NestJS Interceptor'
+description: 'NestJS Response DTO에서 특정 필드만 제외시킬 수 있을까? (Class Transformer)'
+slug: '2025-07-28-nestjs-class-transformer-exclude-expose'
 author: yulmwu
 date: 2025-07-28T05:31:07.318Z
 updated_at: 2026-01-13T04:05:06.876Z
-categories: ["NestJS"]
-tags: ["NestJS"]
+categories: ['NestJS']
+tags: ['NestJS']
 series:
     name: NestJS
     slug: nestjs
@@ -83,7 +83,7 @@ class User {
 	}
 
 	is_gmail(): boolean {
-		return this.email.endsWith("@gmail.com")
+		return this.email.endsWith('@gmail.com')
 	}
 }
 ```
@@ -93,8 +93,8 @@ class User {
 ```ts
 const obj = {
 	id: 1,
-	username: "admin",
-	email: "normal8781@gmail.com",
+	username: 'admin',
+	email: 'normal8781@gmail.com',
 }
 ```
 
@@ -111,7 +111,7 @@ const user = new User(obj.id, obj.username, obj.email)
 이때 `class-transformer` 라이브러리를 사용하면 아주 쉽고 빠르게 변환할 수 있다.
 
 ```ts
-import { plainToInstance } from "class-transformer"
+import { plainToInstance } from 'class-transformer'
 
 const user = plainToInstance(User, obj) // User { ... }
 ```
@@ -119,7 +119,7 @@ const user = plainToInstance(User, obj) // User { ... }
 반대로 객체를 JSON Plain 데이터로 직렬화할 수 도 있다.
 
 ```ts
-import { plainToInstance } from "class-transformer"
+import { plainToInstance } from 'class-transformer'
 
 const plain = instanceToPlain(user) // { ... }
 ```
@@ -163,7 +163,7 @@ class User {
 	}
 
 	is_gmail(): boolean {
-		return this.email.endsWith("@gmail.com")
+		return this.email.endsWith('@gmail.com')
 	}
 }
 ```
@@ -171,7 +171,7 @@ class User {
 그리고 이렇게 명시된 `@Exclude()` 데코레이터는 `class-transformer` 라이브러리의 `instanceToPlain()` 함수 호출 시 자동으로 제외되며 반환된다.
 
 ```ts
-import { plainToInstance } from "class-transformer"
+import { plainToInstance } from 'class-transformer'
 
 const plain = instanceToPlain(user) // { id: ..., username: '...' }
 ```
@@ -179,7 +179,7 @@ const plain = instanceToPlain(user) // { id: ..., username: '...' }
 다만 아무 옵션 없이 그냥 `@Exclude()` 데코레이터를 사용하면 아래와 같이 직렬화/역직렬화 모두 적용된다.
 
 ```ts
-import { Exclude, instanceToPlain, plainToInstance } from "class-transformer"
+import { Exclude, instanceToPlain, plainToInstance } from 'class-transformer'
 
 // class User {
 //    @Exclude()
@@ -242,7 +242,7 @@ User { id: 1, username: 'admin', email: undefined }
 아래의 코드는 위에서 `@Exclude()` 데코레이터 예제와 같은 동작을 한다.
 
 ```ts
-import { Exclude, Expose } from "class-transformer"
+import { Exclude, Expose } from 'class-transformer'
 
 @Exclude()
 class User {
@@ -265,7 +265,7 @@ class User {
 	}
 
 	is_gmail(): boolean {
-		return this.email.endsWith("@gmail.com")
+		return this.email.endsWith('@gmail.com')
 	}
 }
 ```
@@ -304,10 +304,10 @@ NestJS의 인터셉터(Interceptor)는 간단히 말해 요청이나 응답의 �
 ```ts
 // src/common/interceptors/transform.interceptor.ts
 
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from "@nestjs/common"
-import { instanceToPlain } from "class-transformer"
-import { Observable } from "rxjs"
-import { map } from "rxjs/operators"
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
+import { instanceToPlain } from 'class-transformer'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
@@ -324,7 +324,7 @@ export class TransformInterceptor implements NestInterceptor {
 필자의 경우 전역으로 등록해주었다.
 
 ```ts
-import { TransformInterceptor } from "./common/interceptors/transform.interceptor"
+import { TransformInterceptor } from './common/interceptors/transform.interceptor'
 
 // 생략
 const app = await NestFactory.create(AppModule)

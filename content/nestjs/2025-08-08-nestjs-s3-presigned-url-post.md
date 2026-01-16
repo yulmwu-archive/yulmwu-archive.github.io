@@ -1,12 +1,12 @@
 ---
-title: "[NestJS] Using AWS S3 Presigned URL (POST)"
-description: "NestJS에서 AWS S3 Presigned URL 사용하기 (POST 방식)"
-slug: "2025-08-08-nestjs-s3-presigned-url-post"
+title: '[NestJS] Using AWS S3 Presigned URL (POST)'
+description: 'NestJS에서 AWS S3 Presigned URL 사용하기 (POST 방식)'
+slug: '2025-08-08-nestjs-s3-presigned-url-post'
 author: yulmwu
 date: 2025-08-08T11:43:35.057Z
 updated_at: 2026-01-14T19:20:36.309Z
-categories: ["NestJS"]
-tags: ["NestJS", "aws"]
+categories: ['NestJS']
+tags: ['NestJS', 'aws']
 series:
     name: NestJS
     slug: nestjs
@@ -68,24 +68,24 @@ S3에 업로드하게 되면 연결된 람다(또는 Lambda@Edge)가 파일의 �
 ```ts
 // upload.module.ts
 
-import { Module } from "@nestjs/common"
-import { UploadController } from "./upload.controller"
-import { UploadService } from "./upload.service"
-import { ConfigService } from "@nestjs/config"
-import { S3Client } from "@aws-sdk/client-s3"
+import { Module } from '@nestjs/common'
+import { UploadController } from './upload.controller'
+import { UploadService } from './upload.service'
+import { ConfigService } from '@nestjs/config'
+import { S3Client } from '@aws-sdk/client-s3'
 
 @Module({
 	controllers: [UploadController],
 	providers: [
 		{
-			provide: "S3_CLIENT",
+			provide: 'S3_CLIENT',
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => {
 				return new S3Client({
-					region: configService.get<string>("AWS_REGION") ?? "ap-northeast-2",
+					region: configService.get<string>('AWS_REGION') ?? 'ap-northeast-2',
 					credentials: {
-						accessKeyId: configService.get("AWS_ACCESS_KEY_ID") ?? "",
-						secretAccessKey: configService.get("AWS_SECRET_ACCESS_KEY") ?? "",
+						accessKeyId: configService.get('AWS_ACCESS_KEY_ID') ?? '',
+						secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY') ?? '',
 					},
 				})
 			},
@@ -102,17 +102,17 @@ export class UploadModule {}
 ```ts
 // upload.service.ts
 
-import { Inject, Injectable } from "@nestjs/common"
-import { S3Client } from "@aws-sdk/client-s3"
-import { createPresignedPost } from "@aws-sdk/s3-presigned-post"
-import { ConfigService } from "@nestjs/config"
-import { GeneratePresignedUrlRequestDto, PresignedUrlResponseDto } from "./dto" // DTO 코드 생략
-import { v4 as uuidv4 } from "uuid"
+import { Inject, Injectable } from '@nestjs/common'
+import { S3Client } from '@aws-sdk/client-s3'
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
+import { ConfigService } from '@nestjs/config'
+import { GeneratePresignedUrlRequestDto, PresignedUrlResponseDto } from './dto' // DTO 코드 생략
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UploadService {
 	constructor(
-		@Inject("S3_CLIENT")
+		@Inject('S3_CLIENT')
 		private readonly s3: S3Client,
 		private readonly configService: ConfigService,
 	) {}
@@ -121,14 +121,14 @@ export class UploadService {
 		const key = `uploads/${uuidv4()}/${dto.filename}`
 
 		const { url, fields } = await createPresignedPost(this.s3, {
-			Bucket: this.configService.get<string>("AWS_S3_BUCKET_NAME") ?? "",
+			Bucket: this.configService.get<string>('AWS_S3_BUCKET_NAME') ?? '',
 			Key: key,
 			Fields: {
-				"Content-Type": dto.contentType,
+				'Content-Type': dto.contentType,
 			},
 			Conditions: [
-				["content-length-range", 0, 3 * 1024 * 1024], // Max 3MB
-				["starts-with", "$Content-Type", "image/"],
+				['content-length-range', 0, 3 * 1024 * 1024], // Max 3MB
+				['starts-with', '$Content-Type', 'image/'],
 			],
 			Expires: 600, // 10 minutes
 		})

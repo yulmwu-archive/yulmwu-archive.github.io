@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] CSA(Client Side Apply, last-applied) and SSA(Server Side Apply) (Feat. Helm 4)"
-description: "쿠버네티스의 CSA(Client Side Apply)와 SSA(Server Side Apply), 필드 소유권에 대하여 (Feat. Helm 4.0 릴리즈)"
-slug: "2025-12-04-kubernetes-csa-ssa"
+title: '[Kubernetes] CSA(Client Side Apply, last-applied) and SSA(Server Side Apply) (Feat. Helm 4)'
+description: '쿠버네티스의 CSA(Client Side Apply)와 SSA(Server Side Apply), 필드 소유권에 대하여 (Feat. Helm 4.0 릴리즈)'
+slug: '2025-12-04-kubernetes-csa-ssa'
 author: yulmwu
 date: 2025-12-04T07:28:55.187Z
 updated_at: 2026-01-13T04:51:29.573Z
-categories: ["Kubernetes"]
-tags: ["helm", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['helm', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -137,7 +137,7 @@ kubectl apply의 경우 `--server-side` 옵션을 통해 `kubectl.kubernetes.io/
                   f:name: {}
   manager: kubectl
   operation: Apply # = kubectl apply, 이 경우 metadata의 last-applied 어노테이션을 남기지 않음
-  time: "2025-12-04T13:51:21Z"
+  time: '2025-12-04T13:51:21Z'
 ```
 
 또한 `--field-manager` 옵션을 통해 위 `manager` 이름을 변경할 수 있으며, 당연하겠지만 SSA의 경우 `--dry-run=client` 옵션을 사용할 수 없고, `--dry-run=server`는 사용할 수 있다.
@@ -189,7 +189,7 @@ managedFields:
                       f:name: {}
       manager: manager-a
       operation: Apply
-      time: "2025-12-04T14:17:11Z"
+      time: '2025-12-04T14:17:11Z'
 ```
 
 이제 Manager B가 해당 라벨을 수정하겠다고 지정해보자. 명령어는 아까와 동일하다.
@@ -246,7 +246,7 @@ See https://kubernetes.io/docs/reference/using-api/server-side-apply/#conflicts
                   f:name: {}
   manager: manager-a
   operation: Apply
-  time: "2025-12-04T14:17:11Z"
+  time: '2025-12-04T14:17:11Z'
 - apiVersion: v1
   fieldsType: FieldsV1
   fieldsV1:
@@ -261,7 +261,7 @@ See https://kubernetes.io/docs/reference/using-api/server-side-apply/#conflicts
                   f:name: {}
   manager: manager-b
   operation: Apply
-  time: "2025-12-04T14:20:20Z"
+  time: '2025-12-04T14:20:20Z'
 ```
 
 다만 `--force-conflicts` 옵션은 소유권에 대한 의도를 무시하기 때문에 설계에 있어 문제가 생길 수 있고, 애초에 SSA에선 Conflict가 나지 않도록 원천적으로 설계하는 것이 중요하기 때문에 해당 옵션은 최후의 Takeover 수단으로 사용하는 것이 좋을 것이다.

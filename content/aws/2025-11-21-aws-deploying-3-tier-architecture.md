@@ -1,12 +1,12 @@
 ---
-title: "[AWS Computing] Deploying 3 Tier Architecture (ALB, Bastion, RDS)"
-description: "AWS ALB - EC2 - RDS로 3 Tier 아키텍처 구현하기"
-slug: "2025-11-21-aws-deploying-3-tier-architecture"
+title: '[AWS Computing] Deploying 3 Tier Architecture (ALB, Bastion, RDS)'
+description: 'AWS ALB - EC2 - RDS로 3 Tier 아키텍처 구현하기'
+slug: '2025-11-21-aws-deploying-3-tier-architecture'
 author: yulmwu
 date: 2025-11-21T12:27:07.839Z
 updated_at: 2026-01-13T04:04:55.885Z
-categories: ["AWS"]
-tags: ["aws"]
+categories: ['AWS']
+tags: ['aws']
 series:
     name: AWS
     slug: aws

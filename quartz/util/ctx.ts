@@ -1,7 +1,7 @@
-import { QuartzConfig } from "../cfg"
-import { QuartzPluginData } from "../plugins/vfile"
-import { FileTrieNode } from "./fileTrie"
-import { FilePath, FullSlug } from "./path"
+import { QuartzConfig } from '../cfg'
+import { QuartzPluginData } from '../plugins/vfile'
+import { FileTrieNode } from './fileTrie'
+import { FilePath, FullSlug } from './path'
 
 export interface Argv {
 	directory: string
@@ -47,4 +47,4 @@ export function trieFromAllFiles(allFiles: QuartzPluginData[]): FileTrieNode<Bui
 	return trie
 }
 
-export type WorkerSerializableBuildCtx = Omit<BuildCtx, "cfg" | "trie">
+export type WorkerSerializableBuildCtx = Omit<BuildCtx, 'cfg' | 'trie'>

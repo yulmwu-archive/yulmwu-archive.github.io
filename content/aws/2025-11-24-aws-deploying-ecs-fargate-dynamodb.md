@@ -1,12 +1,12 @@
 ---
-title: "[AWS Computing] Deploying a web service based on ECS Fargate and DynamoDB"
-description: "AWS ECR 및 ECS Fargate를 통한 웹 서비스 배포하기"
-slug: "2025-11-24-aws-deploying-ecs-fargate-dynamodb"
+title: '[AWS Computing] Deploying a web service based on ECS Fargate and DynamoDB'
+description: 'AWS ECR 및 ECS Fargate를 통한 웹 서비스 배포하기'
+slug: '2025-11-24-aws-deploying-ecs-fargate-dynamodb'
 author: yulmwu
 date: 2025-11-24T10:32:58.641Z
 updated_at: 2026-01-13T04:04:47.016Z
-categories: ["AWS"]
-tags: ["aws"]
+categories: ['AWS']
+tags: ['aws']
 series:
     name: AWS
     slug: aws

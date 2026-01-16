@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Pod Health Check with Readiness, Liveness Probes (Feat. Pod Lifecycle)"
-description: "Readiness Probe 및 Liveness Probe를 통한 파드 Health Checking (Feat. Pod LifeCycle)"
-slug: "2025-09-26-kubernetes-pod-probe"
+title: '[Kubernetes] Pod Health Check with Readiness, Liveness Probes (Feat. Pod Lifecycle)'
+description: 'Readiness Probe 및 Liveness Probe를 통한 파드 Health Checking (Feat. Pod LifeCycle)'
+slug: '2025-09-26-kubernetes-pod-probe'
 author: yulmwu
 date: 2025-09-26T08:51:23.736Z
 updated_at: 2025-12-20T17:50:51.752Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -47,24 +47,24 @@ Probe에 대해 배워보기 전 알아야할 중요 개념이 있다. 바로 �
 status:
     conditions:
         - lastProbeTime: null
-          lastTransitionTime: "2025-09-28T00:41:03Z"
-          status: "True"
+          lastTransitionTime: '2025-09-28T00:41:03Z'
+          status: 'True'
           type: PodReadyToStartContainers
         - lastProbeTime: null
-          lastTransitionTime: "2025-09-28T00:41:01Z"
-          status: "True"
+          lastTransitionTime: '2025-09-28T00:41:01Z'
+          status: 'True'
           type: Initialized
         - lastProbeTime: null
-          lastTransitionTime: "2025-09-28T00:41:03Z"
-          status: "True"
+          lastTransitionTime: '2025-09-28T00:41:03Z'
+          status: 'True'
           type: Ready
         - lastProbeTime: null
-          lastTransitionTime: "2025-09-28T00:41:03Z"
-          status: "True"
+          lastTransitionTime: '2025-09-28T00:41:03Z'
+          status: 'True'
           type: ContainersReady
         - lastProbeTime: null
-          lastTransitionTime: "2025-09-28T00:41:01Z"
-          status: "True"
+          lastTransitionTime: '2025-09-28T00:41:01Z'
+          status: 'True'
           type: PodScheduled
     phase: Running
 ```
@@ -96,7 +96,7 @@ containerStatuses:
       started: true
       state:
           running:
-              startedAt: "2025-09-28T00:41:02Z"
+              startedAt: '2025-09-28T00:41:02Z'
 ```
 
 여기서 `state`엔 아래와 같은 상태를 확인할 수 있고, `running` 상태를 제외하면 `reason`을 통해 어떠한 이유로 해당 상태가 되었는지 확인할 수 있다.
@@ -201,9 +201,9 @@ spec:
                       - containerPort: 8080
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "8080"
+                        value: '8080'
                       - name: POD
                         valueFrom:
                             fieldRef:
@@ -213,7 +213,7 @@ spec:
                         mountPath: /data
                   readinessProbe:
                       exec:
-                          command: ["sh", "-c", "[ -f /data/test.txt ]"]
+                          command: ['sh', '-c', '[ -f /data/test.txt ]']
                       initialDelaySeconds: 3
                       periodSeconds: 5
                       failureThreshold: 1
@@ -221,7 +221,7 @@ spec:
                       timeoutSeconds: 1
                   livenessProbe:
                       exec:
-                          command: ["sh", "-c", "[ -f /data/test.txt ]"]
+                          command: ['sh', '-c', '[ -f /data/test.txt ]']
                       initialDelaySeconds: 10
                       periodSeconds: 10
                       failureThreshold: 2

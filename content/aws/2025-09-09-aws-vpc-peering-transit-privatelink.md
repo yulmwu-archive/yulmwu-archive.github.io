@@ -1,12 +1,12 @@
 ---
-title: "[AWS Networking] VPC Peering, Transit Gateway and PrivateLink"
-description: "AWS VPC Peering, Transit Gateway 및 PrivateLink를 통한 다중 VPC/계정 간 네트워킹"
-slug: "2025-09-09-aws-vpc-peering-transit-privatelink"
+title: '[AWS Networking] VPC Peering, Transit Gateway and PrivateLink'
+description: 'AWS VPC Peering, Transit Gateway 및 PrivateLink를 통한 다중 VPC/계정 간 네트워킹'
+slug: '2025-09-09-aws-vpc-peering-transit-privatelink'
 author: yulmwu
 date: 2025-09-09T23:35:30.426Z
 updated_at: 2026-01-14T09:53:44.953Z
-categories: ["AWS"]
-tags: ["aws", "networking"]
+categories: ['AWS']
+tags: ['aws', 'networking']
 series:
     name: AWS
     slug: aws

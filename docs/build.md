@@ -1,5 +1,5 @@
 ---
-title: "Building your Quartz"
+title: 'Building your Quartz'
 ---
 
 Once you've [[index#🪴 Get Started|initialized]] Quartz, let's see what it looks like locally:

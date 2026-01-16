@@ -1,12 +1,12 @@
 ---
-title: "[DB/SQL] Recursive CTE(Common Table Expression)을 통한 N+1 문제 개선해보기"
-description: "Recursive CTE를 통해 Directory Breadcrumb를 구현하면서 Depth 만큼의 N+1 문제 해결해보기"
-slug: "2025-11-15-db-recursive-cte-feat-breadcrumb"
+title: '[DB/SQL] Recursive CTE(Common Table Expression)을 통한 N+1 문제 개선해보기'
+description: 'Recursive CTE를 통해 Directory Breadcrumb를 구현하면서 Depth 만큼의 N+1 문제 해결해보기'
+slug: '2025-11-15-db-recursive-cte-feat-breadcrumb'
 author: yulmwu
 date: 2025-11-15T11:08:28.310Z
 updated_at: 2026-01-13T04:05:07.620Z
-categories: ["DB/SQL"]
-tags: ["PostgreSQL", "db", "sql", "typeOrm"]
+categories: ['DB/SQL']
+tags: ['PostgreSQL', 'db', 'sql', 'typeOrm']
 series:
     name: DB/SQL
     slug: database

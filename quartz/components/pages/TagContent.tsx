@@ -1,13 +1,13 @@
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../types"
-import style from "../styles/listPage.scss"
-import { PageList, SortFn } from "../PageList"
-import { FullSlug, getAllSegmentPrefixes, resolveRelative, simplifySlug } from "../../util/path"
-import { QuartzPluginData } from "../../plugins/vfile"
-import { Root } from "hast"
-import { htmlToJsx } from "../../util/jsx"
-import { i18n } from "../../i18n"
-import { ComponentChildren } from "preact"
-import { concatenateResources } from "../../util/resources"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from '../types'
+import style from '../styles/listPage.scss'
+import { PageList, SortFn } from '../PageList'
+import { FullSlug, getAllSegmentPrefixes, resolveRelative, simplifySlug } from '../../util/path'
+import { QuartzPluginData } from '../../plugins/vfile'
+import { Root } from 'hast'
+import { htmlToJsx } from '../../util/jsx'
+import { i18n } from '../../i18n'
+import { ComponentChildren } from 'preact'
+import { concatenateResources } from '../../util/resources'
 
 interface TagContentOptions {
 	sort?: SortFn
@@ -25,11 +25,11 @@ export default ((opts?: Partial<TagContentOptions>) => {
 		const { tree, fileData, allFiles, cfg } = props
 		const slug = fileData.slug
 
-		if (!(slug?.startsWith("tags/") || slug === "tags")) {
+		if (!(slug?.startsWith('tags/') || slug === 'tags')) {
 			throw new Error(`Component "TagContent" tried to render a non-tag page: ${slug}`)
 		}
 
-		const tag = simplifySlug(slug.slice("tags/".length) as FullSlug)
+		const tag = simplifySlug(slug.slice('tags/'.length) as FullSlug)
 		const allPagesWithTag = (tag: string) =>
 			allFiles.filter((file) => (file.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes).includes(tag))
 
@@ -37,8 +37,8 @@ export default ((opts?: Partial<TagContentOptions>) => {
 			(tree as Root).children.length === 0 ? fileData.description : htmlToJsx(fileData.filePath!, tree)
 		) as ComponentChildren
 		const cssClasses: string[] = fileData.frontmatter?.cssclasses ?? []
-		const classes = cssClasses.join(" ")
-		if (tag === "/") {
+		const classes = cssClasses.join(' ')
+		if (tag === '/') {
 			const tags = [
 				...new Set(allFiles.flatMap((data) => data.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes)),
 			].sort((a, b) => a.localeCompare(b))
@@ -84,7 +84,7 @@ export default ((opts?: Partial<TagContentOptions>) => {
 											{i18n(cfg.locale).pages.tagContent.itemsUnderTag({ count: pages.length })}
 											{pages.length > options.numPages && (
 												<>
-													{" "}
+													{' '}
 													<span>
 														{i18n(cfg.locale).pages.tagContent.showingFirst({
 															count: options.numPages,

@@ -1,8 +1,8 @@
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
-import breadcrumbsStyle from "./styles/breadcrumbs.scss"
-import { FullSlug, SimpleSlug, resolveRelative, simplifySlug } from "../util/path"
-import { classNames } from "../util/lang"
-import { trieFromAllFiles } from "../util/ctx"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from './types'
+import breadcrumbsStyle from './styles/breadcrumbs.scss'
+import { FullSlug, SimpleSlug, resolveRelative, simplifySlug } from '../util/path'
+import { classNames } from '../util/lang'
+import { trieFromAllFiles } from '../util/ctx'
 
 type CrumbData = {
 	displayName: string
@@ -29,15 +29,15 @@ interface BreadcrumbOptions {
 }
 
 const defaultOptions: BreadcrumbOptions = {
-	spacerSymbol: "❯",
-	rootName: "Home",
+	spacerSymbol: '❯',
+	rootName: 'Home',
 	resolveFrontmatterTitle: true,
 	showCurrentPage: true,
 }
 
 function formatCrumb(displayName: string, baseSlug: FullSlug, currentSlug: SimpleSlug): CrumbData {
 	return {
-		displayName: displayName.replaceAll("-", " "),
+		displayName: displayName.replaceAll('-', ' '),
 		path: resolveRelative(baseSlug, currentSlug),
 	}
 }
@@ -46,7 +46,7 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
 	const options: BreadcrumbOptions = { ...defaultOptions, ...opts }
 	const Breadcrumbs: QuartzComponent = ({ fileData, allFiles, displayClass, ctx }: QuartzComponentProps) => {
 		const trie = (ctx.trie ??= trieFromAllFiles(allFiles))
-		const slugParts = fileData.slug!.split("/")
+		const slugParts = fileData.slug!.split('/')
 		const pathNodes = trie.ancestryChain(slugParts)
 
 		if (!pathNodes) {
@@ -61,7 +61,7 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
 
 			// For last node (current page), set empty path
 			if (idx === pathNodes.length - 1) {
-				crumb.path = ""
+				crumb.path = ''
 			}
 
 			return crumb
@@ -72,7 +72,7 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
 		}
 
 		return (
-			<nav class={classNames(displayClass, "breadcrumb-container")} aria-label="breadcrumbs">
+			<nav class={classNames(displayClass, 'breadcrumb-container')} aria-label="breadcrumbs">
 				{crumbs.map((crumb, index) => (
 					<div class="breadcrumb-element">
 						<a href={crumb.path}>{crumb.displayName}</a>

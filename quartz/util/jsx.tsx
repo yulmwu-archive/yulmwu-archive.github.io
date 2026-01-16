@@ -1,8 +1,8 @@
-import { Components, Jsx, toJsxRuntime } from "hast-util-to-jsx-runtime"
-import { Node, Root } from "hast"
-import { Fragment, jsx, jsxs } from "preact/jsx-runtime"
-import { trace } from "./trace"
-import { type FilePath } from "./path"
+import { Components, Jsx, toJsxRuntime } from 'hast-util-to-jsx-runtime'
+import { Node, Root } from 'hast'
+import { Fragment, jsx, jsxs } from 'preact/jsx-runtime'
+import { trace } from './trace'
+import { type FilePath } from './path'
 
 const customComponents: Components = {
 	table: (props) => (
@@ -18,7 +18,7 @@ export function htmlToJsx(fp: FilePath, tree: Node) {
 			Fragment,
 			jsx: jsx as Jsx,
 			jsxs: jsxs as Jsx,
-			elementAttributeNameCase: "html",
+			elementAttributeNameCase: 'html',
 			components: customComponents,
 		})
 	} catch (e) {

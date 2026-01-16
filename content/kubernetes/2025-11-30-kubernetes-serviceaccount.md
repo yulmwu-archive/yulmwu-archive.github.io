@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] ServiceAccount, RBAC: AuthN/AuthZ for Kubernetes API"
-description: "Kubernetes API에 접근하기 위한 RBAC(Role Based Access Control) 기반 ServiceAccount"
-slug: "2025-11-30-kubernetes-serviceaccount"
+title: '[Kubernetes] ServiceAccount, RBAC: AuthN/AuthZ for Kubernetes API'
+description: 'Kubernetes API에 접근하기 위한 RBAC(Role Based Access Control) 기반 ServiceAccount'
+slug: '2025-11-30-kubernetes-serviceaccount'
 author: yulmwu
 date: 2025-11-30T11:18:59.974Z
 updated_at: 2026-01-15T13:19:50.822Z
-categories: ["Kubernetes"]
-tags: ["aws", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['aws', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -181,9 +181,9 @@ metadata:
     name: foo-pod-reader
     namespace: default
 rules:
-    - apiGroups: [""]
-      resources: ["pods"]
-      verbs: ["get", "list", "watch"]
+    - apiGroups: ['']
+      resources: ['pods']
+      verbs: ['get', 'list', 'watch']
 ```
 
 여기서 `apiGroups`는 해당 리소스(오브젝트)의 API Group으로, 이는 `kubectl api-resources` 명령어나 Docs를 참조하자. 예시로 Ingress 오브젝트는 `networking.k8s.io` API Group에 위치한다.
@@ -273,9 +273,9 @@ metadata:
     name: foo-pod-reader
     namespace: default
 rules:
-    - apiGroups: [""]
-      resources: ["pods"]
-      verbs: ["get", "list", "watch"]
+    - apiGroups: ['']
+      resources: ['pods']
+      verbs: ['get', 'list', 'watch']
 ```
 
 ```yaml
@@ -365,7 +365,7 @@ kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   142m
 예시로 파드를 하나 만들고 쿠버네티스 API를 호출해보겠다. (쿠버네티스 SDK, 클라이언트) 적절한 권한이 적용된 Role이 없으나 아까와 같이 403을 응답으로 받아야 한다.
 
 ```js
-const k8s = require("@kubernetes/client-node")
+const k8s = require('@kubernetes/client-node')
 
 const kc = new k8s.KubeConfig()
 kc.loadFromDefault()
@@ -373,7 +373,7 @@ kc.loadFromDefault()
 kc.makeApiClient(k8s.CoreV1Api)
 	.listNamespace()
 	.then((res) => console.log(res.items.map((ns) => ns.metadata.name)))
-	.catch((err) => console.error("Error fetching pods:", err))
+	.catch((err) => console.error('Error fetching pods:', err))
 ```
 
 간단하게 네임스페이스 리스트를 출력하는 소스코드이다.
@@ -409,7 +409,7 @@ spec:
     containers:
         - name: k8s-client-demo
           image: rlawnsdud/k8s-client-demo:latest
-          command: ["sleep", "3600"]
+          command: ['sleep', '3600']
 ```
 
 _(`sleep 3600`을 호출한 이유는 컨테이너가 곧바로 죽지 않도록 하기 위함이다. exec로 접속 후 직접 `node index.js`를 실행하면 된다)_

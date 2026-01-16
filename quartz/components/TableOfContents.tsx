@@ -1,20 +1,20 @@
-import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
-import legacyStyle from "./styles/legacyToc.scss"
-import modernStyle from "./styles/toc.scss"
-import { classNames } from "../util/lang"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from './types'
+import legacyStyle from './styles/legacyToc.scss'
+import modernStyle from './styles/toc.scss'
+import { classNames } from '../util/lang'
 
 // @ts-ignore
-import script from "./scripts/toc.inline"
-import { i18n } from "../i18n"
-import OverflowListFactory from "./OverflowList"
-import { concatenateResources } from "../util/resources"
+import script from './scripts/toc.inline'
+import { i18n } from '../i18n'
+import OverflowListFactory from './OverflowList'
+import { concatenateResources } from '../util/resources'
 
 interface Options {
-	layout: "modern" | "legacy"
+	layout: 'modern' | 'legacy'
 }
 
 const defaultOptions: Options = {
-	layout: "modern",
+	layout: 'modern',
 }
 
 let numTocs = 0
@@ -28,10 +28,10 @@ export default ((opts?: Partial<Options>) => {
 
 		const id = `toc-${numTocs++}`
 		return (
-			<div class={classNames(displayClass, "toc")}>
+			<div class={classNames(displayClass, 'toc')}>
 				<button
 					type="button"
-					class={fileData.collapseToc ? "collapsed toc-header" : "toc-header"}
+					class={fileData.collapseToc ? 'collapsed toc-header' : 'toc-header'}
 					aria-controls={id}
 					aria-expanded={!fileData.collapseToc}
 				>
@@ -51,7 +51,7 @@ export default ((opts?: Partial<Options>) => {
 						<polyline points="6 9 12 15 18 9"></polyline>
 					</svg>
 				</button>
-				<OverflowList id={id} class={fileData.collapseToc ? "collapsed toc-content" : "toc-content"}>
+				<OverflowList id={id} class={fileData.collapseToc ? 'collapsed toc-content' : 'toc-content'}>
 					{fileData.toc.map((tocEntry) => (
 						<li key={tocEntry.slug} class={`depth-${tocEntry.depth}`}>
 							<a href={`#${tocEntry.slug}`} data-for={tocEntry.slug}>
@@ -90,5 +90,5 @@ export default ((opts?: Partial<Options>) => {
 	}
 	LegacyTableOfContents.css = legacyStyle
 
-	return layout === "modern" ? TableOfContents : LegacyTableOfContents
+	return layout === 'modern' ? TableOfContents : LegacyTableOfContents
 }) satisfies QuartzComponentConstructor

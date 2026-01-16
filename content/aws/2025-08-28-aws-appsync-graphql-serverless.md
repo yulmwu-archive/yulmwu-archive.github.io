@@ -1,12 +1,12 @@
 ---
-title: "[AWS Integration] Serverless GraphQL API with AWS AppSync and JavaScript Resolver"
-description: "AWS AppSync를 통한 서버리스 GraphQL API 구축하기"
-slug: "2025-08-28-aws-appsync-graphql-serverless"
+title: '[AWS Integration] Serverless GraphQL API with AWS AppSync and JavaScript Resolver'
+description: 'AWS AppSync를 통한 서버리스 GraphQL API 구축하기'
+slug: '2025-08-28-aws-appsync-graphql-serverless'
 author: yulmwu
 date: 2025-08-28T23:57:35.785Z
 updated_at: 2025-12-07T19:18:22.946Z
-categories: ["AWS"]
-tags: ["Integration", "aws", "serverless"]
+categories: ['AWS']
+tags: ['Integration', 'aws', 'serverless']
 series:
     name: AWS
     slug: aws
@@ -86,23 +86,23 @@ AppSync에 연결된 서비스가 API Gateway와는 다르게 Resolver가 있고
 > export const request = (ctx) => {
 > 	const now = new Date().toISOString()
 > 	return {
-> 		operation: "UpdateItem",
+> 		operation: 'UpdateItem',
 > 		key: {
 > 			id: {
 > 				S: ctx.args.id,
 > 			},
 > 		},
 > 		update: {
-> 			expression: "SET #n = :n, #u = :u",
+> 			expression: 'SET #n = :n, #u = :u',
 > 			expressionNames: {
-> 				"#n": "name",
-> 				"#u": "updatedAt",
+> 				'#n': 'name',
+> 				'#u': 'updatedAt',
 > 			},
 > 			expressionValues: {
-> 				":n": {
+> 				':n': {
 > 					S: ctx.args.newName,
 > 				},
-> 				":u": {
+> 				':u': {
 > 					S: now,
 > 				},
 > 			},
@@ -171,28 +171,28 @@ https://velog.io/@yulmwu/aws-serverless#4-4-cognito
 NodeJS SDK를 사용해서 가져와보도록 하자.
 
 ```js
-import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { createHmac } from "crypto"
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from '@aws-sdk/client-cognito-identity-provider'
+import { createHmac } from 'crypto'
 
-const CLIENT_ID = "..."
-const CLIENT_SECRET_KEY = "..."
+const CLIENT_ID = '...'
+const CLIENT_SECRET_KEY = '...'
 
 const clientSecretHashGenerator = (username, clientId, clientSecretKey) => {
-	const hmac = createHmac("sha256", clientSecretKey)
+	const hmac = createHmac('sha256', clientSecretKey)
 	hmac.update(username + clientId)
 
-	return hmac.digest("base64")
+	return hmac.digest('base64')
 }
 
 const cognitoClient = new CognitoIdentityProviderClient()
 
 const command = new InitiateAuthCommand({
-	AuthFlow: "USER_PASSWORD_AUTH",
+	AuthFlow: 'USER_PASSWORD_AUTH',
 	ClientId: CLIENT_ID,
 	AuthParameters: {
-		USERNAME: "...",
-		PASSWORD: "...",
-		SECRET_HASH: clientSecretHashGenerator("test", CLIENT_ID, CLIENT_SECRET_KEY),
+		USERNAME: '...',
+		PASSWORD: '...',
+		SECRET_HASH: clientSecretHashGenerator('test', CLIENT_ID, CLIENT_SECRET_KEY),
 	},
 })
 
@@ -305,10 +305,10 @@ Resolver 유형은 단위 Resolver로 선택한다. 파이프라인은 AppSync �
 그럼 Resolver 코드를 작성할 수 있는 에디터가 나온다. 아래의 코드를 붙여넣자.
 
 ```js
-import { util } from "@aws-appsync/utils"
+import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => ({
-	operation: "GetItem",
+	operation: 'GetItem',
 	key: util.dynamodb.toMapValues({ id: ctx.args.id }),
 })
 
@@ -320,7 +320,7 @@ export const response = (ctx) => ctx.result
 다음으로 listPosts도 만들어준다. 간단하게 Scan 명령어를 보내도록 하였는데, 실사용 시 성능상 문제가 될 수 있으므로 자제하는게 좋다.
 
 ```js
-export const request = () => ({ operation: "Scan" })
+export const request = () => ({ operation: 'Scan' })
 
 export const response = (ctx) => ctx.result.items
 ```
@@ -348,17 +348,17 @@ Postman으로 테스트해봐도 되지만 콘솔에서 쿼리를 날려볼 수 
 ```js
 // createPost Mutation
 
-import { util } from "@aws-appsync/utils"
+import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => {
 	const username = ctx.identity?.username
-	if (!username) util.error("Unauthorized", "Unauthorized")
+	if (!username) util.error('Unauthorized', 'Unauthorized')
 
 	const id = util.autoId()
 	const now = util.time.nowISO8601()
 
 	return {
-		operation: "PutItem",
+		operation: 'PutItem',
 		key: util.dynamodb.toMapValues({ id }),
 		attributeValues: util.dynamodb.toMapValues({
 			title: ctx.args.title,
@@ -366,7 +366,7 @@ export const request = (ctx) => {
 			author: username,
 			createdAt: now,
 		}),
-		condition: { expression: "attribute_not_exists(id)" },
+		condition: { expression: 'attribute_not_exists(id)' },
 	}
 }
 
@@ -376,49 +376,49 @@ export const response = (ctx) => ctx.result
 ```js
 // updatePost Mutation
 
-import { util } from "@aws-appsync/utils"
+import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => {
 	const username = ctx.identity?.username
-	if (!username) util.error("Unauthorized", "Unauthorized")
+	if (!username) util.error('Unauthorized', 'Unauthorized')
 
 	const sets = []
 	const names = {}
 	const values = {}
 
 	if (ctx.args.title !== undefined) {
-		sets.push("#title = :title")
-		names["#title"] = "title"
-		values[":title"] = ctx.args.title
+		sets.push('#title = :title')
+		names['#title'] = 'title'
+		values[':title'] = ctx.args.title
 	}
 	if (ctx.args.content !== undefined) {
-		sets.push("#content = :content")
-		names["#content"] = "content"
-		values[":content"] = ctx.args.content
+		sets.push('#content = :content')
+		names['#content'] = 'content'
+		values[':content'] = ctx.args.content
 	}
-	if (sets.length === 0) util.error("Nothing to update", "BadRequest")
+	if (sets.length === 0) util.error('Nothing to update', 'BadRequest')
 
 	return {
-		operation: "UpdateItem",
+		operation: 'UpdateItem',
 		key: util.dynamodb.toMapValues({ id: ctx.args.id }),
 		update: {
-			expression: `SET ${sets.join(", ")}`,
+			expression: `SET ${sets.join(', ')}`,
 			expressionNames: names,
 			expressionValues: util.dynamodb.toMapValues(values),
 		},
 		condition: {
-			expression: "#author = :u",
-			expressionNames: { "#author": "author" },
-			expressionValues: util.dynamodb.toMapValues({ ":u": username }),
+			expression: '#author = :u',
+			expressionNames: { '#author': 'author' },
+			expressionValues: util.dynamodb.toMapValues({ ':u': username }),
 		},
 	}
 }
 
 export const response = (ctx) => {
 	if (ctx.error) {
-		const t = ctx.error.type || ""
-		if (t.includes("ConditionalCheckFailedException")) {
-			util.error("You are not the author of this post", "Forbidden")
+		const t = ctx.error.type || ''
+		if (t.includes('ConditionalCheckFailedException')) {
+			util.error('You are not the author of this post', 'Forbidden')
 		}
 		util.error(ctx.error.message, t)
 	}
@@ -429,28 +429,28 @@ export const response = (ctx) => {
 ```js
 // deletePost Mutation
 
-import { util } from "@aws-appsync/utils"
+import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => {
 	const username = ctx.identity?.username
-	if (!username) util.error("Unauthorized", "Unauthorized")
+	if (!username) util.error('Unauthorized', 'Unauthorized')
 
 	return {
-		operation: "DeleteItem",
+		operation: 'DeleteItem',
 		key: util.dynamodb.toMapValues({ id: ctx.args.id }),
 		condition: {
-			expression: "#author = :u",
-			expressionNames: { "#author": "author" },
-			expressionValues: util.dynamodb.toMapValues({ ":u": username }),
+			expression: '#author = :u',
+			expressionNames: { '#author': 'author' },
+			expressionValues: util.dynamodb.toMapValues({ ':u': username }),
 		},
 	}
 }
 
 export const response = (ctx) => {
 	if (ctx.error) {
-		const t = ctx.error.type || ""
-		if (t.includes("ConditionalCheckFailedException")) {
-			util.error("You are not the author of this post", "Forbidden")
+		const t = ctx.error.type || ''
+		if (t.includes('ConditionalCheckFailedException')) {
+			util.error('You are not the author of this post', 'Forbidden')
 		}
 		util.error(ctx.error.message, t)
 	}

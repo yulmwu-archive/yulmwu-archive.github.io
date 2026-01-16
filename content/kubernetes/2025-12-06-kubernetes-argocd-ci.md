@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes CI/CD] ArgoCD + CI with Github Actions and Kind"
-description: "Github Actions 및 Kind를 통한 쿠버네티스 ArgoCD CI(Continuous integration) 구성하기"
-slug: "2025-12-06-kubernetes-argocd-ci"
+title: '[Kubernetes CI/CD] ArgoCD + CI with Github Actions and Kind'
+description: 'Github Actions 및 Kind를 통한 쿠버네티스 ArgoCD CI(Continuous integration) 구성하기'
+slug: '2025-12-06-kubernetes-argocd-ci'
 author: yulmwu
 date: 2025-12-06T09:52:15.245Z
 updated_at: 2026-01-15T00:55:27.229Z
-categories: ["Kubernetes"]
-tags: ["CI/CD", "argocd", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['CI/CD', 'argocd', 'kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -87,7 +87,7 @@ name: demo-app
 description: A demo application
 type: application
 version: 0.1.0
-appVersion: "1.0.0"
+appVersion: '1.0.0'
 ```
 
 ```yaml
@@ -96,7 +96,7 @@ appVersion: "1.0.0"
 replicaCount: 1
 image:
     repository: nginx
-    tag: "1.25"
+    tag: '1.25'
     pullPolicy: IfNotPresent
 service:
     type: ClusterIP
@@ -258,13 +258,13 @@ jobs:
             - name: Set up kubectl
               uses: azure/setup-kubectl@v4
               with:
-                  version: "latest"
+                  version: 'latest'
 
             - name: Set up kind
               uses: helm/kind-action@v1
               with:
                   cluster_name: argocd-ci-cluster
-                  kubectl_version: "v1.33.0"
+                  kubectl_version: 'v1.33.0'
 ```
 
 ## 2-3. ArgoCD Installation

@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Operator and Operator Pattern"
-description: "쿠버네티스 Operator 패턴을 통한 Day 2 Operation 자동화"
-slug: "2025-09-29-kubernetes-operator"
+title: '[Kubernetes] Operator and Operator Pattern'
+description: '쿠버네티스 Operator 패턴을 통한 Day 2 Operation 자동화'
+slug: '2025-09-29-kubernetes-operator'
 author: yulmwu
 date: 2025-09-29T23:24:51.261Z
 updated_at: 2026-01-13T04:04:54.115Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -73,9 +73,9 @@ kind: SampleDB
 metadata:
     name: my-db
 spec:
-    version: "1.2.3"
+    version: '1.2.3'
     replicas: 3
-    backupSchedule: "0 2 * * *"
+    backupSchedule: '0 2 * * *'
 ```
 
 이를 위해선 CRD와 이 CR 매니페스트를 보고 Operation 동작(StatefulSet, PVC, Service 자동 생성/조정, 버전 업그레이드, 백업 등 자동화)을 위한 비즈니스 로직은 Operator 컨트롤러를 통해 구현된다.
@@ -120,7 +120,7 @@ prometheus:
         storageSpec:
             volumeClaimTemplate:
                 spec:
-                    accessModes: ["ReadWriteOnce"]
+                    accessModes: ['ReadWriteOnce']
                     resources:
                         requests:
                             storage: 20Gi
@@ -207,9 +207,9 @@ spec:
                       - containerPort: 8080
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "8080"
+                        value: '8080'
 ---
 apiVersion: v1
 kind: Service
@@ -247,7 +247,7 @@ spec:
         matchLabels:
             app: example-app
     namespaceSelector:
-        matchNames: ["default"]
+        matchNames: ['default']
     endpoints:
         - port: http
           interval: 30s

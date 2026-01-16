@@ -1,21 +1,21 @@
-import { QuartzTransformerPlugin } from "../types"
-import { visit } from "unist-util-visit"
-import { Root, Text, Parent } from "mdast"
+import { QuartzTransformerPlugin } from '../types'
+import { visit } from 'unist-util-visit'
+import { Root, Text, Parent } from 'mdast'
 
 export const FlexibleEmphasis: QuartzTransformerPlugin = () => {
 	return {
-		name: "FlexibleEmphasis",
+		name: 'FlexibleEmphasis',
 		markdownPlugins() {
 			return [
 				() => {
 					return (tree: Root) => {
-						visit(tree, "text", (node: Text, index, parent: Parent | undefined) => {
+						visit(tree, 'text', (node: Text, index, parent: Parent | undefined) => {
 							if (!parent || index === undefined) return
 
 							const text = node.value
 							// Match **"text"** or **'text'** patterns
 							const strongPattern = /\*\*([^*]+?)\*\*/g
-							
+
 							if (strongPattern.test(text)) {
 								const newNodes: any[] = []
 								let lastIndex = 0
@@ -23,21 +23,21 @@ export const FlexibleEmphasis: QuartzTransformerPlugin = () => {
 
 								for (const match of matches) {
 									const matchIndex = match.index!
-									
+
 									// Add text before match
 									if (matchIndex > lastIndex) {
 										newNodes.push({
-											type: "text",
+											type: 'text',
 											value: text.slice(lastIndex, matchIndex),
 										})
 									}
 
 									// Add strong node
 									newNodes.push({
-										type: "strong",
+										type: 'strong',
 										children: [
 											{
-												type: "text",
+												type: 'text',
 												value: match[1],
 											},
 										],
@@ -49,7 +49,7 @@ export const FlexibleEmphasis: QuartzTransformerPlugin = () => {
 								// Add remaining text
 								if (lastIndex < text.length) {
 									newNodes.push({
-										type: "text",
+										type: 'text',
 										value: text.slice(lastIndex),
 									})
 								}

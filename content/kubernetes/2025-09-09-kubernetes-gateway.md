@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes w/ EKS] Gateway API (Feat. AWS VPC Lattice)"
-description: "Ingress의 차세대, Gateway API 실습 및 AWS Lattice 개념"
-slug: "2025-09-09-kubernetes-gateway"
+title: '[Kubernetes w/ EKS] Gateway API (Feat. AWS VPC Lattice)'
+description: 'Ingress의 차세대, Gateway API 실습 및 AWS Lattice 개념'
+slug: '2025-09-09-kubernetes-gateway'
 author: yulmwu
 date: 2025-09-09T02:34:00.236Z
 updated_at: 2026-01-12T09:20:27.581Z
-categories: ["Kubernetes"]
-tags: ["aws", "eks", "kubernetes", "networking"]
+categories: ['Kubernetes']
+tags: ['aws', 'eks', 'kubernetes', 'networking']
 series:
     name: Kubernetes
     slug: kubernetes
@@ -180,7 +180,7 @@ kind: ClusterConfig
 metadata:
     name: eks-demo
     region: ap-northeast-2
-    version: "1.33"
+    version: '1.33'
 vpc:
     cidr: 10.1.0.0/16
     nat:
@@ -251,17 +251,17 @@ spec:
                       - containerPort: 3000
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "3000"
+                        value: '3000'
                       - name: POD
                         valueFrom:
                             fieldRef:
                                 fieldPath: metadata.name
                       - name: ROUTE
-                        value: "v1"
+                        value: 'v1'
                       - name: GLOBAL_PREFIX
-                        value: "/v1"
+                        value: '/v1'
                   readinessProbe:
                       httpGet:
                           path: /v1/health
@@ -310,17 +310,17 @@ spec:
                       - containerPort: 3000
                   env:
                       - name: HOST
-                        value: "0.0.0.0"
+                        value: '0.0.0.0'
                       - name: PORT
-                        value: "3000"
+                        value: '3000'
                       - name: POD
                         valueFrom:
                             fieldRef:
                                 fieldPath: metadata.name
                       - name: ROUTE
-                        value: "v2"
+                        value: 'v2'
                       - name: GLOBAL_PREFIX
-                        value: "/v2"
+                        value: '/v2'
                   readinessProbe:
                       httpGet:
                           path: /v2/health
@@ -357,14 +357,14 @@ metadata:
     name: tg-policy-demo-app-a
 spec:
     targetRef:
-        group: ""
+        group: ''
         kind: Service
         name: demo-app-a
     protocol: HTTP
     protocolVersion: HTTP1
     healthCheck:
         enabled: true
-        path: "/v1/health"
+        path: '/v1/health'
         port: 3000
         protocol: HTTP
         protocolVersion: HTTP1
@@ -379,14 +379,14 @@ metadata:
     name: tg-policy-demo-app-b
 spec:
     targetRef:
-        group: ""
+        group: ''
         kind: Service
         name: demo-app-b
     protocol: HTTP
     protocolVersion: HTTP1
     healthCheck:
         enabled: true
-        path: "/v2/health"
+        path: '/v2/health'
         port: 3000
         protocol: HTTP
         protocolVersion: HTTP1

@@ -1,12 +1,12 @@
 ---
-title: "[Kubernetes] Operator Implemented using the Go language and Operator SDK"
-description: "Go 언어에서 Operator SDK를 통한 쿠버네티스 Operator 구현 실습"
-slug: "2025-10-01-kubernetes-operator-go"
+title: '[Kubernetes] Operator Implemented using the Go language and Operator SDK'
+description: 'Go 언어에서 Operator SDK를 통한 쿠버네티스 Operator 구현 실습'
+slug: '2025-10-01-kubernetes-operator-go'
 author: yulmwu
 date: 2025-10-01T08:16:26.908Z
 updated_at: 2026-01-08T08:18:03.446Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
     name: Kubernetes
     slug: kubernetes

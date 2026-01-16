@@ -1,5 +1,5 @@
 ---
-title: "OxHugo Compatibility"
+title: 'OxHugo Compatibility'
 tags:
     - feature/transformer
 ---
