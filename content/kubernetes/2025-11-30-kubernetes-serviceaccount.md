@@ -1,19 +1,19 @@
 ---
-title: '[Kubernetes] ServiceAccount, RBAC: AuthN/AuthZ for Kubernetes API'
-description: 'Kubernetes API에 접근하기 위한 RBAC(Role Based Access Control) 기반 ServiceAccount'
-slug: '2025-11-30-kubernetes-serviceaccount'
+title: "[Kubernetes] ServiceAccount, RBAC: AuthN/AuthZ for Kubernetes API"
+description: "Kubernetes API에 접근하기 위한 RBAC(Role Based Access Control) 기반 ServiceAccount"
+slug: "2025-11-30-kubernetes-serviceaccount"
 author: yulmwu
 date: 2025-11-30T11:18:59.974Z
 updated_at: 2026-01-15T13:19:50.822Z
-categories: ['Kubernetes']
-tags: ['aws', 'kubernetes']
+categories: ["Kubernetes"]
+tags: ["aws", "kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-serviceaccount.png
 linked_posts:
-    previous: 2025-11-30-kubernetes-istio-envoy
-    next: 2025-11-30-kubernetes-prometheus-grafana
+  previous: 2025-11-30-kubernetes-istio-envoy
+  next: 2025-11-30-kubernetes-prometheus-grafana
 is_private: false
 ---
 
@@ -37,11 +37,11 @@ _디스코드(Discord)를 사용해봤다면 매우 익숙한 형태일 것이�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f3144750-1245-4601-8531-a3e9e3b67f03/image.png)
 
-즉 사용자나 애플리케이션*(쿠버네티스에선 Pod, Deployment 등이 해당된다)*에 직접적으로 권한을 부여하는 것이 아니라 역할을 만들고 그 역할에 권한을 부여, 그리고 사용자나 애플리케이션에 Role을 부여하는 형태이다.
+즉 사용자나 애플리케이션_(쿠버네티스에선 Pod, Deployment 등이 해당된다)_에 직접적으로 권한을 부여하는 것이 아니라 역할을 만들고 그 역할에 권한을 부여, 그리고 사용자나 애플리케이션에 Role을 부여하는 형태이다.
 
 # 2. Kubernetes AuthN/AuthZ
 
-RBAC 기반의 ServiceAccount를 설명하기 전, 쿠버네티스 API에서 어떻게 인증(AuthN)과 인가(AuthZ)가 이루어지는지 알고 넘어가는 것이 좋다.
+RBAC 기반의 ServiceAccount를 설명하기 전, 쿠버네티스 API에서 어떻게 인증(AuthN)과 인가(AuthZ)가 이루어지는지 알고 넘어가는 것이 좋다. 
 
 쿠버네티스 API 또한 HTTP 서버이기 때문에 이해하는데 있어 어렵지 않다.
 
@@ -51,7 +51,7 @@ RBAC 기반의 ServiceAccount를 설명하기 전, 쿠버네티스 API에서 어
 
 이때 ServiceAccount JWT 토큰이나 외부 써드파티 OIDC(Open ID Connect)나 OAuth, X.509 인증서 등으로 인증한다.
 
-그리고 생소한 Admission Controller라는 것을 거치는데, 이는 요청이 서버로 들어가 클러스터에 반영되기 전 요청을 변형(Mutating)하거나 정책에 대해 유효한지 체크(Validating)하여 위반 시 요청을 거부하는 역할을 한다.
+그리고 생소한 Admission Controller라는 것을 거치는데, 이는 요청이 서버로 들어가 클러스터에 반영되기 전 요청을 변형(Mutating)하거나 정책에 대해 유효한지 체크(Validating)하여 위반 시 요청을 거부하는 역할을 한다. 
 
 _(예를 들어 Mutating에선 StorageClass를 지정하지 않은 PVC 생성 요청에 대해 default StorageClass를 적용, Validating은 네임스페이스 존재 여부, ResourceQuota 등을 체크한다.)_
 
@@ -88,13 +88,13 @@ users:
     client-key: /Users/user/.minikube/profiles/demo/client.key
 ```
 
-위와 같이 모든 권한을 가진 사용자(인증서)와 Context를 조합하여 현재 Context를 설정하고 kubectl을 통해 쿠버네티스 API에서 모든 권한을 가질 수 있던 것이였다.
+위와 같이 모든 권한을 가진 사용자(인증서)와 Context를 조합하여 현재 Context를 설정하고 kubectl을 통해 쿠버네티스 API에서 모든 권한을 가질 수 있던 것이였다. 
 
 그런데 이렇게 인증서만으로 관리하는 것은 쉽지 않기 때문에 쿠버네티스에선 ServiceAccount 오브젝트를 통해 사용자를 관리하는 경우가 많다.
 
 # 3. ServiceAccount
 
-앞서 여러번 언급했지만, ServiceAccount는 한 명의 사용자나 애플리케이션에 대한 계정으로, ServiceAccount에 Role 또는 ClusterRole을 붙여 사용한다.
+앞서 여러번 언급했지만, ServiceAccount는 한 명의 사용자나 애플리케이션에 대한 계정으로, ServiceAccount에 Role 또는 ClusterRole을 붙여 사용한다. 
 
 ServiceAccount는 기본적으로 네임스페이스 내에 속하는 오브젝트인데, 아래와 같이 기본 ServiceAccount와 쿠버네티스 시스템에서 사용되는 ServiceAccount들이 구성되어 있는 것을 볼 수 있다.
 
@@ -121,9 +121,9 @@ kube-system       clusterrole-aggregation-controller            0         56s
 apiVersion: v1
 kind: Secret
 metadata:
-    name: foo-token
-    annotations:
-        kubernetes.io/service-account.name: foo
+  name: foo-token
+  annotations:
+    kubernetes.io/service-account.name: foo
 type: kubernetes.io/service-account-token
 ```
 
@@ -139,7 +139,7 @@ CA_PATH=~/.minikube/ca.crt
 API_SERVER="https://127.0.0.1:50232"
 ```
 
-이제 아래의 명령어를 통해 Foo ServiceAccount를 가지고 쿠버네티스 API인 `pods/get`에 접근해보자.
+이제 아래의 명령어를 통해 Foo ServiceAccount를 가지고 쿠버네티스 API인 `pods/get`에 접근해보자. 
 
 ```shell
 curl --header "Authorization: Bearer $TOKEN" \
@@ -178,26 +178,26 @@ _(여기서 Pods는 Core API이기 때문에 API Group이 따로 없다.)_
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-    name: foo-pod-reader
-    namespace: default
+  name: foo-pod-reader
+  namespace: default
 rules:
-    - apiGroups: ['']
-      resources: ['pods']
-      verbs: ['get', 'list', 'watch']
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
 ```
 
-여기서 `apiGroups`는 해당 리소스(오브젝트)의 API Group으로, 이는 `kubectl api-resources` 명령어나 Docs를 참조하자. 예시로 Ingress 오브젝트는 `networking.k8s.io` API Group에 위치한다.
+여기서 `apiGroups`는 해당 리소스(오브젝트)의 API Group으로, 이는 `kubectl api-resources` 명령어나 Docs를 참조하자. 예시로 Ingress 오브젝트는 `networking.k8s.io` API Group에 위치한다. 
 
-그리고 이를 ServiceAccount에 적용하기 위해선 ServiceAccount나 Role을 수정하는 것이 아닌 RoleBinding 및 ClusterRoleBinding을 만들어 ServiceAccount와 Role을 바인딩해줘야 한다.
+그리고 이를 ServiceAccount에 적용하기 위해선 ServiceAccount나 Role을 수정하는 것이 아닌 RoleBinding 및 ClusterRoleBinding을 만들어 ServiceAccount와 Role을 바인딩해줘야 한다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/17ff11f5-212c-45db-bcc9-8354586f6020/image.png)
 
 > 범위(레벨)를 클러스터로 두냐 네임스페이스로 두냐는 Role과 ClusterRole이 아닌 RoleBinding과 ClusterRoleBinding으로 결정된다.
->
+> 
 > 즉 아래와 같은 상황에선 역할 자체는 ClusterRole 이지만, 권한은 네임스페이스로 제한된다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/935d9c0f-0261-42a4-907f-9549e9a3b30f/image.png)
->
+> 
 > 즉 클러스터 레벨에서 공통으로 사용되는 역할을 ClusterRole로 설정해둘 수 있는데, 이럴 경우 일단 권한의 의도가 명확하지 않고 ClusterRole 자체가 모든 네임스페이스에 대한 접근 권한을 가지고 있기 때문에 보안상, 또는 휴먼 에러에 취약할 수 있다.
 
 RoleBinding은 아래와 같이 작성한다.
@@ -208,16 +208,16 @@ RoleBinding은 아래와 같이 작성한다.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-    name: foo-pod-reader-binding
-    namespace: default
+  name: foo-pod-reader-binding
+  namespace: default
 subjects:
-    - kind: ServiceAccount
-      name: foo
-      namespace: default
+  - kind: ServiceAccount
+    name: foo
+    namespace: default
 roleRef:
-    kind: Role
-    name: foo-pod-reader
-    apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: foo-pod-reader
+  apiGroup: rbac.authorization.k8s.io
 ```
 
 위 두 오브젝트를 적용하고 아까의 쿠버네티스 API 호출 명령어(curl)를 실행해보자.
@@ -270,12 +270,12 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-    name: foo-pod-reader
-    namespace: default
+  name: foo-pod-reader
+  namespace: default
 rules:
-    - apiGroups: ['']
-      resources: ['pods']
-      verbs: ['get', 'list', 'watch']
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
 ```
 
 ```yaml
@@ -284,15 +284,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-    name: foo-namespace-reader-binding
+  name: foo-namespace-reader-binding
 subjects:
-    - kind: ServiceAccount
-      name: foo
-      namespace: default
+  - kind: ServiceAccount
+    name: foo
+    namespace: default
 roleRef:
-    kind: ClusterRole
-    name: foo-namespace-reader
-    apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: foo-namespace-reader
+  apiGroup: rbac.authorization.k8s.io
 ```
 
 ```shell
@@ -353,13 +353,13 @@ kubectl apply -f ns-clusterrolebinding.yaml
 하지만 Operator 등에서 커스텀 컨트롤러와 같은 경우 이 또한 컨테이너화된 애플리케이션이기 때문에 파드로 운영된다. 이 포스팅에선 Operator 커스텀 컨트롤러를 만들지 않고 `https://kubernetes`를 호출하여 쿠버네티스 API를 사용해보겠다.
 
 > `kubectl get services`를 실행했을 때 서비스를 만들지 않아도 아래와 같이 443(HTTPS) 포트가 오픈되어 있는 `kubernetes` 서비스가 존재한다.
-
+> 
 ```
 > kubectl get services
 NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   142m
 ```
-
+> 
 > 이는 쿠버네티스 API에 접근하기 위한 ClusterIP 서비스로, 해당 서비스로 접속하여 쿠버네티스 API를 호출할 수 있다.
 
 예시로 파드를 하나 만들고 쿠버네티스 API를 호출해보겠다. (쿠버네티스 SDK, 클라이언트) 적절한 권한이 적용된 Role이 없으나 아까와 같이 403을 응답으로 받아야 한다.
@@ -371,12 +371,13 @@ const kc = new k8s.KubeConfig()
 kc.loadFromDefault()
 
 kc.makeApiClient(k8s.CoreV1Api)
-	.listNamespace()
-	.then((res) => console.log(res.items.map((ns) => ns.metadata.name)))
-	.catch((err) => console.error('Error fetching pods:', err))
+    .listNamespace()
+    .then((res) => console.log(res.items.map((ns) => ns.metadata.name)))
+    .catch((err) => console.error('Error fetching pods:', err))
 ```
 
 간단하게 네임스페이스 리스트를 출력하는 소스코드이다.
+
 
 예제의 소스코드와 Dockerfile은 [깃허브 레포지토리](https://github.com/yulmwu/blog-example-demo/tree/main/k8s-serviceaccount-example/k8s-client-demo)에서 확인해볼 수 있다. 적절히 Docker로 빌드하고, 쿠버네티스에서 파드로 만들어보자.
 
@@ -385,7 +386,7 @@ kubectl -n default run k8s-client-demo --image=rlawnsdud/k8s-client-demo:latest 
 kubectl -n default exec -it k8s-client-demo -- /bin/sh
 ```
 
-접속했다면 `node index.js` 명령어를 실행하여 쿠버네티스 SDK를 사용해보자.
+접속했다면 `node index.js` 명령어를 실행하여 쿠버네티스 SDK를 사용해보자. 
 
 ```shell
 $ node index.js
@@ -402,14 +403,14 @@ Body: "{\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"F
 apiVersion: v1
 kind: Pod
 metadata:
-    name: k8s-client-demo
-    namespace: default
+  name: k8s-client-demo
+  namespace: default
 spec:
-    serviceAccountName: foo
-    containers:
-        - name: k8s-client-demo
-          image: rlawnsdud/k8s-client-demo:latest
-          command: ['sleep', '3600']
+  serviceAccountName: foo
+  containers:
+    - name: k8s-client-demo
+      image: rlawnsdud/k8s-client-demo:latest
+      command: ["sleep", "3600"]
 ```
 
 _(`sleep 3600`을 호출한 이유는 컨테이너가 곧바로 죽지 않도록 하기 위함이다. exec로 접속 후 직접 `node index.js`를 실행하면 된다)_
@@ -422,7 +423,7 @@ $ node index.js
 그럼 위와 같이 성공적으로 권한이 적용된 것을 볼 수 있다. 그런데 어떻게 파드에 ServiceAccount를 적용시켰던 것일까? 그 해답은 만든 파드에 `describe`를 해보면 알 수 있다.
 
 ```shell
-> kubectl describe pods/k8s-client-demo
+> kubectl describe pods/k8s-client-demo 
 ...
     Mounts:
       /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-stl9c (ro)
@@ -436,3 +437,4 @@ $ node index.js
 
 "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZuWWI4ZHFVeVhOc0dMNDlCckJ6eVNuVHdSU29SamRYNlBnQ2pEa3hJNmsifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9j...
 ```
+

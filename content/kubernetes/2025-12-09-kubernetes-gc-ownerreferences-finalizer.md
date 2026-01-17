@@ -1,19 +1,19 @@
 ---
-title: '[Kubernetes] Garbage Collection: OwnerReference, Orphaning and Finalizer'
-description: '쿠버네티스의 GC(Garbage Collection)와 OwnerReferences, Finalizer'
-slug: '2025-12-09-kubernetes-gc-ownerreferences-finalizer'
+title: "[Kubernetes] Garbage Collection: OwnerReference, Orphaning and Finalizer"
+description: "쿠버네티스의 GC(Garbage Collection)와 OwnerReferences, Finalizer"
+slug: "2025-12-09-kubernetes-gc-ownerreferences-finalizer"
 author: yulmwu
 date: 2025-12-09T03:03:45.564Z
 updated_at: 2026-01-14T13:18:24.518Z
-categories: ['Kubernetes']
-tags: ['kubernetes']
+categories: ["Kubernetes"]
+tags: ["kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-gc-ownerreferences-finalizer.png
 linked_posts:
-    previous: 2025-12-09-kubernetes-csa-ssa
-    next: 2025-12-09-kubernetes-pac-with-gatekeeper-and-kyverno
+  previous: 2025-12-09-kubernetes-csa-ssa
+  next: 2025-12-09-kubernetes-pac-with-gatekeeper-and-kyverno
 is_private: false
 ---
 
@@ -52,27 +52,27 @@ service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   7d17h
 
 # 1. ownerReferences
 
-예시로 Deployment를 생성하고 아래와 같이 부모 요소의 리소스 UID와 자식 요소(ReplicaSet, Pod)의 YAML을 확인해보자.
+예시로 Deployment를 생성하고 아래와 같이 부모 요소의 리소스 UID와 자식 요소(ReplicaSet, Pod)의 YAML을 확인해보자. 
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: test
-    namespace: default
+  name: test
+  namespace: default
 spec:
-    replicas: 1
-    selector:
-        matchLabels:
-            app: test
-    template:
-        metadata:
-            labels:
-                app: test
-        spec:
-            containers:
-                - name: nginx
-                  image: nginx:latest
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
 ```
 
 `kubectl get <Resource> -n default -o yaml`을 통해 YAML 형식으로 출력되도록 한다. (주요한 부분만 남겨두고 생략하였다.)
@@ -116,15 +116,16 @@ metadata:
   uid: 284917a5-3d88-40a4-9401-151d8281f7e2 # 2849
 ```
 
-위와 같이 자식 리소스의 메타데이터에 `ownerReferences` 필드가 있고, 부모 리소스의 UID가 포함되어 있는 것을 볼 수 있다.
 
-여기서 `blockOwnerDeletion` 필드와 `controller` 필드가 있는 것을 볼 수 있다.
+위와 같이 자식 리소스의 메타데이터에 `ownerReferences` 필드가 있고, 부모 리소스의 UID가 포함되어 있는 것을 볼 수 있다. 
 
-`blockOwnerDeletion`은 Foreground 삭제에서 자식 요소가 남아있는 한 부모 요소를 삭제하지 않도록 한다.
+여기서 `blockOwnerDeletion` 필드와 `controller` 필드가 있는 것을 볼 수 있다. 
+
+`blockOwnerDeletion`은 Foreground 삭제에서 자식 요소가 남아있는 한 부모 요소를 삭제하지 않도록 한다. 
 
 > 쿠버네티스에서 부모 리소스를 삭제할 때 자식 리소스를 어떻게 처리할지를 3가지로 선택할 수 있다.
->
-> 자식 부터 시작하여 부모 순서로 삭제하는 Foreground, 부모 먼저 삭제 후 자식은 백그라운드에서 삭제하는 Background, 부모만 삭제하고 자식은 남겨두는 Orphan 방식이 있다.
+> 
+> 자식 부터 시작하여 부모 순서로 삭제하는 Foreground, 부모 먼저 삭제 후 자식은 백그라운드에서 삭제하는 Background, 부모만 삭제하고 자식은 남겨두는 Orphan 방식이 있다. 
 > (이는 `--cascade` 옵션으로 지정할 수 있다. 기본값은 Background이다.)
 
 `controller`는 여러 OwnerReferences 중 이 자식 리소스를 실질적으로 관리하는 주 컨트롤러를 지정한다. (`: true`)
@@ -141,7 +142,7 @@ metadata:
 
 # 3. Finalizer
 
-한가지 예시를 들어보자. Ingress/Gateway나 LoadBalancer Service에서 AWS Load Balancer Controller를 사용한다고 가정해보자.
+한가지 예시를 들어보자. Ingress/Gateway나 LoadBalancer Service에서 AWS Load Balancer Controller를 사용한다고 가정해보자. 
 
 만약 ALB와 연동된 Ingress를 지우게 된다면 컨트롤러에 의해 같이 생성된 AWS ALB(ELB) 또한 삭제가 되어야 할 것이다. 하지만 AWS ALB는 쿠버네티스 GC가 직접 삭제할 수 없기 때문에 컨트롤러에 의존하게 된다.
 
@@ -155,8 +156,8 @@ metadata:
 
 ```yaml
 spec:
-    finalizers:
-        - kubernetes
+  finalizers:
+  - kubernetes
 ```
 
 위와 같이 어떤 리소스(네임스페이스 등)는 기본적으로 kubernetes(또는 kubernetes.io/pv-protection 등)를 포함하는 Finalizer를 가진다.
@@ -164,7 +165,7 @@ spec:
 
 ---
 
-Finalizer에 대한 실습 후 포스팅을 마무리 해보겠다. ConfigMap을 생성하고 Finalizer를 달아서 의도적으로 영원히 삭제되지 않도록 해보겠다.
+Finalizer에 대한 실습 후 포스팅을 마무리 해보겠다. ConfigMap을 생성하고 Finalizer를 달아서 의도적으로 영원히 삭제되지 않도록 해보겠다. 
 
 ```shell
 > kubectl create configmap finalizer-demo --from-literal=a=b
@@ -183,23 +184,22 @@ configmap/finalizer-demo patched
 ```shell
 > kubectl get configmap/finalizer-demo -o yaml
 ```
-
 ```yaml
 apiVersion: v1
 data:
-    a: b
+  a: b
 kind: ConfigMap
 metadata:
-    creationTimestamp: '2025-12-12T06:59:16Z'
-    finalizers:
-        - example.com/cleanup
-    name: finalizer-demo
-    namespace: default
-    resourceVersion: '27434'
-    uid: 53103bfd-6694-4b17-bca9-eda147e0937a
+  creationTimestamp: "2025-12-12T06:59:16Z"
+  finalizers:
+  - example.com/cleanup
+  name: finalizer-demo
+  namespace: default
+  resourceVersion: "27434"
+  uid: 53103bfd-6694-4b17-bca9-eda147e0937a
 ```
 
-그리고 `kubectl delete configmap/finalizer-demo` 명령어를 입력하여 삭제를 시도해보자.
+그리고 `kubectl delete configmap/finalizer-demo` 명령어를 입력하여 삭제를 시도해보자. 
 
 ```shell
 > kubectl delete configmap/finalizer-demo
@@ -217,22 +217,21 @@ finalizer-demo     1      4m16s
 ```shell
 > kubectl get configmap/finalizer-demo -o yaml
 ```
-
 ```yaml
 apiVersion: v1
 data:
-    a: b
+  a: b
 kind: ConfigMap
 metadata:
-    creationTimestamp: '2025-12-12T06:59:16Z'
-    deletionGracePeriodSeconds: 0
-    deletionTimestamp: '2025-12-12T07:02:22Z'
-    finalizers:
-        - example.com/cleanup
-    name: finalizer-demo
-    namespace: default
-    resourceVersion: '27554'
-    uid: 53103bfd-6694-4b17-bca9-eda147e0937a
+  creationTimestamp: "2025-12-12T06:59:16Z"
+  deletionGracePeriodSeconds: 0
+  deletionTimestamp: "2025-12-12T07:02:22Z"
+  finalizers:
+  - example.com/cleanup
+  name: finalizer-demo
+  namespace: default
+  resourceVersion: "27554"
+  uid: 53103bfd-6694-4b17-bca9-eda147e0937a
 ```
 
 그럼 출력과 같이 `deletionTimestamp`는 찍히는 것을 볼 수 있다. 즉 쿠버네티스 API에 의해 삭제 요청은 되었지만, Finalizer에 의해 삭제되지 않는 모습이다. 아래의 명령어로 해당 Finalizer를 지워 컨트롤러를 흉내 내본다면 즉시 삭제되는 모습을 볼 수 있을 것이다.
@@ -247,6 +246,6 @@ configmap/finalizer-demo patched
 Error from server (NotFound): configmaps "finalizer-demo" not found
 ```
 
-이로써 쿠버네티스의 GC와 OwnerReference, 그리고 Finalizer에 대해 알아보았다. 쿠버네티스를 운영하면서 여러 리소스에 대한 부모-자식 관계 문제가 발생할 수 있다.
+이로써 쿠버네티스의 GC와 OwnerReference, 그리고 Finalizer에 대해 알아보았다. 쿠버네티스를 운영하면서 여러 리소스에 대한 부모-자식 관계 문제가 발생할 수 있다. 
 
 그때 쿠버네티스의 GC와 OwnerReference, Finalizer에 대한 이해가 있다면 해결될 수 도 있으니 알아두면 좋을 것이다.

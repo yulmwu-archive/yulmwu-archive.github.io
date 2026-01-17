@@ -1,25 +1,25 @@
 ---
-title: '[Cloudflare] Expose local servers to the internet with Cloudflare Tunnel'
-description: 'Cloudflare Tunnel을 통한 포트 포워딩이나 Public IP 없이 로컬 서버 인터넷에 노출시키기'
-slug: '2025-11-25-cloudflare-tunnel'
+title: "[Cloudflare] Expose local servers to the internet with Cloudflare Tunnel"
+description: "Cloudflare Tunnel을 통한 포트 포워딩이나 Public IP 없이 로컬 서버 인터넷에 노출시키기"
+slug: "2025-11-25-cloudflare-tunnel"
 author: yulmwu
 date: 2025-11-25T12:54:10.291Z
-updated_at: 2026-01-16T10:11:23.367Z
-categories: ['Cloudflare']
-tags: ['Cloudflare']
+updated_at: 2026-01-17T09:30:17.212Z
+categories: ["Cloudflare"]
+tags: ["Cloudflare"]
 series:
-    name: Cloudflare
-    slug: cloudflare
+  name: Cloudflare
+  slug: cloudflare
 thumbnail: ../../thumbnails/cloudflare/cloudflare-tunnel.png
 linked_posts:
-    previous:
-    next: 2025-11-25-cloudflare-ddos-protection
+  previous: 
+  next: 2025-11-25-cloudflare-ddos-protection
 is_private: false
 ---
 
 # 0. Overview
 
-필자가 라즈베리파이를 통해 서버를 구축해야 할 일이 있었다.
+필자가 라즈베리파이를 통해 서버를 구축해야 할 일이 있었다. 
 
 가용성이 중요하지 않고 트래픽이 유동이지 않고 개인적으로 사용할 서버였기 때문에 집에서 라즈베리파이를 통해 서버를 구축하려고 했었다.
 
@@ -115,11 +115,11 @@ Accept-Ranges: bytes
 
 ## 2-3. cloudflared
 
-이제 Cloudflare Tunnel 데몬인 cloudflared를 설치해보자.
+이제 Cloudflare Tunnel 데몬인 cloudflared를 설치해보자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/50df1b15-f0f1-40e4-8e96-fbf44dd424f1/image.png)
 
-Cloudflare Zero Trust 탭에 들어가면 위와 같이 나타날 것이다. 여기서 왼쪽 사이드바에 Networks > Connectors로 들어간다.
+Cloudflare Zero Trust 탭에 들어가면 위와 같이 나타날 것이다. 여기서 왼쪽 사이드바에 Networks > Connectors로 들어간다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b9b6ea47-465b-403d-bb1b-18bf9e0b04c8/image.png)
 
@@ -131,7 +131,7 @@ Cloudflared를 선택한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/3c78f3a7-2c7c-4d22-aee1-1705d9522f80/image.png)
 
-이름을 입력하고 Save Tunnel을 클릭한다. 그러면 아래와 같이 설치 명령어가 나오는데, 아래에 인증 명령어까지 나오게 된다.
+이름을 입력하고 Save Tunnel을 클릭한다. 그러면 아래와 같이 설치 명령어가 나오는데, 아래에 인증 명령어까지 나오게 된다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c136e701-13de-4d7f-bd12-fca714bfccf6/image.png)
 

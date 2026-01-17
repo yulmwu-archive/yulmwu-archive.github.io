@@ -1,36 +1,36 @@
 ---
-title: '[AWS Computing] Deployment with ECR, ECS and Fargate'
-description: 'AWS ECS 및 Fargate를 통한 컨테이너 컴퓨팅'
-slug: '2025-07-04-ecs-deploy'
+title: "[AWS Computing] Deployment with ECR, ECS and Fargate"
+description: "AWS ECS 및 Fargate를 통한 컨테이너 컴퓨팅"
+slug: "2025-07-04-ecs-deploy"
 author: yulmwu
 date: 2025-07-04T12:51:41.224Z
 updated_at: 2025-12-24T05:51:31.371Z
-categories: ['AWS']
-tags: ['Computing', 'aws']
+categories: ["AWS"]
+tags: ["Computing", "aws"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/ecs-deploy.png
 linked_posts:
-    previous:
-    next: 2025-07-04-ec2-bastion-host
+  previous: 
+  next: 2025-07-04-ec2-bastion-host
 is_private: false
 ---
 
 > 해당 게시글은 [세명컴퓨터고등학교](https://smc.sen.hs.kr/) 수업에서 진행된 프로젝트의 일부입니다.
->
+> 
 > **본 글의 저작권은 [yulmwu (김준영)](https://github.com/yulmwu)에게 있습니다.** 개인적인 용도로만 사용 가능하며, 상업적 목적의 **무단 복제, 배포, 또는 변형을 금지합니다.**
->
+> 
 > 이미지의 출처가 있는 경우 별도로 명시하며, 출처가 없는 경우 직접 제작한 이미지입니다.
->
+> 
 > 글에 오류가 댓글로 남겨주시거나 피드백해주시면 감사드리겠습니다.
 
 > 포스팅에서 사용한 소스코드는 깃허브에 올려두었습니다. 아래의 링크에 방문하여 확인하실 수 있습니다.
->
+> 
 > https://github.com/yulmwu/smc-project-25-07
 >
 > 발표에 사용된 프레젠테이션(PPT)는 아래와 같습니다.
->
+> 
 > https://drive.google.com/file/d/1Rql8ehSy6-u_SHsOWYmt1wcvkgkH45qk/view?usp=sharing
 
 # 0. Overview
@@ -41,9 +41,9 @@ is_private: false
 (1등의 경우 학과도 다르고 퀄리티 있는 게임을 만들어와서 넘사벽이였다..)
 
 > ![](https://velog.velcdn.com/images/yulmwu/post/f8661f30-a053-4640-b730-b045b3ce5ea0/image.png)
->
+> 
 > 참고로 만들었던 프로젝트는 한국사 과목과 융합하라고 하여 조선인사이드라는 프로젝트를 만들었었다.
->
+> 
 > 게시글/댓글 CRUD, 페이지네이션 등의 기본적인 기능들을 최대한 구현하였으나 시간이 촉박하여 더욱 세부적인 기능을 구현하지 못했다는 것이 아쉬울 따름이다.
 
 필자는 앞서 이야기했듯 전체적인 개발과 배포에 중심을 뒀는데, 이 포스팅에선 AWS 배포와 관련하여 이야기를 해보겠다.
@@ -140,7 +140,7 @@ ECR은 Elastic Container Registry의 약자로, 이름 그대로 도커 컨테�
 먼저 테스트를 위해 로컬에서 빌드하고 배포해보자. 위와 같이 먼저 이미지를 빌드해준다.
 
 > 참고로 맥의 경우 빌드 시 `--platform linux/amd64`로 플랫폼을 지정해줘야 한다.
->
+> 
 > ECS Fargate에서 64비트 AMD 기반의 리눅스를 사용하기 때문.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/38050a76-5a6b-48df-a2aa-a55f088277b7/image.png)
@@ -194,6 +194,7 @@ ECS에선 크게 클러스터와 서비스, 그리고 태스크가 있는데 먼
 즉 Docker Compose 파일과 흡사하다고 생각하면 된다.
 
 마지막으로 태스크(Task)는 하나하나의 컨테이너를 말하며, 서비스의 오토스케일링 등의 규칙에 따라 생성되고 삭제될 수 있다. (인스턴스)
+
 
 ![](https://velog.velcdn.com/images/yulmwu/post/6ba2f3c2-b6c0-4fe9-acd6-35d7f6ef3a31/image.png)
 
@@ -332,49 +333,49 @@ Route53은 AWS에서 제공하는 DNS 서비스이다. 도메인을 구매할 �
 name: Deploy Backend
 
 on:
-    push:
-        paths:
-            - 'backend/**'
-            - '.github/workflows/backend-deploy.yaml'
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-deploy.yaml'
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        env:
-            AWS_REGION: ap-northeast-2
-            AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-            ECR_REPO_NAME: smc-07-project-backend-repo
-            ECS_CLUSTER_NAME: smc-07-project-cluster
-            ECS_SERVICE_NAME: smc-07-project-backend-task-service
+    env:
+      AWS_REGION: ap-northeast-2
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      ECR_REPO_NAME: smc-07-project-backend-repo
+      ECS_CLUSTER_NAME: smc-07-project-cluster
+      ECS_SERVICE_NAME: smc-07-project-backend-task-service
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v2
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-            - name: Login to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-            - name: Build, tag, and push image to Amazon ECR
-              run: |
-                  cd backend
-                  docker build --platform linux/amd64 -t $ECR_REPO_NAME .
-                  docker tag $ECR_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
-                  docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          cd backend
+          docker build --platform linux/amd64 -t $ECR_REPO_NAME .
+          docker tag $ECR_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
 
-            - name: Update ECS service
-              run: |
-                  aws ecs update-service \
-                    --cluster $ECS_CLUSTER_NAME \
-                    --service $ECS_SERVICE_NAME \
-                    --force-new-deployment
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER_NAME \
+            --service $ECS_SERVICE_NAME \
+            --force-new-deployment
 ```
 
 도커 빌드 후 서비스를 업데이트하는 간단한 워크플로우이며, 조건과 변수를 다르게 하여 프론트엔드 배포용 워크플로우도 작성할 수 있다.

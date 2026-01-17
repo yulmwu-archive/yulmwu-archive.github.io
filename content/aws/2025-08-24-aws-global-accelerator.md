@@ -1,25 +1,25 @@
 ---
-title: '[AWS Networking] AWS Global Accelerator (AGA)'
-description: 'AWS Global Accelerator를 통한 글로벌 서비스의 네트워크 퍼포먼스 올리기'
-slug: '2025-08-24-aws-global-accelerator'
+title: "[AWS Networking] AWS Global Accelerator (AGA)"
+description: "AWS Global Accelerator를 통한 글로벌 서비스의 네트워크 퍼포먼스 올리기"
+slug: "2025-08-24-aws-global-accelerator"
 author: yulmwu
 date: 2025-08-24T05:15:47.274Z
-updated_at: 2026-01-09T17:36:18.736Z
-categories: ['AWS']
-tags: ['aws', 'networking']
+updated_at: 2026-01-17T10:29:05.973Z
+categories: ["AWS"]
+tags: ["aws", "networking"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-global-accelerator.png
 linked_posts:
-    previous: 2025-08-24-aws-vpc-peering-transit-privatelink
-    next: 2025-08-24-aws-s2s-vpn
+  previous: 2025-08-24-aws-vpc-peering-transit-privatelink
+  next: 2025-08-24-aws-s2s-vpn
 is_private: false
 ---
 
 # 0. Overview
 
-AWS엔 리전에 의존하지 않는 "글로벌 서비스"라는게 존재한다.
+AWS엔 리전에 의존하지 않는 "글로벌 서비스"라는게 존재한다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f21937d6-525e-4a6d-95a6-72c03ec84b92/image.png)
 
@@ -27,7 +27,7 @@ AWS엔 리전에 의존하지 않는 "글로벌 서비스"라는게 존재한다
 
 예를 들어 CloudFront를 생각해보자. AWS는 어떻게 빠르게 콘텐츠를 캐싱하고 클라이언트에게 전달될까? 그 배경엔 AWS의 자체적인 백본 네트워크가 존재하기 때문이다.
 
-클라이언트가 CloudFront에 접속하면 가장 가까운 엣지 로케이션(또는 엣지 PoP=Point of Presence)에서 빠르게 데이터를 전송한다.
+클라이언트가 CloudFront에 접속하면 가장 가까운 엣지 로케이션(또는 엣지 PoP=Point of Presence)에서 빠르게 데이터를 전송한다. 
 
 그리고 이 엣지 로케이션은 AWS의 자체적인 백본 네트워크에 연결되어 있고, 전세계 퍼블릭 인터넷 통신망을 통하지 않고 자체적인 네트워크를 통해 송수신되기 때문에 빠른 속도를 낼 수 있다.
 
@@ -44,34 +44,36 @@ Direct Connect의 최대 대역폭이 400Gbps임을 생각해보면 엄청나게
 여기서 클라이언트는 가장 가까운 엣지 로케이션에 접속해 AWS 백본 네트워크를 거쳐 최적의 경로로 빠르게 애플리케이션에 트래픽을 송수신할 수 있는데, 이 서비스를 AWS Global Accelerator(AGA)라고 한다.
 
 > ### CloudFront vs Global Accelerator
->
+> 
 > 두 서비스 모두 AWS 백본 네트워크를 사용한다는 점과, 클라이언트는 가장 가까운 엣지 로케이션에 접속하여 빠르게 데이터를 송수신할 수 있다는 점이 같다.
->
+> 
 > 다만 두 서비스는 목적과 동작이 완전히 다르다. CloudFront의 경우 CDN 캐싱 서비스로, 엣지 로케이션에 콘텐츠를 캐싱한다. DNS 기반으로 가장 가까운 엣지 로케이션에 접근하며, 캐싱된 콘텐츠를 가져오거나 캐싱된 콘텐츠가 아닐 경우 오리진 서버에서 데이터를 가져오게 된다.
->
+> 
 > 이에 반해 Global Accelerator는 OSI 7계층 관점에서 OSI 4계층인 전송 계층에서 TCP/UDP 트래픽을 다룬다. (CloudFront는 HTTP/HTTPS를 주로 다룸, OSI 7계층)
->
+> 
 > 클라이언트는 Global Accelerator의 Anycast IP에 접근하게 된다면 가장 가까운 엣지 로케이션에 진입한다. 그러면 최적의 경로를 찾게 되고, 최종적으로 애플리케이션의 엔드포인트에 빠르게 접근할 수 있게 된다.
->
+> 
 > 이때 애플리케이션이 동작하지 않는다면 자동으로 다른 리전의 서비스로 Failover되게 할 수 있다. (2개 이상의 서비스 연결 시)
 
 > ### Anycast IP
->
+> 
 > AWS Global Accelerator의 엣지 로케이션들은 같은 IP를 가지고, 클라이언트는 그 IP로 접속하여 가장 가까운 엣지 로케이션으로 접근한다.
->
+> 
 > 이처럼 Global Accelerator의 엣지 로케이션은 Anycast IP를 기반으로 동작하는데, Anycast IP와 Unicast IP를 비교하면 아래와 같다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/6621d686-71af-4a09-bfd1-92dbef03e159/image.png)
->
+> 
 > 위 사진처럼 Unicast의 경우 클라이언트에서 목적지를 정했다면, 무조건 해당 IP를 가진 유일한 서버로 접근한다. 반면 Anycast는 아래와 같다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/bb66f8f4-4837-4a79-8be5-8186337d33da/image.png)
->
+> 
 > 사진과 같이 여러대의 서버에 같은 IP를 할당한다. 그리고 BGP와 같은 라우팅 프로토콜로 클라이언트가 가장 가까운 서버에 접근할 수 있도록 설정하고, 사진처럼 클라이언트는 여러 서버 중 가장 가까이 있는 서버로 접근하게 되는 것이다.
->
+> 
 > Global Accelerator는 후자, Anycast IP를 기반으로 엣지 로케이션에 접근하도록 한다.
 
-서론이 길었다. 예를 들어 아래의 경우를 보자.
+
+
+서론이 길었다. 예를 들어 아래의 경우를 보자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f6e407b4-0a47-4bbc-ab23-a269473e067a/image.png)
 
@@ -79,7 +81,7 @@ Direct Connect의 최대 대역폭이 400Gbps임을 생각해보면 엄청나게
 
 ![](https://velog.velcdn.com/images/yulmwu/post/001bb724-d585-4fc8-a757-bcc05c646713/image.png)
 
-사진과 같이 물리적으로 멀리 떨어져 있으니 당연히 레이턴시가 생기게 될 것이다. 물론 실제로 느끼기엔 레이턴시가 그리 크지 않을 수 있으나, 게임 서버와 같은 네트워크 속도가 생명인 서비스나 중요한 은행 등의 서비스라면 이야기가 달라진다.
+사진과 같이 물리적으로 멀리 떨어져 있으니 당연히 레이턴시가 생기게 될 것이다. 물론 실제로 느끼기엔 레이턴시가 그리 크지 않을 수 있으나, 게임 서버와 같은 네트워크 속도가 생명인 서비스나 중요한 은행 등의 서비스라면 이야기가 달라진다. 
 
 그래서 AWS Global Accelerator를 사용하면 아래와 같다.
 
@@ -97,7 +99,7 @@ Direct Connect의 최대 대역폭이 400Gbps임을 생각해보면 엄청나게
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f2d39a5f-676b-40cc-bdb7-4cbbeed943e9/image.png)
 
-이렇게 할 경우 하나의 Anycast IP를 사용하여 가까운 Global Accelerator 엣지 로케이션에 접근하고, 백본 네트워크에서 최적의 경로와 가까운 서버를 찾는다.
+이렇게 할 경우 하나의 Anycast IP를 사용하여 가까운 Global Accelerator 엣지 로케이션에 접근하고, 백본 네트워크에서 최적의 경로와 가까운 서버를 찾는다. 
 
 여기서 만약 ap-northeast-1 리전에 있는 서버가 다운되면 어떻게 될까? 이 경우엔 Global Accelerator에서 자동으로 남은 가장 가까운 서버인 us-east-1에 있는 서버로 Failover 한다.
 
@@ -215,7 +217,7 @@ IP 주소 유형은 IPv4로 선택한다. 원할 시 IPv4, IPv6 듀얼 스택으
 
 ![](https://velog.velcdn.com/images/yulmwu/post/6d1db9b2-3543-4d42-ae04-b2c3779ee481/image.png)
 
-같은 설정으로 ap-northeast-2 리전의 엔드포인트 그룹도 만들어둔다.
+같은 설정으로 ap-northeast-2 리전의 엔드포인트 그룹도 만들어둔다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/eaafd99a-5736-4d83-a689-4279b942f1af/image.png)
 
@@ -265,7 +267,7 @@ Global Accelerator의 기능 중 하나로 가까운 리전의 서비스가 다�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/5b9f7c3b-a770-47c4-9c8a-de8879157680/image.png)
 
-ap-northeast-2에 올린 EC2를 중지시켜보자.
+ap-northeast-2에 올린 EC2를 중지시켜보자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4d845a8f-bcf0-4695-9103-854f3a8972b5/image.png)
 
@@ -304,11 +306,11 @@ ap-northeast-2에 올린 EC2를 중지시켜보자.
 - Global Accelerator DT Premium (대한민국에서 미국으로) : $1,000 × 0.017\$ = 17\$$
 - (또는) Global Accelerator DT Premium (대한민국에서 대한민국으로) : $1,000 × 0.043\$ = 43\$$
 
-그리고 GLobal Accelerator는 기본적으로 고정된 2개의 퍼블릭 IPv4 주소를 할당해준다.
+그리고 GLobal Accelerator는 기본적으로 고정된 2개의 퍼블릭 IPv4 주소를 할당해준다. 
 즉 VPC Public IP 요금(시간 당 0.005$)에 따라 아래와 같이 IPv4 요금이 나온다.
 
-- Public IPv4 : $2 × 0.005 × 24 × 30 = 7.2\$$
+* Public IPv4 : $2 × 0.005 × 24 × 30 = 7.2\$$
 
 결과적으로 모두 합산하면 월별로 약 150\$의 요금이 발생하게 된다. 물론 대한민국 소스(리전)에서 미국 엣지 로케이션으로 보내는 기준이고, 리전과 엣지 로케이션에 따라 다르게 부과되니 요금 표를 참고하도록 하자.
 
-이상으로 AWS Global Accelerator에 대한 포스팅을 마치겠다.
+이상으로 AWS Global Accelerator에 대한 포스팅을 마치겠다. 

@@ -1,25 +1,25 @@
 ---
 title: "[Kafka Producer] About Producer's Message Delivery Time "
-description: 'Kafka 프로듀서의 send(ProducerRecord) 호출 부터 브로커의 응답까지의 전송 시간에 대하여'
-slug: '2025-12-01-kafka-producer-message-delivery-time'
+description: "Kafka 프로듀서의 send(ProducerRecord) 호출 부터 브로커의 응답까지의 전송 시간에 대하여"
+slug: "2025-12-01-kafka-producer-message-delivery-time"
 author: yulmwu
 date: 2025-12-01T01:34:12.283Z
 updated_at: 2026-01-14T08:53:22.077Z
-categories: ['Kafka']
-tags: ['kafka']
+categories: ["Kafka"]
+tags: ["kafka"]
 series:
-    name: Kafka
-    slug: kafka
+  name: Kafka
+  slug: kafka
 thumbnail: ../../thumbnails/kafka/kafka-producer-message-delivery-time.png
 linked_posts:
-    previous:
-    next:
+  previous: 
+  next: 
 is_private: false
 ---
 
 # 0. Overview
 
-필자가 Kafka를 사용하면서 협업에 있어 주로 Producer 쪽을 다루는데, 다른 팀원들의 이러한 Producer에서 브로커까지의 메세지 전달에 대해 이해력이 부족하다고 생각하여 포스팅을 쓰게 되었다.
+필자가 Kafka를 사용하면서 협업에 있어 주로 Producer 쪽을 다루는데, 다른 팀원들의 이러한 Producer에서 브로커까지의 메세지 전달에 대해 이해력이 부족하다고 생각하여 포스팅을 쓰게 되었다. 
 
 프로듀서를 중점으로 다루는 포스팅이지만 Kafka를 전반적으로 이해하는데 있어 중요한 개념과 관련 옵션이 포함되어 있기 때문에, 이해하고 넘어가는 것이 좋다고 생각한다.
 
@@ -47,7 +47,7 @@ is_private: false
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ffe811e9-3397-4a24-9b77-f33126164181/image.png)
 
-먼저 `send()`를 호출한 시점부터 리턴이 될때까지 해당 스레드가 블록되고, 리턴이 되었다면 Kafka의 응답을 받을 때 까지(즉 콜백이 호출될 때 까지) 걸리는 시간이 발생하게 된다.
+먼저 `send()`를 호출한 시점부터 리턴이 될때까지 해당 스레드가 블록되고, 리턴이 되었다면 Kafka의 응답을 받을 때 까지(즉 콜백이 호출될 때 까지) 걸리는 시간이 발생하게 된다. 
 
 ## 2-1. `max.block.ms` and `linger.ms`
 
@@ -57,7 +57,7 @@ is_private: false
 
 만약 이를 초과한다면 `send()` 메서드 자체에서 예외가 발생하게 된다.
 
-그리고 `linger.ms`와 다이어그램엔 포함하지 않았지만 `batch.size` 옵션이 있는데, `linger.ms`는 Kafka Producer가 메시지를 묶어 배치 형태로 보내기 위해 대기하는 최대 시간이다.
+그리고 `linger.ms`와 다이어그램엔 포함하지 않았지만 `batch.size` 옵션이 있는데, `linger.ms`는 Kafka Producer가 메시지를 묶어 배치 형태로 보내기 위해 대기하는 최대 시간이다. 
 
 여기서 "최대"라는 단어를 선택한 이유는 이 옵션 말고 다른 옵션도 이러한 대기 시간에 영향을 미친다는 뜻으로, `batch.size`라는 옵션은 이름에서도 유추할 수 있듯이 배치의 최대 사이즈(바이트)를 지정하고, 이를 초과할 경우 즉시 배치가 Kafka 브로커로 전송된다.
 
@@ -71,7 +71,7 @@ _(이 외에도 어떠한 이유로 배치에 대한 백그라운드 스레드�
 
 `ack` 옵션이 0일 경우 응답을 받지 않는, 즉 Fire and Forget 방식이기 때문에 이 시간은 무의미하다. 만약 이때 타임아웃이 발생한다면 아래의(#2-3) 옵션에 따라 재시도 되거나 타임아웃 예외와 함께 콜백을 호출한다.
 
-여기서 In-Flight Requests 라는 용어가 등장하는데, 이는 아직 브로커의 응답을 받지 못한 요청, 즉 아직 응답을 대기중인 Producer 요청을 의미한다.
+여기서 In-Flight Requests 라는 용어가 등장하는데, 이는 아직 브로커의 응답을 받지 못한 요청, 즉 아직 응답을 대기중인 Producer 요청을 의미한다. 
 
 다른 용어로 Outstanding Requests(대기중인 요청)라고도 하고, 추후 살펴볼 `max.in.flight.requests.per.connection` 옵션이 직접적으로 관여한다.
 
@@ -85,7 +85,7 @@ _(여기서 일시적인 오류는 메시지의 최대 크기를 초과하는 �
 
 이때 `retries` 옵션이 이러한 재시도(재전송) 횟수를 지정하고(기본값은 무한이다), 이마저도 넘기게 된다면 예외와 함께 콜백이 호출된다.
 
-`retry.backoff.ms` 옵션은 이 재전송 간격을 조정하고, 기본 값은 100ms이다. 단 이 값들을 직접 조정하는 것 보단 아래의 `delivery.timeout.ms` 옵션을 증가시키는 방식으로 접근하는 것이 더욱 더 이득일 수 있다.
+`retry.backoff.ms` 옵션은 이 재전송 간격을 조정하고, 기본 값은 100ms이다. 단 이 값들을 직접 조정하는 것 보단 아래의 `delivery.timeout.ms` 옵션을 증가시키는 방식으로 접근하는 것이 더욱 더 이득일 수 있다. 
 
 ## 2-4. `delivery.timeout.ms`
 

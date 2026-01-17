@@ -1,19 +1,19 @@
 ---
-title: '[AWS Networking] VPC Peering, Transit Gateway and PrivateLink'
-description: 'AWS VPC Peering, Transit Gateway 및 PrivateLink를 통한 다중 VPC/계정 간 네트워킹'
-slug: '2025-09-09-aws-vpc-peering-transit-privatelink'
+title: "[AWS Networking] VPC Peering, Transit Gateway and PrivateLink"
+description: "AWS VPC Peering, Transit Gateway 및 PrivateLink를 통한 다중 VPC/계정 간 네트워킹"
+slug: "2025-09-09-aws-vpc-peering-transit-privatelink"
 author: yulmwu
 date: 2025-09-09T23:35:30.426Z
 updated_at: 2026-01-14T09:53:44.953Z
-categories: ['AWS']
-tags: ['aws', 'networking']
+categories: ["AWS"]
+tags: ["aws", "networking"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-vpc-peering-transit-privatelink.png
 linked_posts:
-    previous: 2025-09-09-aws-serverless
-    next: 2025-09-09-aws-global-accelerator
+  previous: 2025-09-09-aws-serverless
+  next: 2025-09-09-aws-global-accelerator
 is_private: false
 ---
 
@@ -98,13 +98,13 @@ TGW는 자체적으로 라우팅 테이블을 가지게 되는데, 목적지로�
 
 ## (1) VPC Peering
 
-먼저 2개의 VPC를 만들어주겠다. VPC A는 CIDR `10.1.0.0/16`, VPC B는 CIDR `10.2.0.0/16`으로 설정하겠다.
+먼저 2개의 VPC를 만들어주겠다. VPC A는 CIDR `10.1.0.0/16`, VPC B는 CIDR `10.2.0.0/16`으로 설정하겠다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ee65cc60-66e7-4505-af53-7222f25f7c92/image.png)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/955f5401-fc1c-469a-96a9-3aa60e921222/image.png)
 
-다음으로 각 VPC에 테스트용 EC2를 만들자.
+다음으로 각 VPC에 테스트용 EC2를 만들자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f83cd8d6-71b4-42bd-af1e-b59149913a4c/image.png)
 
@@ -132,7 +132,7 @@ Peering 설정에서 요청자와 수락자가 있는데, VPC B의 인스턴스�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/dfdd9790-03a6-4a2d-8a12-3fa32a7ab851/image.png)
 
-만들고나면 수락 대기중이라 표시되는데, 작업 버튼에서 수락을 해주자. 그리고 각 VPC의 서브넷 라우팅 테이블에서 Peering이 가능하도록 설정을 해줘야 한다.
+만들고나면  수락 대기중이라 표시되는데, 작업 버튼에서 수락을 해주자. 그리고 각 VPC의 서브넷 라우팅 테이블에서 Peering이 가능하도록 설정을 해줘야 한다.
 
 먼저 VPC A부터 보자.
 
@@ -162,7 +162,7 @@ VPC가 다르기 때문에 접근이 안된다. 이제 Transit Gateway를 만들
 
 ![](https://velog.velcdn.com/images/yulmwu/post/1afcd3a9-4989-47ff-a5f0-4a5c0603517c/image.png)
 
-그러면 구성에 여러 옵션이 나오는데, 그 중 "기본 라우팅 테이블 연결(Association)"은 VPC Attachment 하나 당 하나의 TGW 라우팅 테이블을 연결한다.
+그러면 구성에 여러 옵션이 나오는데, 그 중 "기본 라우팅 테이블 연결(Association)"은 VPC Attachment 하나 당 하나의 TGW 라우팅 테이블을 연결한다. 
 
 그리고 "기본 라우팅 테이블 전파(Propagation)"는 연결된 VPC Attachment를 바탕으로 한개 이상의 TGW 라우팅 테이블에 해당 VPC CIDR을 자동으로 등록해준다.
 
@@ -172,7 +172,7 @@ VPC가 다르기 때문에 접근이 안된다. 이제 Transit Gateway를 만들
 
 ![](https://velog.velcdn.com/images/yulmwu/post/498f8262-1a46-436e-b8e7-069439e1805a/image.png)
 
-그리고 VPC A, B Attachment를 생성해주자.
+그리고 VPC A, B Attachment를 생성해주자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/a101ca98-2cd8-4dc0-b5ab-f454af38e0dd/image.png)
 
@@ -267,7 +267,7 @@ VPC 엔드포인트를 만들어보자.
 ![](https://velog.velcdn.com/images/yulmwu/post/d5183418-3bdb-49f7-b20f-9f1d8e30a992/image.png)
 
 > 기본적으로 S3 Gateway 엔드포인트가 있다. (VPC 생성에서 옵션 체크 시)
->
+> 
 > 이는 S3, DynamoDB와 같이 인터넷을 거쳐 퍼블릭 엔드포인트를 통해 접근을 하는 서비스를 IGW/NAT을 거치지 않고 AWS 백본망으로 연결되도록 하는 Gateway 엔드포인트이다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/a297047d-c581-49e4-ba78-217087ffabd4/image.png)

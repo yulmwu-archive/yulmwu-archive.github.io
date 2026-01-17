@@ -1,19 +1,19 @@
 ---
-title: '[Kubernetes] Secret Encryption with Sealed Secrets'
-description: 'Sealed Secrets를 통한 외부 시크릿 저장소 없이 암호화된 시크릿 사용 방법'
-slug: '2025-10-02-kubernetes-sealed-secrets'
+title: "[Kubernetes] Secret Encryption with Sealed Secrets"
+description: "Sealed Secrets를 통한 외부 시크릿 저장소 없이 암호화된 시크릿 사용 방법"
+slug: "2025-10-02-kubernetes-sealed-secrets"
 author: yulmwu
 date: 2025-10-02T02:48:42.263Z
 updated_at: 2026-01-10T05:48:01.468Z
-categories: ['Kubernetes']
-tags: ['kubernetes']
+categories: ["Kubernetes"]
+tags: ["kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-sealed-secrets.png
 linked_posts:
-    previous: 2025-10-02-kubernetes-operator-go
-    next: 2025-10-02-kubernetes-istio-envoy
+  previous: 2025-10-02-kubernetes-operator-go
+  next: 2025-10-02-kubernetes-istio-envoy
 is_private: false
 ---
 
@@ -27,25 +27,25 @@ is_private: false
 apiVersion: v1
 kind: Secret
 metadata:
-    name: my-secret
+  name: my-secret
 type: Opaque
 data: # base64
-    username: bXkgdmVyeSBzZWNyZXQgdXNlcm5hbWU=
-    password: dG9wIHNlY3JldCBwYXNzd29yZA==
-    apikey: em5IaFJZQm1mY2tSRHpuSGhSWUJtZmNrUkQ=
+  username: bXkgdmVyeSBzZWNyZXQgdXNlcm5hbWU=
+  password: dG9wIHNlY3JldCBwYXNzd29yZA==
+  apikey: em5IaFJZQm1mY2tSRHpuSGhSWUJtZmNrUkQ=
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-    name: my-pod
+  name: my-pod
 spec:
-    containers:
-        - name: my-container
-          image: nginx
-          envFrom:
-              - secretRef:
-                    name: my-secret
-
+  containers:
+    - name: my-container
+      image: nginx
+      envFrom:
+        - secretRef:
+            name: my-secret
+            
 # kubectl apply -f example.yaml
 # kubectl exec -it my-pod -- /bin/
 
@@ -67,7 +67,7 @@ External Secrets는 외부 저장소(AWS Secrets Manager 등)를 통해 시크�
 
 Bitnami에서 개발한 [Sealed Secretes](https://github.com/bitnami-labs/sealed-secrets)는 시크릿을 암호화하여 저장한다. 그리고 클러스터에선 Sealed Secrets Controller가 복호화 및 실제론 Secret 리소스로 변환하여 사용한다.
 
-때문에 Sealed Secrets Controller만이 가지고 있는 개인 키로만 복호화를 할 수 있고, 제공되는 공개 키를 통해 값을 암호화한다.
+때문에 Sealed Secrets Controller만이 가지고 있는 개인 키로만 복호화를 할 수 있고, 제공되는 공개 키를 통해 값을 암호화한다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b8f8637a-f5e8-4c68-bcc4-2be4b533ed1e/image.png)
 
@@ -121,12 +121,12 @@ kubeseal \
 apiVersion: v1
 kind: Secret
 metadata:
-    name: my-secret
+  name: my-secret
 type: Opaque
 data:
-    username: bXkgdmVyeSBzZWNyZXQgdXNlcm5hbWU=
-    password: dG9wIHNlY3JldCBwYXNzd29yZA==
-    apikey: em5IaFJZQm1mY2tSRHpuSGhSWUJtZmNrUkQ=
+  username: bXkgdmVyeSBzZWNyZXQgdXNlcm5hbWU=
+  password: dG9wIHNlY3JldCBwYXNzd29yZA==
+  apikey: em5IaFJZQm1mY2tSRHpuSGhSWUJtZmNrUkQ=
 ```
 
 이제 아래의 명령어를 통해 Secret 오브젝트를 SealedSecret CR 오브젝트로 변환해보겠다.
@@ -138,7 +138,7 @@ kubeseal \
   --namespace=apps \
   --controller-name=sealed-secrets \
   --controller-namespace=kube-system \
-  < secret.yaml > sealedsecret.yaml
+  < secret.yaml > sealedsecret.yaml 
 ```
 
 그럼 `sealedsecret.yaml` 파일이 생성되고, 열어보면 아래와 같이 생성되었을 것이다.
@@ -149,39 +149,39 @@ kubeseal \
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
-    annotations:
-        sealedsecrets.bitnami.com/namespace-wide: 'true'
-    name: my-secret
-    namespace: apps
+  annotations:
+    sealedsecrets.bitnami.com/namespace-wide: "true"
+  name: my-secret
+  namespace: apps
 spec:
-    encryptedData:
-        apikey: ...
-        password: ...
-        username: ....
-    template:
-        metadata:
-            annotations:
-                sealedsecrets.bitnami.com/namespace-wide: 'true'
-            name: my-secret
-            namespace: apps
-        type: Opaque
+  encryptedData:
+    apikey: ...
+    password: ...
+    username: ....
+  template:
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/namespace-wide: "true"
+      name: my-secret
+      namespace: apps
+    type: Opaque
 ```
 
 그리고 `kubectl apply -f sealedsecret.yaml`을 통해 CR을 적용하면 된다. Sealed Secret과 컨트롤러에 의한 Secret 오브젝트가 잘 생성되었는지 확인해보자.
 
 ```shell
-> kubectl -n apps get sealedsecrets,secrets
+> kubectl -n apps get sealedsecrets,secrets 
 NAME                                 STATUS   SYNCED   AGE
 sealedsecret.bitnami.com/my-secret            True     2m1s
 
 NAME               TYPE     DATA   AGE
 secret/my-secret   Opaque   3      2m1s
 
-> kubectl -n apps get secrets -o json | egrep 'apikey|password|username'
+> kubectl -n apps get secrets -o json | egrep 'apikey|password|username'       
 	"apikey": "em5IaFJZQm1mY2tSRHpuSGhSWUJtZmNrUkQ=",
 	"password": "dG9wIHNlY3JldCBwYXNzd29yZA==",
 	"username": "bXkgdmVyeSBzZWNyZXQgdXNlcm5hbWU="
-
+    
 > kubectl exec -n apps -it my-pod -- /bin/sh
 # > env | egrep 'username|password|apikey'
 # username=my very secret username
@@ -191,4 +191,4 @@ secret/my-secret   Opaque   3      2m1s
 
 이렇게 암호화된 SealedSecrets는 컨트롤러에 의해 복호화될 수 있고, 이로써 깃 레포지토리엔 `sealedsecret.yaml`만 올려도 되게 된다.
 
-Sealed Secrets는 특히 GitOps 환경에서 매우 적합하고, 외부 시크릿 저장소를 사용하지 않기 때문에 추가적인 비용이 발생하지 않는다는 장점이 있고, 사용 방법도 매우 쉬운 걸 볼 수 있다.
+Sealed Secrets는 특히 GitOps 환경에서 매우 적합하고, 외부 시크릿 저장소를 사용하지 않기 때문에 추가적인 비용이 발생하지 않는다는 장점이 있고, 사용 방법도 매우 쉬운 걸 볼 수 있다. 

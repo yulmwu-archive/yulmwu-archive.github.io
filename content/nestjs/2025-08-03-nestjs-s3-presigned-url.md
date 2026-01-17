@@ -1,24 +1,24 @@
 ---
-title: '[NestJS] Using AWS S3 Presigned URL'
-description: 'NestJS에서 AWS S3 Presigned URL 사용하기'
-slug: '2025-08-03-nestjs-s3-presigned-url'
+title: "[NestJS] Using AWS S3 Presigned URL"
+description: "NestJS에서 AWS S3 Presigned URL 사용하기"
+slug: "2025-08-03-nestjs-s3-presigned-url"
 author: yulmwu
 date: 2025-08-03T05:36:07.088Z
 updated_at: 2026-01-13T04:05:06.996Z
-categories: ['NestJS']
-tags: ['NestJS', 'aws']
+categories: ["NestJS"]
+tags: ["NestJS", "aws"]
 series:
-    name: NestJS
-    slug: nestjs
+  name: NestJS
+  slug: nestjs
 thumbnail: ../../thumbnails/nestjs/nestjs-s3-presigned-url.png
 linked_posts:
-    previous: 2025-08-03-nestjs-intersectiontype
-    next: 2025-08-03-nestjs-s3-presigned-url-post
+  previous: 2025-08-03-nestjs-intersectiontype
+  next: 2025-08-03-nestjs-s3-presigned-url-post
 is_private: false
 ---
 
 > POST 방식의 Presigned URL은 2편에서 다룹니다.
->
+> 
 > https://velog.io/@yulmwu/nestjs-s3-presigned-url-post
 
 # 0. Overview
@@ -37,13 +37,13 @@ is_private: false
 
 ![](https://velog.velcdn.com/images/yulmwu/post/8cc2e5da-cd85-450f-b3ed-8d42825165e3/image.png)
 
-먼저 클라이언트는 서버에 Presigned URL을 요청한다. 그러면 서버는 AWS S3에 해당 객체(키)와 만료 시간 등과 함께 Presigned URL 생성을 요청한다.
+먼저 클라이언트는 서버에 Presigned URL을 요청한다. 그러면 서버는 AWS S3에 해당 객체(키)와 만료 시간 등과 함께 Presigned URL 생성을 요청한다. 
 
 그러면 AWS S3는 해당 키에 대한 Presigned URL을 발급해주는데, 이제 클라이언트는 해당 Presigned URL에 직접 HTTP PUT을 통해 파일을 업로드할 수 있다.
 
-또한 해당 Presigned URL은 특정 키(객체=파일)에 대해서만 작업할 수 있게 해주기 때문에 보안상 문제가 되지도 않는다.
+또한 해당 Presigned URL은 특정 키(객체=파일)에 대해서만 작업할 수 있게 해주기 때문에 보안상 문제가 되지도 않는다. 
 
-즉 Presigned URL은 특정 리소스에 대한 권한이 부여되어 있는 URL을 의미한다.
+즉 Presigned URL은 특정 리소스에 대한 권한이 부여되어 있는 URL을 의미한다. 
 
 # 2. Using in NestJS
 
@@ -79,24 +79,24 @@ import { ConfigService } from '@nestjs/config'
 import { S3Client } from '@aws-sdk/client-s3'
 
 @Module({
-	controllers: [UploadController],
-	providers: [
-		{
-			provide: 'S3_CLIENT',
-			inject: [ConfigService],
-			useFactory: (configService: ConfigService) => {
-				return new S3Client({
-					region: configService.get<string>('AWS_REGION') ?? 'ap-northeast-2',
-					credentials: {
-						accessKeyId: configService.get('AWS_ACCESS_KEY_ID') ?? '',
-						secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY') ?? '',
-					},
-				})
-			},
-		},
-		UploadService,
-	],
-	exports: [UploadService],
+    controllers: [UploadController],
+    providers: [
+        {
+            provide: 'S3_CLIENT',
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => {
+                return new S3Client({
+                    region: configService.get<string>('AWS_REGION') ?? 'ap-northeast-2',
+                    credentials: {
+                        accessKeyId: configService.get('AWS_ACCESS_KEY_ID') ?? '',
+                        secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY') ?? '',
+                    },
+                })
+            },
+        },
+        UploadService,
+    ],
+    exports: [UploadService],
 })
 export class UploadModule {}
 ```
@@ -108,7 +108,7 @@ export class UploadModule {}
 private readonly s3: S3Client
 ```
 
-다음으로 서비스 코드이다.
+다음으로 서비스 코드이다. 
 
 ```ts
 // upload.service.ts
@@ -122,32 +122,32 @@ import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UploadService {
-	constructor(
-		@Inject('S3_CLIENT')
-		private readonly s3: S3Client,
-		private readonly configService: ConfigService,
-	) {}
+    constructor(
+        @Inject('S3_CLIENT')
+        private readonly s3: S3Client,
+        private readonly configService: ConfigService,
+    ) {}
 
-	async generatePresignedUrl(dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
-		const key = `uploads/${uuidv4()}/${dto.filename}`
+    async generatePresignedUrl(dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
+        const key = `uploads/${uuidv4()}/${dto.filename}`
 
-		const command = new PutObjectCommand({
-			Bucket: this.configService.get<string>('AWS_S3_BUCKET_NAME'),
-			Key: key,
-			ContentType: dto.contentType,
-		})
+        const command = new PutObjectCommand({
+            Bucket: this.configService.get<string>('AWS_S3_BUCKET_NAME'),
+            Key: key,
+            ContentType: dto.contentType,
+        })
 
-		return {
-			url: await getSignedUrl(this.s3, command, {
-				expiresIn: 600, // 10 minutes
-			}),
-			key,
-		}
-	}
+        return {
+            url: await getSignedUrl(this.s3, command, {
+                expiresIn: 600, // 10 minutes
+            }),
+            key,
+        }
+    }
 }
 ```
 
-여기서 핵심은 `generatePresignedUrl()` 함수의 `getSignedUrl()` 호출 부분이다.
+여기서 핵심은 `generatePresignedUrl()` 함수의 `getSignedUrl()` 호출 부분이다. 
 
 어떠한 작업에 대해 Presigned URL을 발급할지 S3 명령어를 받는다. 업로드에 대한 권한이 포함된 Presigned URL을 발급 받고 싶으므로 `PutObjectCommand` 명령어를 받도록 한다.
 
@@ -166,15 +166,15 @@ import { ApiBadRequestResponse, ApiOperation, ApiResponse, ApiTags } from '@nest
 @Controller('upload')
 @ApiTags('Upload')
 export class UploadController {
-	constructor(private readonly uploadService: UploadService) {}
+    constructor(private readonly uploadService: UploadService) {}
 
-	@Post('presigned-url')
-	@ApiOperation({ summary: 'Generate a presigned URL for file upload' })
-	@ApiResponse({ status: 201, description: 'Presigned URL generated successfully', type: PresignedUrlResponseDto })
-	@ApiBadRequestResponse({ description: 'Invalid request' })
-	getPresignedUrl(@Body() dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
-		return this.uploadService.generatePresignedUrl(dto)
-	}
+    @Post('presigned-url')
+    @ApiOperation({ summary: 'Generate a presigned URL for file upload' })
+    @ApiResponse({ status: 201, description: 'Presigned URL generated successfully', type: PresignedUrlResponseDto })
+    @ApiBadRequestResponse({ description: 'Invalid request' })
+    getPresignedUrl(@Body() dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
+        return this.uploadService.generatePresignedUrl(dto)
+    }
 }
 ```
 
@@ -185,15 +185,15 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsNotEmpty } from 'class-validator'
 
 export class GeneratePresignedUrlRequestDto {
-	@ApiProperty({ description: 'The name of the file to be uploaded.', example: 'example.jpg' })
-	@IsString()
-	@IsNotEmpty()
-	filename: string
+    @ApiProperty({ description: 'The name of the file to be uploaded.', example: 'example.jpg' })
+    @IsString()
+    @IsNotEmpty()
+    filename: string
 
-	@ApiProperty({ description: 'The content type of the file to be uploaded. (MIME type)', example: 'image/jpeg' })
-	@IsString()
-	@IsNotEmpty()
-	contentType: string
+    @ApiProperty({ description: 'The content type of the file to be uploaded. (MIME type)', example: 'image/jpeg' })
+    @IsString()
+    @IsNotEmpty()
+    contentType: string
 }
 ```
 
@@ -204,19 +204,19 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsString, IsNotEmpty } from 'class-validator'
 
 export class PresignedUrlResponseDto {
-	@ApiProperty({
-		description: 'The presigned URL for uploading the file.',
-		example: 'https://BUCKET.s3.amazonaws.com/uploads/UUID/example.jpg?AWSAccessKeyId=...',
-	})
-	@IsString()
-	@IsNotEmpty()
-	url: string
+    @ApiProperty({
+        description: 'The presigned URL for uploading the file.',
+        example: 'https://BUCKET.s3.amazonaws.com/uploads/UUID/example.jpg?AWSAccessKeyId=...',
+    })
+    @IsString()
+    @IsNotEmpty()
+    url: string
 
-	@ApiProperty({
-		description: 'The key under which the file will be stored in S3.',
-		example: 'uploads/UUID/example.jpg',
-	})
-	key: string
+    @ApiProperty({
+        description: 'The key under which the file will be stored in S3.',
+        example: 'uploads/UUID/example.jpg',
+    })
+    key: string
 }
 ```
 

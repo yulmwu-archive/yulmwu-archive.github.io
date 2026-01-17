@@ -1,26 +1,26 @@
 ---
-title: '[AWS CI/CD] EC2 Deployment with CodeDeploy + Github Actions #1 (Single EC2 Instance)'
-description: 'AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (Single EC2 Instance)'
-slug: '2025-07-23-aws-codedeploy-single-ec2'
+title: "[AWS CI/CD] EC2 Deployment with CodeDeploy + Github Actions #1 (Single EC2 Instance)"
+description: "AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (Single EC2 Instance)"
+slug: "2025-07-23-aws-codedeploy-single-ec2"
 author: yulmwu
 date: 2025-07-23T05:21:34.383Z
 updated_at: 2026-01-10T03:03:54.023Z
-categories: ['AWS']
-tags: ['CI/CD', 'aws']
+categories: ["AWS"]
+tags: ["CI/CD", "aws"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-codedeploy-single-ec2.png
 linked_posts:
-    previous: 2025-07-23-aws-source-destination-check
-    next: 2025-07-23-aws-codedeploy-asg
+  previous: 2025-07-23-aws-source-destination-check
+  next: 2025-07-23-aws-codedeploy-asg
 is_private: false
 ---
 
 > 본 글에선 단일 EC2 인스턴스에 대해 자동화 배포 아키텍처를 만들고 배포하며, 오토스케일링과 로드 밸런싱이 적용된 아키텍처에서 CodeDeploy를 사용한 자동화 배포 구축은 아래의 글에서 확인해보실 수 있습니다.
->
+> 
 > [[AWS] EC2 Deployment with CodeDeploy + Github Actions (with Auto Scaling)](https://velog.io/@yulmwu/aws-codedeploy-asg)
->
+> 
 > 본 글에서 CodeDeploy 등의 개념과 간단하게 단일 EC2 인스턴스에 CodeDeploy를 사용한 자동화 배포 방법을 설명합니다.
 
 # 0. Overview
@@ -65,29 +65,29 @@ Jenkins나 Github Actions 다양한 CI/CD 툴이 존재하는데, 굳이 AWS에�
 CodeDeploy는 배포 그룹(Deployment Group)으로 어디에, 어떤 방식으로 배포할지를 정의하며, 단일 EC2 인스턴스나 오토스케일링 그룹 등을 대상으로 정하고 In Place 방식이나 Blue/Green 방식을 선택할 수 있다.
 
 > ### In Place, Blue/Green
->
+> 
 > 배포 방식엔 크게 In Place 방식과 Blue/Green 방식으로 나뉠 수 있는데, 먼저 **In Place** 방식은 기존의 인스턴스에 새로운 코드(애플리케이션)을 덮어쓰는 방식으로 업데이트한다.
->
+> 
 > CodeDeploy에서 제공하는 In Place 방식에선 한번에 몇개의 인스턴스를 업데이트할지 정할 수 있다.
->
+> 
 > - `AllAtOnce`: 배포 시 모든 인스턴스에 동시에 배포함 (무중단이 중요하지 않을 때, 빠름, 롤링 업데이트 X)
 > - `HalfAtATime`: 절반씩 나눠서 인스턴스에 배포함 (10개라면 5개씩 나눠서)
 > - `OneAtATime`: 하나씩 배포함, 무중단이 중요하다면 이걸 추천
->
+> 
 > 즉 롤링 업데이트의 일종인데, 인스턴스가 교체되는 동안 다른 유효 인스턴스에 트래픽이 몰릴 수 있다는 단점이 있으나, 기존의 인스턴스에 덮어 쓰기 때문에 새로운 인스턴스는 만들지 않는다.
 >
 > ![](https://velog.velcdn.com/images/yulmwu/post/6030932e-5dc7-42d5-876c-16e0bb6c0c72/image.png)
->
+> 
 > **Blue/Green** 방식은 정 반대로, 새로운 분기점을 만든다. 무슨 말이냐, 예를 들어 기존에 오토스케일링 그룹이 있고 그 안에 5개의 인스턴스가 돌아간다면 업데이트된 새로운 오토스케일링 그룹을 만들고 그 안에 새로운 인스턴스를 새로 만든다는 것이다.
->
+> 
 > 그리고 그 새로운 인스턴스를 사용할 수 있다면 로드밸런서 등에서 대상을 새로운 오토스케일링 그룹으로 변경하여 업데이트하는 방식이다.
->
-> 덕분에 무중단으로 서비스가 업데이트되고, 점차적으로 업데이트되는 In Place 방식과는 다르게 한번에 업데이트되기 때문에 관련된 오류도 없는 편이다.
->
+> 
+> 덕분에 무중단으로 서비스가 업데이트되고, 점차적으로 업데이트되는 In Place 방식과는 다르게 한번에 업데이트되기 때문에 관련된 오류도 없는 편이다. 
+> 
 > 하지만 업데이트되는 동안엔 새로운 인스턴스가 만들어지고 그 만큼 리소스가 2배로 소비되기 때문에 그럴 환경이 안된다면 사용할 수 없는 배포 방식이다. 다만 우리는 클라우드 환경이기 때문에 큰 문제 없이 사용할 수 있고, 업데이트 후 기존의 리소스는 제거되기 때문에 리소스 사용량 또한 큰 걱정을 할 필요는 없다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/ceae6c98-fea0-4d2d-99d0-72221f78c2ce/image.png)
->
+> 
 > 이 포스팅에선 Blue/Green 배포 방식을 사용한다.
 
 CodeDeploy에서 배포할 새로운 코드는 S3나 Github 레포지토리, CodeCommit 등의 서비스에서 가져올 수 있으나 S3에 업로드된 소스코드를 가져오는 식으로 사용해볼 것이다.
@@ -98,15 +98,15 @@ CodeDeploy에서 배포할 새로운 코드는 S3나 Github 레포지토리, Cod
 version: 0.0
 os: linux
 files:
-    - source: /
-      destination: /home/ec2-user/app
+  - source: /
+    destination: /home/ec2-user/app
 hooks:
-    BeforeInstall:
-        - location: scripts/before_install.sh
-    AfterInstall:
-        - location: scripts/after_install.sh
-    ApplicationStart:
-        - location: scripts/start.sh
+  BeforeInstall:
+    - location: scripts/before_install.sh
+  AfterInstall:
+    - location: scripts/after_install.sh
+  ApplicationStart:
+    - location: scripts/start.sh
 ```
 
 여기서 Hooks의 각 단계를 Lifecycle Event Hooks라고 부르는데, 각 단계에서 어떤 스크립트를 실행할 지를 정의한다.
@@ -115,7 +115,7 @@ hooks:
 
 #### (1) ApplicationStop
 
-배포가 진행되기 전, 기존의 애플리케이션을 중단할 때 실행되는 훅이다.
+배포가 진행되기 전, 기존의 애플리케이션을 중단할 때 실행되는 훅이다. 
 
 `pm2 stop all`, `docker stop` 등의 명령어를 스크립트에 넣어 애플리케이션을 종료한다.
 
@@ -228,7 +228,7 @@ EC2에 붙일 IAM 역할을 만든다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/43ab576f-5628-46c7-806b-0c469573bc64/image.png)
 
-그리고 EC2 IAM 역할을 수정했다면 CodeDeploy Agent 서비스를 재시작해야한다.
+그리고 EC2 IAM 역할을 수정했다면 CodeDeploy Agent 서비스를 재시작해야한다. 
 
 ```shell
 sudo service codedeploy-agent restart
@@ -266,7 +266,7 @@ CodeDeploy에 부여할 수 있는 정책은 저거 하나밖에 없다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4441316e-be4e-4510-8897-d54c320fbab0/image.png)
 
-배포 유형은 현재 위치, 즉 In Place를 선택한다.
+배포 유형은 현재 위치, 즉 In Place를 선택한다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/a9d5c1da-9f9f-4c5f-a4bc-724a6161bce1/image.png)
 
@@ -290,38 +290,38 @@ CodeDeploy에 부여할 수 있는 정책은 저거 하나밖에 없다.
 version: 0.0
 os: linux
 files:
-    - source: .
-      destination: /home/ubuntu/app
+  - source: .
+    destination: /home/ubuntu/app
 ```
 
 S3에 업로드해둔 소스코드를 가져오고 그걸 `~/app`에 복사해둔다. 그 다음으로 CodeDeploy Lifecycle 이벤트에 맞는 Hook 스크립트를 작성하는데, 사용할 Hook들은 아래와 같다.
 
 ```yaml
 hooks:
-    ApplicationStop:
-        - location: scripts/stop_server.sh
-          timeout: 60
-          runas: ubuntu
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 60
+      runas: ubuntu
 
-    BeforeInstall:
-        - location: scripts/before_install.sh
-          timeout: 60
-          runas: ubuntu
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      timeout: 60
+      runas: ubuntu
 
-    AfterInstall:
-        - location: scripts/install_dependencies.sh
-          timeout: 60
-          runas: ubuntu
+  AfterInstall:
+    - location: scripts/install_dependencies.sh
+      timeout: 60
+      runas: ubuntu
 
-    ApplicationStart:
-        - location: scripts/start_server.sh
-          timeout: 60
-          runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 60
+      runas: ubuntu
 
-    ValidateService:
-        - location: scripts/validate_service.sh
-          timeout: 60
-          runas: ubuntu
+  ValidateService:
+    - location: scripts/validate_service.sh
+      timeout: 60
+      runas: ubuntu
 ```
 
 먼저 `ApplicationStop` 이벤트를 처리할 스크립트는 아래와 같다.
@@ -343,7 +343,7 @@ rm -rf /home/ubuntu/app/*
 
 기존의 `app` 디렉토리의 파일들을 삭제한다. 위 두 이벤트를 하나라 합쳐도 상관 없긴 하다.
 
-`AfterInstall` 과정 이후 통해 소스코드를 설치했다면 NodeJS 의존성을 설치하도록 한다.
+`AfterInstall` 과정 이후 통해 소스코드를 설치했다면 NodeJS 의존성을 설치하도록 한다. 
 (`install_dependencies.sh`)
 
 ```bash
@@ -385,60 +385,60 @@ exit 1
 name: Deploy to EC2 with CodeDeploy
 
 on:
-    push:
-        branches: main
+  push:
+    branches: main
 
 jobs:
-    deploy:
-        name: Deploy CodeDeploy
-        runs-on: ubuntu-latest
+  deploy:
+    name: Deploy CodeDeploy
+    runs-on: ubuntu-latest
 
-        env:
-            AWS_REGION: ap-northeast-2
-            S3_BUCKET: exam-codedeploy-bucket
-            S3_KEY: dist.zip
-            CODEDEPLOY_APP: ExamCodeDeployApp
-            CODEDEPLOY_GROUP: ExamDeploymentGroup
+    env:
+      AWS_REGION: ap-northeast-2
+      S3_BUCKET: exam-codedeploy-bucket
+      S3_KEY: dist.zip
+      CODEDEPLOY_APP: ExamCodeDeployApp
+      CODEDEPLOY_GROUP: ExamDeploymentGroup
 
-        steps:
-            - name: Checkout source
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v2
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ap-northeast-2
-
-            - name: Zip source code
-              run: |
-                  zip -r dist.zip . -x '*.git*' -x 'node_modules/*'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+          
+      - name: Zip source code
+        run: |
+          zip -r dist.zip . -x '*.git*' -x 'node_modules/*'
 ```
 
 AWS 인증을 해주고, S3에 배포하고 CodeDeploy에서 사용하기 위해 소스코드를 압축한다.
 
 ```yaml
-- name: Delete old artifact from S3
-  run: |
-      aws s3 rm s3://$S3_BUCKET/$S3_KEY || true
-
-- name: Upload artifact to S3
-  run: |
-      aws s3 cp dist.zip s3://$S3_BUCKET/$S3_KEY
+      - name: Delete old artifact from S3
+        run: |
+          aws s3 rm s3://$S3_BUCKET/$S3_KEY || true
+          
+      - name: Upload artifact to S3
+        run: |
+          aws s3 cp dist.zip s3://$S3_BUCKET/$S3_KEY
 ```
 
 그리고 기존에 S3에 올렸던 아키텍트 파일을 삭제해주고, S3에 업로드한다.
 
 ```yaml
-- name: CodeDeploy deployment
-  run: |
-      aws deploy create-deployment \
-        --application-name $CODEDEPLOY_APP \
-        --deployment-group-name $CODEDEPLOY_GROUP \
-        --s3-location bucket=$S3_BUCKET,key=$S3_KEY,bundleType=zip \
-        --deployment-config-name CodeDeployDefault.AllAtOnce \
-        --file-exists-behavior OVERWRITE
+      - name: CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name $CODEDEPLOY_APP \
+            --deployment-group-name $CODEDEPLOY_GROUP \
+            --s3-location bucket=$S3_BUCKET,key=$S3_KEY,bundleType=zip \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --file-exists-behavior OVERWRITE
 ```
 
 마지막으로 위와 같이 CodeDeploy에 배포 명령을 주도록 하여 CodeDeploy를 실행한다.
@@ -453,7 +453,7 @@ https://github.com/eocndp/aws-codedeploy-example
 
 ![](https://velog.velcdn.com/images/yulmwu/post/2fc99540-8078-48db-9f91-965041e95d7c/image.png)
 
-그리고 CodeDeploy의 로그를 확인해보자.
+그리고 CodeDeploy의 로그를 확인해보자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7368f713-e146-4c13-81d7-757c2d419f2b/image.png)
 

@@ -1,19 +1,19 @@
 ---
-title: '[AWS Networking] EC2 Source/Destination Checking (Feat. NAT Instance)'
-description: 'AWS EC2의 Source/Destination Check 옵션 (Feat. EC2 NAT Instance)'
-slug: '2026-01-04-aws-source-destination-check'
+title: "[AWS Networking] EC2 Source/Destination Checking (Feat. NAT Instance)"
+description: "AWS EC2의 Source/Destination Check 옵션 (Feat. EC2 NAT Instance)"
+slug: "2026-01-04-aws-source-destination-check"
 author: yulmwu
 date: 2026-01-04T00:52:31.030Z
 updated_at: 2026-01-16T07:44:19.559Z
-categories: ['AWS']
-tags: ['aws']
+categories: ["AWS"]
+tags: ["aws"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-source-destination-check.png
 linked_posts:
-    previous: 2026-01-04-aws-s2s-vpn
-    next: 2026-01-04-aws-codedeploy-single-ec2
+  previous: 2026-01-04-aws-s2s-vpn
+  next: 2026-01-04-aws-codedeploy-single-ec2
 is_private: false
 ---
 
@@ -47,7 +47,7 @@ AWS EC2는 기본적으로 아래와 같은 네트워크 트래픽을 받은 경
 
 ![](https://velog.velcdn.com/images/yulmwu/post/057acbf1-e588-42e6-a9ac-6a5106c5f300/image.png)
 
-보안적인 측면, 가용성, 네트워크 대역폭 등의 측면에서 더 뛰어난 NAT Gateway가 나오고 NAT Gateway로의 마이그레이션 또한 권장하고 있지만, 간혹 비용적인 측면으로 NAT Instance를 직접 프로비저닝하기도 한다.
+보안적인 측면, 가용성, 네트워크 대역폭 등의 측면에서 더 뛰어난 NAT Gateway가 나오고 NAT Gateway로의 마이그레이션 또한 권장하고 있지만, 간혹 비용적인 측면으로 NAT Instance를 직접 프로비저닝하기도 한다. 
 
 일반적으로 추천되는 아키텍처는 아니지만, 이 포스팅에서는 Source/Destination Check 옵션을 확인해보기 위해 NAT Instance를 프로비저닝하고 실습해보도록 하겠다.
 
@@ -129,7 +129,7 @@ sudo tcpdump -ni enX0 net 10.0.128.0/20 and not port 22
 
 ![](https://velog.velcdn.com/images/yulmwu/post/832f510a-6f11-48af-8fc5-f53acb837366/image.png)
 
-그럼 응답이 오지 않는데, NAT Instance에 대한 EC2 Source/Destination Check를 활성화 해두었기 때문이다.
+그럼 응답이 오지 않는데, NAT Instance에 대한 EC2 Source/Destination Check를 활성화 해두었기 때문이다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7e61c5bd-f206-4d62-b451-c6254f83756a/image.png)
 

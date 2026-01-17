@@ -1,39 +1,39 @@
 ---
-title: '[AWS Computing] Deploying 3 Tier Architecture (ALB, Bastion, RDS)'
-description: 'AWS ALB - EC2 - RDS로 3 Tier 아키텍처 구현하기'
-slug: '2025-11-21-aws-deploying-3-tier-architecture'
+title: "[AWS Computing] Deploying 3 Tier Architecture (ALB, Bastion, RDS)"
+description: "AWS ALB - EC2 - RDS로 3 Tier 아키텍처 구현하기"
+slug: "2025-11-21-aws-deploying-3-tier-architecture"
 author: yulmwu
 date: 2025-11-21T12:27:07.839Z
 updated_at: 2026-01-16T08:35:39.094Z
-categories: ['AWS']
-tags: ['aws']
+categories: ["AWS"]
+tags: ["aws"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-deploying-3-tier-architecture.png
 linked_posts:
-    previous: 2025-11-21-aws-deployment-with-ec2-ecs-and-documentdb-elasticache
-    next: 2025-11-21-aws-deploying-ecs-fargate-dynamodb
+  previous: 2025-11-21-aws-deployment-with-ec2-ecs-and-documentdb-elasticache
+  next: 2025-11-21-aws-deploying-ecs-fargate-dynamodb
 is_private: false
 ---
 
 > _본 포스팅의 자료는 세명컴퓨터고등학교 보안과 전공동아리 Null4U(출제: 양OO 선배님)에 있음을 알립니다._
->
+> 
 > 과제 제출일: 2025/11/21
 
 # 0. Overview — Problem
 
 > 이 과제는 AWS의 **고가용성(High Availability)**과 **3-Tier 아키텍처** 구조를 실습하기 위해 설계된 환경입니다.
->
+> 
 > 전체 구성은 다음 세 계층으로 이루어집니다:
->
+> 
 > - **Public Tier** — ALB, Bastion
 > - **Private Tier** — WAS
 > - **Protected(Data) Tier** — RDS
->
+> 
 > 자세한 아키텍처 다이어그램은 아래에 첨부된 자료를 참조하십시오. 채점 기준은 아래와 같습니다.
->
-> - ALB 뒤에 위치한 두 개의 WAS EC2 인스턴스는 로드밸런싱되어 번갈아 응답됩니다. 웹 페이지에서 새로고침을 반복했을 때 EC2 Instance ID 및 EC2 Private IP 값이 변경되어야 합니다.
+> 
+> - ALB 뒤에 위치한 두 개의 WAS EC2 인스턴스는 로드밸런싱되어 번갈아 응답됩니다. 웹 페이지에서 새로고침을 반복했을 때 EC2 Instance ID 및 EC2 Private IP 값이 변경되어야 합니다. 
 > - ALB 뒤에 위치한 두 개의 WAS EC2 인스턴스에 대한 SSH 접근은 오로지 Bastion Host를 통해서만 접근해야 합니다.
 > - RDS 인스턴스는 반드시 Protected Subnet에만 생성되어야 하며, WAS를 제외한 어떠한 대상과도 통신할 수 없어야 합니다.
 
@@ -45,11 +45,11 @@ https://github.com/yulmwu/blog-example-demo/tree/main/aws-3-tier-architecture-ex
 
 _배포 방식은 따로 명시되어 있지 않아 NodeJS를 설치하여 직접 실행해도 되고 도커를 통해 이미지화하여 배포해도 되나, 본 포스팅에선 전자의 방식을 택하였습니다._
 
-# 1. VPC
+# 1. VPC 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/0d583cc0-db1f-4312-a011-9dff6cf075d1/image.png)
 
-먼저 CIDR `10.0.0.0/16`의 VPC를 만들어보자. Public 서브넷 2개와 Protected 서브넷을 포함한 Private 서브넷 4개를 만들어줘야 한다.
+먼저 CIDR `10.0.0.0/16`의 VPC를 만들어보자. Public 서브넷 2개와 Protected 서브넷을 포함한 Private 서브넷 4개를 만들어줘야 한다. 
 
 각 서브넷의 가용 영역은 따로 명시되어 있지는 않지만 `ap-northeast-2a`와 `ap-northeast-2c`로 통일하고, 아키텍처에 명시된 서브넷 CIDR을 따르도록 한다. _(Bastion Host를 올려두지 않는 유휴 Public 서브넷 하나는 생성만 해둘 것)_
 
@@ -90,7 +90,7 @@ NodeJS와 NPM을 기본적으로 설치하고 PM2를 통해 무중단 서비스�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7d4e3a7f-75c7-4348-acdf-a89f21800112/image.png)
 
-위와 같이 모두 프로비저닝 되었다면 Bastion Host로 접속하여 아래와 같은 명령어를 차례대로 입력한다.
+위와 같이 모두 프로비저닝 되었다면 Bastion Host로 접속하여 아래와 같은 명령어를 차례대로 입력한다. 
 
 _User data를 통해 설치하도록 해도 되었겠지만 직접 Bastion Host로 접속하여 실습해보겠다._
 
@@ -108,27 +108,27 @@ npm install
 npm run pm2-start
 ```
 
-> 아키텍처 상 Private 서브넷 및 Protected 서브넷은 IGW가 없어 인터넷과 통신할 수 없기 때문에 NAT Gateway를 구성해야 한다. 아키텍처 상 NAT Gateway는 없으나 아래와 같이 만들어주면 된다.
->
+> 아키텍처 상 Private 서브넷 및 Protected 서브넷은 IGW가 없어 인터넷과 통신할 수 없기 때문에 NAT Gateway를 구성해야 한다. 아키텍처 상 NAT Gateway는 없으나 아래와 같이 만들어주면 된다. 
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/c17680ef-51b6-449b-964e-5acf89104a50/image.png)
->
+> 
 > Private/Protected 서브넷의 라우팅 테이블에 `0.0.0.0` (인터넷) 라우팅을 만든 NAT Gateway로 설정하면 된다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/f240eec7-3ae8-4a72-8f5f-1dbbc33603c4/image.png)
->
+> 
 > 모든 구성이 끝났다면 NAT Gateway를 제거해도 될 것이다.
 
 필자가 PM2 구성까지 해뒀기 때문에 최종적으로 아래와 같이 PM2 프로세스에 app.js가 등록된 것을 확인할 수 있다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/0ece847b-6aaa-4c40-a0da-9ceb7b1de9a7/image.png)
 
-그런데 로그를 확인해보면 아래와 같은 에러가 발생하는 것을 확인할 수 있는데, 아직 DB 정보를 환경 변수로 설정하지 않았기 때문이다.
+그런데 로그를 확인해보면 아래와 같은 에러가 발생하는 것을 확인할 수 있는데,  아직 DB 정보를 환경 변수로 설정하지 않았기 때문이다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/04d67289-05fd-4082-a98e-f9ec3c93e1bc/image.png)
 
 나중에 DB 인스턴스 프로비저닝 후 환경 변수를 수정하여 다시 시작하면 된다.
 
-추가적으로 두 개의 WAS에 연결된 보안 그룹의 이름을 구분하기 쉽도록 수정해두자.
+추가적으로 두 개의 WAS에 연결된 보안 그룹의 이름을 구분하기 쉽도록 수정해두자. 
 Protected 서브넷에 위치한 DB 인스턴스는 이 보안 그룹과만 통신할 수 있어야 한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/509456a9-76c1-481a-8ce8-27a3e2c38607/image.png)

@@ -1,19 +1,19 @@
 ---
-title: '[NestJS] IntersectionType: @nestjs/mapped-types vs @nestjs/swagger'
-description: 'NestJS DTO 상속(IntersectionType)에서 @nestjs/mapped-types vs @nestjs/swagger 라이브러리 차이'
-slug: '2025-07-29-nestjs-intersectiontype'
+title: "[NestJS] IntersectionType: @nestjs/mapped-types vs @nestjs/swagger"
+description: "NestJS DTO 상속(IntersectionType)에서 @nestjs/mapped-types vs @nestjs/swagger 라이브러리 차이"
+slug: "2025-07-29-nestjs-intersectiontype"
 author: yulmwu
 date: 2025-07-29T04:31:52.248Z
 updated_at: 2026-01-14T19:27:10.148Z
-categories: ['NestJS']
-tags: ['NestJS']
+categories: ["NestJS"]
+tags: ["NestJS"]
 series:
-    name: NestJS
-    slug: nestjs
+  name: NestJS
+  slug: nestjs
 thumbnail: ../../thumbnails/nestjs/nestjs-intersectiontype.png
 linked_posts:
-    previous: 2025-07-29-nestjs-class-transformer-exclude-expose
-    next: 2025-07-29-nestjs-s3-presigned-url
+  previous: 2025-07-29-nestjs-class-transformer-exclude-expose
+  next: 2025-07-29-nestjs-s3-presigned-url
 is_private: false
 ---
 
@@ -25,14 +25,14 @@ NestJS에서 DTO(Data Transfer Object)를 만들 때 부모 클래스로 부터 
 
 ```ts
 export class TopicNameDto {
-	@ApiProperty({
-		description: 'The topic name associated with the post.',
-		example: 'programming',
-	})
-	@IsString()
-	@IsNotEmpty()
-	@Matches(/^[a-z]+$/, { message: 'The topic name must be in lowercase letters.' })
-	topicName: string
+    @ApiProperty({
+        description: 'The topic name associated with the post.',
+        example: 'programming',
+    })
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^[a-z]+$/, { message: 'The topic name must be in lowercase letters.' })
+    topicName: string
 }
 ```
 
@@ -42,21 +42,21 @@ export class TopicNameDto {
 
 ```ts
 export class CreatePostDto extends TopicNameDto {
-	@ApiProperty({
-		description: 'The title of the post.',
-		example: 'My First Post',
-	})
-	@IsString()
-	@IsNotEmpty()
-	title: string
+    @ApiProperty({
+        description: 'The title of the post.',
+        example: 'My First Post',
+    })
+    @IsString()
+    @IsNotEmpty()
+    title: string
 
-	@ApiProperty({
-		description: 'The content of the post.',
-		example: 'This is the content of my first post.',
-	})
-	@IsString()
-	@IsNotEmpty()
-	content: string
+    @ApiProperty({
+        description: 'The content of the post.',
+        example: 'This is the content of my first post.',
+    })
+    @IsString()
+    @IsNotEmpty()
+    content: string
 }
 ```
 
@@ -81,44 +81,44 @@ NestJS에선 이러한 상황을 위해 `IntersectionType` 함수를 제공한�
 import { IntersectionType } from '@nestjs/mapped-types'
 
 export class CreatePostDto extends IntersectionType(TitleDto, TopicNameDto) {
-	@ApiProperty({
-		description: 'The content of the post.',
-		example: 'This is the content of my first post.',
-	})
-	@IsString()
-	@IsNotEmpty()
-	content: string
+    @ApiProperty({
+        description: 'The content of the post.',
+        example: 'This is the content of my first post.',
+    })
+    @IsString()
+    @IsNotEmpty()
+    content: string
 }
 ```
 
 이렇게 하면 `CreatePostDto`에 `TitleDto`, `TopicNameDto`의 프로퍼티가 생성된다.
 
-상속처럼 보이지만 상속이 아니고, `IntersectionType` 함수의 동작 과정은 아래와 같다.
+상속처럼 보이지만 상속이 아니고, `IntersectionType` 함수의 동작 과정은 아래와 같다. 
 (아래에서 제공하는 코드는 `IntersectionType`의 실제 구현은 아니다. 이해를 돕기 위한 예시이다.)
 
 ```ts
 export interface Type<T = any> extends Function {
-	new (...args: any[]): T
+    new (...args: any[]): T;
 }
 
 export const IntersectionType = <A, B>(classA: Type<A>, classB: Type<B>): Type<A & B> => {
-	class IntersectionClass {
-		constructor() {
-			Object.assign(this, new classA())
-			Object.assign(this, new classB())
-		}
-	}
-	return IntersectionClass as Type<A & B>
+  class IntersectionClass {
+    constructor() {
+      Object.assign(this, new classA())
+      Object.assign(this, new classB())
+    }
+  }
+  return IntersectionClass as Type<A & B>
 }
 ```
 
 여기서 `Type` 인터페이스는 클래스 타입을 넘기기 위한 인터페이스이다. `Type`을 통해 클래스에서 `extends` 뒤에 `IntersectionType`를 호출할 수 있게 된다.
 
-중요한건 `IntersectionType` 함수의 구현에 있다. 함수의 내부에선 새로운 클래스를 만드는데, 그 클래스에 인자로 받은 `A` 클래스와 `B` 클래스의 프로퍼티(속성)을 복사한다.
+중요한건 `IntersectionType` 함수의 구현에 있다. 함수의 내부에선 새로운 클래스를 만드는데, 그 클래스에 인자로 받은 `A` 클래스와 `B` 클래스의 프로퍼티(속성)을 복사한다. 
 
 때문에 메서드(프로토타입)은 복사되지 않고, 프로퍼티만 복사되어 DTO 클래스에서 상속처럼 사용할 수 있는 것이다.
 
-예시의 구현이였고, 실제 구현에선 가변 인자와 데코레이터 복사, 그리고 더욱 복잡한 타입 선언 코드들이 포함되어 있다.
+예시의 구현이였고, 실제 구현에선 가변 인자와 데코레이터 복사, 그리고 더욱 복잡한 타입 선언 코드들이 포함되어 있다. 
 
 궁금하다면 직접 코드를 뜯어봐도 좋다.
 
@@ -156,12 +156,12 @@ Swagger 문서는 아래와 같이 표시된다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c8b7c17f-fa83-4961-81b6-1ab9d081b2d0/image.png)
 
-이렇게 Swagger 문서에 잘 표시된다. 내부의 구현 코드를 봐도 다르다.
+이렇게 Swagger 문서에 잘 표시된다.  내부의 구현 코드를 봐도 다르다.
 
 - `@nestjs/mapped-types`
-  ![](https://velog.velcdn.com/images/yulmwu/post/ef7a8b13-bd88-48c8-8449-0cda10ecd145/image.png)
-- `@nestjs/swagger`
-  ![](https://velog.velcdn.com/images/yulmwu/post/12dd4dae-94ea-48b7-b58e-580db9bd8119/image.png)
+![](https://velog.velcdn.com/images/yulmwu/post/ef7a8b13-bd88-48c8-8449-0cda10ecd145/image.png)
+- `@nestjs/swagger` 
+![](https://velog.velcdn.com/images/yulmwu/post/12dd4dae-94ea-48b7-b58e-580db9bd8119/image.png)
 
 ---
 

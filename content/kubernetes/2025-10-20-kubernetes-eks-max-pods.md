@@ -1,19 +1,19 @@
 ---
-title: '[Kubernetes w/ EKS] Troubleshooting: Too many pods.'
-description: 'FailedScheduling: Too many pods ??'
-slug: '2025-10-20-kubernetes-eks-max-pods'
+title: "[Kubernetes w/ EKS] Troubleshooting: Too many pods."
+description: "FailedScheduling: Too many pods ??"
+slug: "2025-10-20-kubernetes-eks-max-pods"
 author: yulmwu
 date: 2025-10-20T00:35:31.233Z
 updated_at: 2026-01-15T10:42:45.310Z
-categories: ['Kubernetes']
-tags: ['TROUBLESHOOTING', 'eks', 'kubernetes']
+categories: ["Kubernetes"]
+tags: ["TROUBLESHOOTING", "eks", "kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-eks-max-pods.png
 linked_posts:
-    previous: 2025-10-20-kubernetes-eks-fargate
-    next: 2025-10-20-kubernetes-cert-manager
+  previous: 2025-10-20-kubernetes-eks-fargate
+  next: 2025-10-20-kubernetes-cert-manager
 is_private: false
 ---
 
@@ -25,21 +25,21 @@ EKS 클러스터를 아래와 같이 구성하고 프로비저닝하였다. (eks
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-    name: eks-demo
-    region: ap-northeast-2
-    version: '1.33'
+  name: eks-demo
+  region: ap-northeast-2
+  version: "1.33"
 vpc:
-    cidr: 10.1.0.0/16
-    nat:
-        gateway: Single
+  cidr: 10.1.0.0/16
+  nat:
+    gateway: Single
 managedNodeGroups:
-    - name: ng-1
-      instanceType: t2.micro
-      desiredCapacity: 1
-      privateNetworking: false
-      iam:
-          withAddonPolicies:
-              ebs: true
+  - name: ng-1
+    instanceType: t2.micro
+    desiredCapacity: 1
+    privateNetworking: false
+    iam:
+      withAddonPolicies:
+        ebs: true
 ```
 
 예전에 만들고 클러스터만 생성해보고 바로 종료했던지라 문제를 알 수 없었으나, 최근에 이것저것 해보면서 문제가 발견되었다.
@@ -47,7 +47,7 @@ managedNodeGroups:
 Istio Operator를 설치하는데 이상하게 오래걸려 모든 파드를 조회해보니 CoreDNS 파드가 Pending 상태인 것을 확인할 수 있었다.
 
 ```shell
-> kubectl get pods --all-namespaces
+> kubectl get pods --all-namespaces 
 NAMESPACE      NAME                              READY   STATUS    RESTARTS   AGE
 istio-system   istiod-6f88b778cf-p6rw2           0/1     Pending   0          3m28s
 kube-system    aws-node-s7ffb                    2/2     Running   0          5m4s
@@ -71,7 +71,7 @@ Events:
   Warning  FailedScheduling  5m11s                  default-scheduler  0/1 nodes are available: 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
 ```
 
-FailedScheduling, Too many pods. 라고 한다.
+FailedScheduling, Too many pods. 라고 한다. 
 
 # 1. Too many pods ?
 
@@ -132,6 +132,6 @@ maxPods = (NumberOfENI * (IPv4AddrPerENI - 1)) + 2
 
 ```yaml
 managedNodeGroups:
-    - name: ng-1
-      instanceType: t3.medium
+  - name: ng-1
+    instanceType: t3.medium
 ```

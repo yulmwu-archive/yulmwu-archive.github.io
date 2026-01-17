@@ -1,47 +1,48 @@
 ---
-title: '[AWS Computing] Deploying a web service based on ECS Fargate and DynamoDB'
-description: 'AWS ECR 및 ECS Fargate를 통한 웹 서비스 배포하기'
-slug: '2025-11-24-aws-deploying-ecs-fargate-dynamodb'
+title: "[AWS Computing] Deploying a web service based on ECS Fargate and DynamoDB"
+description: "AWS ECR 및 ECS Fargate를 통한 웹 서비스 배포하기"
+slug: "2025-11-24-aws-deploying-ecs-fargate-dynamodb"
 author: yulmwu
 date: 2025-11-24T10:32:58.641Z
 updated_at: 2026-01-13T04:04:47.016Z
-categories: ['AWS']
-tags: ['aws']
+categories: ["AWS"]
+tags: ["aws"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-deploying-ecs-fargate-dynamodb.png
 linked_posts:
-    previous: 2025-11-24-aws-deploying-3-tier-architecture
-    next: 2025-11-24-aws-serverless
+  previous: 2025-11-24-aws-deploying-3-tier-architecture
+  next: 2025-11-24-aws-serverless
 is_private: false
 ---
 
 > _본 포스팅의 자료는 세명컴퓨터고등학교 보안과 전공동아리 Null4U(출제: 양OO 선배님)에 있음을 알립니다._
->
+> 
 > 과제 제출일: 2025/11/24
 
 # 0. Overview — Problem
 
 > 이 과제는 AWS의 **ECS Fargate** 및 **DynamoDB**를 활용한 웹 서비스 배포를 실습할 수 있는 과제입니다.
->
+> 
 > 제공되는 애플리케이션 코드를 Docker 컨테이너 이미지화하여 **ECR**에 업로드하고, 이를 **ECS Fargate**로 배포하고 **ALB** 뒤에 배포하십시오.
->
-> 각 ECS Fargate Task는 Private Subnet에 분산하여 배포합니다. 2개 이상의 Task를 유지하도록 하십시오. ALB Target Group의 타입은 IP, Health Check 경로는 `/`로 설정하십시오.
->
+> 
+> 각 ECS Fargate Task는 Private Subnet에 분산하여 배포합니다. 2개 이상의 Task를 유지하도록 하십시오. ALB Target Group의 타입은 IP, Health Check 경로는 `/`로 설정하십시오. 
+> 
 > 자세한 아키텍처 다이어그램은 아래에 첨부된 자료를 참조하십시오. 채점 기준은 아래와 같습니다.
->
-> - ALB DNS로 접속 시 웹 페이지가 정상적으로 표시되어야 합니다.
+> 
+> - ALB DNS로 접속 시 웹 페이지가 정상적으로 표시되어야 합니다. 
 > - 웹 페이지의 Server Status 버튼을 클릭했을 때 JSON 출력과 함께 Task IP 값이 변화됨을 확인해야 합니다. 이는 곧 ALB가 두 개 이상의 Fargate Task로 분산된다는 것을 의미합니다.
 > - Check DynamoDB 버튼을 클릭했을 때 DynamoDB 테이블 목록이 보여야 합니다. Fargate Task는 Private 서브넷에서 NAT Gateway를 통해 정상적으로 DynamoDB API에 접근함을 의미합니다. (테이블 이름은 임의로 설정하십시오)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/70215f85-f3a2-43af-be46-306fa37877f7/image.png)
 
+
 배포해야 할 애플리케이션 소스 코드는 아래 레포지토리에서 다운받으실 수 있습니다.
 
 https://github.com/yulmwu/blog-example-demo/tree/main/aws-ecs-dynamodb-web-service-example
 
-# 1. VPC
+# 1. VPC 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4d507a51-db4a-4542-8f21-f936273db338/image.png)
 
@@ -111,6 +112,7 @@ Internet Facing 및 IPv4로 선택한다.
 
 이렇게 해두고 나중에 수정하면 된다. 이대로 ALB를 만들자.
 
+
 # 4. ECS Fargate, ALB Target Group
 
 ![](https://velog.velcdn.com/images/yulmwu/post/3f4d4591-5b50-4da6-aa0a-b0e59dadc069/image.png)
@@ -147,7 +149,7 @@ Internet Facing 및 IPv4로 선택한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/9ced1a83-d2db-479a-9950-d9b682e8b504/image.png)
 
-네트워킹에선 두 개의 Private Subnet을 선택해주고, Public IP는 당연히 꺼두었다.
+네트워킹에선 두 개의 Private Subnet을 선택해주고, Public IP는 당연히 꺼두었다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c8fb8a65-4593-4854-83cb-91d9752ad371/image.png)
 

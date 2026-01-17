@@ -1,19 +1,19 @@
 ---
-title: '[Kubernetes w/ EKS] Pod AutoScaling with HPA '
-description: '쿠버네티스 파드 수평적 오토스케일링(HPA) 실습'
-slug: '2025-09-06-kubernetes-hpa'
+title: "[Kubernetes w/ EKS] Pod AutoScaling with HPA "
+description: "쿠버네티스 파드 수평적 오토스케일링(HPA) 실습"
+slug: "2025-09-06-kubernetes-hpa"
 author: yulmwu
 date: 2025-09-06T01:59:45.085Z
 updated_at: 2026-01-12T00:43:20.545Z
-categories: ['Kubernetes']
-tags: ['eks', 'kubernetes']
+categories: ["Kubernetes"]
+tags: ["eks", "kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-hpa.png
 linked_posts:
-    previous: 2025-09-06-kubernetes-gateway
-    next: 2025-09-06-kubernetes-keda
+  previous: 2025-09-06-kubernetes-gateway
+  next: 2025-09-06-kubernetes-keda
 is_private: false
 ---
 
@@ -35,10 +35,10 @@ is_private: false
 이 포스팅에선 HPA(Horizontal Pod AutoScaler)만 다룬다.
 
 > VPA는 실제 서비스에선 사용 빈도가 상대적으로 낮은데, 크게 아래와 같은 이유가 있다.
->
+> 
 > - HPA와 충돌 가능성이 있음(HPA의 스케일 인/아웃 조건이 리소스 사용량을 바탕으로 하는데 VPA는 그 요청/제한 값을 조절함)
 > - VPA가 값을 조정하면 해당 파드는 재생성이 필요함. 때문에 무중단 서비스에선 부담이 될 수 있음
->
+> 
 > 대신 VPA는 파드 사용량을 관찰하여 추천 값을 계산해주는데, 이렇게 계산만 하고 수동으로 업데이트하는 경우도 있다.
 
 # 1. What is HPA(Horizontal Pod AutoScaler)?
@@ -47,13 +47,13 @@ is_private: false
 
 ![](https://velog.velcdn.com/images/yulmwu/post/2f016ead-e1b3-4897-a9f2-438f6febdad3/image.png)
 
-실습에 앞서 간단하게 동작 과정을 살펴보자. 일단 HPA는 오토스케일링 기준이나 관련 값을 지정하는 HorizontalPodAutoscaler 리소스(오브젝트)가 있고, 실질적인 오토스케일링은 HPA Controller가 담당한다.
+실습에 앞서 간단하게 동작 과정을 살펴보자. 일단 HPA는 오토스케일링 기준이나 관련 값을 지정하는 HorizontalPodAutoscaler 리소스(오브젝트)가 있고, 실질적인 오토스케일링은 HPA Controller가 담당한다. 
 
 HPA Controller는 Metrics Server에서 메트릭 값을 가져오는데, Metrics Server가 직접 노드의 메트릭을 수집하진 않는다.
 
 워커 노드의 kubelet 내부적으로 존재하는 cAdvisor(Container Advisor)에서 메트릭을 수집하고, Metrics Server는 kubelet에서 가져온 데이터를 정리하여 `metrics.k8s.io`로 API를 노출한다.
 
-이렇게 수집된 메트릭을 바탕으로 HPA Controller가 파드의 수를 줄이거나 늘린다. (스케일 인/스케일 아웃)
+이렇게 수집된 메트릭을 바탕으로 HPA Controller가 파드의 수를 줄이거나 늘린다. (스케일 인/스케일 아웃) 
 
 > VPA도 동작 과정 자체는 비슷하다. 하지만 HPA와는 다르게 파드의 수를 조정하지 않고 파드의 리소스 요청/제한 값을 늘리는 것이다.
 
@@ -100,7 +100,7 @@ $DesiredReplicas = ceil(2 \times 200 \div 50) = 8$
 각각 아래와 같은 기능을 바탕으로 판단한다.
 
 - **Pods Metrics**: 파드에서 따로 제공되는 지표로, Prometheus Adapter나 CloudWatch Adapter 등에서 제공하는 Custom Metrics API에서 수집한다. 타겟의 타입은 파드 별 측정 값을 평균으로 한 `AverageValue`만 사용된다.
-- **Object Metrics**: 특정 쿠버네티스 오브젝트(서비스, Ingress 등)에서 제공하는 지표를 기준으로 한다.
+- **Object Metrics**: 특정 쿠버네티스 오브젝트(서비스, Ingress 등)에서 제공하는 지표를 기준으로 한다. 
 - **External Metrics**: 클러스터 외부 시스템 등에서 제공하는 지표로, 메시지 브로커의 메시지 수 등의 지표를 기준으로 한다.
 
 해당 Metrics는 Metrics Server에서 수집하는 것이 아닌 Custom Metrics API에서 수집된다.
@@ -118,21 +118,21 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-    name: eks-test
-    region: ap-northeast-2
-    version: '1.33'
+  name: eks-test
+  region: ap-northeast-2 
+  version: "1.33" 
 
 vpc:
-    cidr: 10.0.0.0/16
+  cidr: 10.0.0.0/16
 
 managedNodeGroups:
-    - name: ng-public
-      instanceTypes: ['t3.small']
-      desiredCapacity: 1
-      minSize: 1
-      maxSize: 1
-      privateNetworking: false
-      labels: { nodegroup: public }
+  - name: ng-public
+    instanceTypes: ["t3.small"]
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 1
+    privateNetworking: false
+    labels: { nodegroup: public }
 ```
 
 ```shell
@@ -159,49 +159,49 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: hpa-test
+  name: hpa-test
 spec:
-    replicas: 1
-    selector:
-        matchLabels:
-            app: hpa-test
-    template:
-        metadata:
-            labels:
-                app: hpa-test
-        spec:
-            containers:
-                - name: app
-                  image: rlawnsdud/testapp:latest
-                  imagePullPolicy: IfNotPresent
-                  ports:
-                      - containerPort: 80
-                  env:
-                      - name: PORT
-                        value: '80'
-                      - name: APP_NAME
-                        valueFrom:
-                            fieldRef:
-                                fieldPath: metadata.name
-                  resources:
-                      requests:
-                          cpu: '100m'
-                          memory: '128Mi'
-                      limits:
-                          cpu: '500m'
-                          memory: '256Mi'
-                  readinessProbe:
-                      httpGet:
-                          path: /
-                          port: 80
-                      initialDelaySeconds: 2
-                      periodSeconds: 5
-                  livenessProbe:
-                      httpGet:
-                          path: /
-                          port: 80
-                      initialDelaySeconds: 10
-                      periodSeconds: 10
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hpa-test
+  template:
+    metadata:
+      labels:
+        app: hpa-test
+    spec:
+      containers:
+        - name: app
+          image: rlawnsdud/testapp:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: PORT
+              value: "80"
+            - name: APP_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
 ```
 
 여기서 `spec.containers.resources`를 보면 CPU/메모리 요청 값은 각각 `100m`, `128Mi`로 설정해두었다. `readinessProbe`와 `livenessProbe`는 Health Check를 하기 위해 적어두었고, 당장은 없어도 된다.
@@ -214,15 +214,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    name: hpa-test
+  name: hpa-test
 spec:
-    selector:
-        app: hpa-test
-    ports:
-        - name: http
-          port: 80
-          targetPort: 80
-    type: NodePort
+  selector:
+    app: hpa-test
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: NodePort
 ```
 
 ![](https://velog.velcdn.com/images/yulmwu/post/808b7673-55b2-43ea-bcd0-cb38198c161a/image.png)
@@ -237,45 +237,45 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-    name: hpa-test
+  name: hpa-test
 spec:
-    scaleTargetRef:
-        apiVersion: apps/v1
-        kind: Deployment
-        name: hpa-test
-    minReplicas: 1
-    maxReplicas: 10
-    metrics:
-        - type: Resource
-          resource:
-              name: cpu
-              target:
-                  type: Utilization
-                  averageUtilization: 50
-        # - type: Resource
-        #   resource:
-        #     name: memory
-        #     target:
-        #       type: AverageValue
-        #       averageValue: "200Mi"
-    behavior:
-        scaleUp:
-            stabilizationWindowSeconds: 0
-            policies:
-                - type: Percent
-                  value: 100
-                  periodSeconds: 60
-                - type: Pods
-                  value: 4
-                  periodSeconds: 60
-            selectPolicy: Max
-        scaleDown:
-            stabilizationWindowSeconds: 60
-            policies:
-                - type: Percent
-                  value: 50
-                  periodSeconds: 60
-            selectPolicy: Max
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hpa-test
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: AverageValue
+    #       averageValue: "200Mi"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+        - type: Pods
+          value: 4
+          periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+      selectPolicy: Max
 ```
 
 Metrics 타입은 Resource, 타겟 타입은 Utilization로 해두었고 50%를 넘었을 때 오토스케일링 되게 해두었다.
@@ -292,7 +292,7 @@ Metrics 타입은 Resource, 타겟 타입은 Utilization로 해두었고 50%를 
 이제 파드에 부하를 주면서 CPU 사용률을 올려야 하는데, 간단하게 alpine에서 `stress-ng`라는 패키지를 통해 CPU 부하를 줘보겠다.
 
 ```shell
-kubectl exec -it hpa-test-85b9f8ffbf-zpd2j -- sh
+kubectl exec -it hpa-test-85b9f8ffbf-zpd2j -- sh 
 # alpine
 apk add --no-cache stress-ng
 ```
@@ -328,3 +328,4 @@ $DesiredReplicas = ceil(1 \times 200 \div 50) = 4$
 이상으로 HPA에 대해 간단히 알아보았다. 추후 VPA나 CA(Cluster AutoScaler)에 대해서도 다뤄보도록 하겠다.
 
 끝.
+

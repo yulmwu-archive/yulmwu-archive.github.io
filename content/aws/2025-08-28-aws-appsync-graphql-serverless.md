@@ -1,24 +1,24 @@
 ---
-title: '[AWS Integration] Serverless GraphQL API with AWS AppSync and JavaScript Resolver'
-description: 'AWS AppSync를 통한 서버리스 GraphQL API 구축하기'
-slug: '2025-08-28-aws-appsync-graphql-serverless'
+title: "[AWS Integration] Serverless GraphQL API with AWS AppSync and JavaScript Resolver"
+description: "AWS AppSync를 통한 서버리스 GraphQL API 구축하기"
+slug: "2025-08-28-aws-appsync-graphql-serverless"
 author: yulmwu
 date: 2025-08-28T23:57:35.785Z
-updated_at: 2025-12-07T19:18:22.946Z
-categories: ['AWS']
-tags: ['Integration', 'aws', 'serverless']
+updated_at: 2026-01-17T11:03:54.112Z
+categories: ["AWS"]
+tags: ["Integration", "aws", "serverless"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-appsync-graphql-serverless.png
 linked_posts:
-    previous: 2025-08-28-aws-sqs-sns
-    next: 2025-08-28-aws-click-heatmap-with-kds-msf-glue-athena
+  previous: 2025-08-28-aws-sqs-sns
+  next: 2025-08-28-aws-click-heatmap-with-kds-msf-glue-athena
 is_private: false
 ---
 
 > 포스팅에서 사용된 AppSync 예제는 아래의 깃허브 링크에서 확인하실 수 있습니다.
->
+> 
 > https://github.com/eocndp/aws-appsync-example
 
 # 0. Overview
@@ -27,7 +27,7 @@ AWS엔 API 요청을 받아 람다나 다른 서비스에 라우팅하고 여러
 
 서버리스 또는 AWS Amplify에서 구축하여 사용할 수 있는데, REST API를 기반으로 한다는 점이다.
 
-그럼 GraphQL을 사용하는 경우 서버리스로 GraphQL 요청(쿼리)를 처리할 수 있는 서비스가 있을까?
+그럼 GraphQL을 사용하는 경우 서버리스로 GraphQL 요청(쿼리)를 처리할 수 있는 서비스가 있을까? 
 
 API Gateway는 API 엔드포인트에 따라 서비스(람다 등)로 라우팅시키는 프록시에 가깝다는 점에서 결이 다르지만, AWS AppSync라는 서비스가 존재한다.
 
@@ -58,11 +58,11 @@ AppSync에 연결된 서비스가 API Gateway와는 다르게 Resolver가 있고
 그래서 AppSync는 API Gateway와는 다르게 GraphQL 기반의 오케스트레이션 레이어로, 다양한 데이터 소스(DynamoDB, RDS, 람다, HTTP 엔드포인트) 등을 통합하고, 인증이나 캐싱과 같은 기능을 제공하는 서비스이다.
 
 > ### VTL Resolver vs JavaScript Resolver
->
+> 
 > 위 아키텍처에서 사용한 Resolver는 JavaScript를 사용하는 Resolver이다. 하지만 JavaScript Resolver가 나오기 전엔 VTL Resolver가 있었는데, VTL Resolver는 JSON 형태의 템플릿 언어이다.
->
+> 
 > 간단하고 장점이 있지만, 선언적이라 사용할 수 있는 로직도 제한적이고 가독성과 유지보수성이 떨어진다는 3콤보 때문에 잘 사용하진 않는다. 예시의 VTL 코드는 아래와 같다. (Request)
->
+> 
 > ```js
 > #set($now = $util.time.nowISO8601())
 > {
@@ -79,46 +79,46 @@ AppSync에 연결된 서비스가 API Gateway와는 다르게 Resolver가 있고
 > 	}
 > }
 > ```
->
+> 
 > 그래서 JavaScript Resolver가 등장하였는데, 일단 프로그래밍 언어이기 때문에 VTL의 단점을 커버할 수 있었다.
->
+> 
 > ```js
 > export const request = (ctx) => {
-> 	const now = new Date().toISOString()
-> 	return {
-> 		operation: 'UpdateItem',
-> 		key: {
-> 			id: {
-> 				S: ctx.args.id,
-> 			},
-> 		},
-> 		update: {
-> 			expression: 'SET #n = :n, #u = :u',
-> 			expressionNames: {
-> 				'#n': 'name',
-> 				'#u': 'updatedAt',
-> 			},
-> 			expressionValues: {
-> 				':n': {
-> 					S: ctx.args.newName,
-> 				},
-> 				':u': {
-> 					S: now,
-> 				},
-> 			},
-> 		},
-> 	}
+>     const now = new Date().toISOString()
+>     return {
+>         operation: "UpdateItem",
+>         key: {
+>             id: {
+>                 S: ctx.args.id
+>             }
+>         },
+>         update: {
+>             expression: "SET #n = :n, #u = :u",
+>             expressionNames: {
+>                 "#n": "name",
+>                 "#u": "updatedAt"
+>             },
+>             expressionValues: {
+>                 ":n": {
+>                     S: ctx.args.newName
+>                 },
+>                 ":u": {
+>                     S: now
+>                 }
+>             }
+>         }
+>     }
 > }
->
+> 
 > export const response = (ctx) => {
-> 	return ctx.result
+>     return ctx.result
 > }
 > ```
 >
 > 확실히 VTL보다 가독성도 좋고, 유지보수성도 좋아졌다. 또한 사용할 수 있는 로직도 훨씬 다양해졌다.
->
+> 
 > 참고로 `request`는 GraphQL 쿼리를 받아 DB 등의 데이터 소스에 쿼리 등을 보내는 함수고, `response`는 데이터 소스의 결과를 받아올 때 가공할 수 있는 함수이다.
->
+> 
 > (해당 포스팅에선 JavaScript Resolver를 사용한다.)
 
 # 1. AWS Architecture
@@ -137,7 +137,7 @@ DB로는 DynamoDB를 사용해볼 것이고, JavaScript Resolver를 사용한다
 
 1. Cognito 유저 풀 생성 및 테스트 유저 생성
 2. DynamoDB 테이블 생성
-3. AppSync 생성, 인증 설정 및 GraphQL 스키마 작성
+3. AppSync 생성, 인증 설정 및 GraphQL 스키마 작성 
 4. AppSync 데이터 소스 생성, Resolver 작성
 
 ## (1) Cognito
@@ -160,7 +160,7 @@ https://velog.io/@yulmwu/aws-serverless#4-4-cognito
 
 ![](https://velog.velcdn.com/images/yulmwu/post/69f8092c-9000-40bf-9c58-a731b2ed0910/image.png)
 
-이메일 제공을 필수로 해두었기 때문에 이메일 인증이 필요하다.
+이메일 제공을 필수로 해두었기 때문에 이메일 인증이 필요하다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e0535ed0-22cd-4a75-9c8a-021ebf7c7ac4/image.png)
 
@@ -178,22 +178,22 @@ const CLIENT_ID = '...'
 const CLIENT_SECRET_KEY = '...'
 
 const clientSecretHashGenerator = (username, clientId, clientSecretKey) => {
-	const hmac = createHmac('sha256', clientSecretKey)
-	hmac.update(username + clientId)
+    const hmac = createHmac('sha256', clientSecretKey)
+    hmac.update(username + clientId)
 
-	return hmac.digest('base64')
+    return hmac.digest('base64')
 }
 
 const cognitoClient = new CognitoIdentityProviderClient()
 
 const command = new InitiateAuthCommand({
-	AuthFlow: 'USER_PASSWORD_AUTH',
-	ClientId: CLIENT_ID,
-	AuthParameters: {
-		USERNAME: '...',
-		PASSWORD: '...',
-		SECRET_HASH: clientSecretHashGenerator('test', CLIENT_ID, CLIENT_SECRET_KEY),
-	},
+    AuthFlow: 'USER_PASSWORD_AUTH',
+    ClientId: CLIENT_ID,
+    AuthParameters: {
+        USERNAME: '...',
+        PASSWORD: '...',
+        SECRET_HASH: clientSecretHashGenerator('test', CLIENT_ID, CLIENT_SECRET_KEY),
+    },
 })
 
 const result = await cognitoClient.send(command)
@@ -203,7 +203,7 @@ console.log(result.AuthenticationResult?.AccessToken)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e9562a18-ceac-4512-ab35-8026939ca994/image.png)
 
-이제 좀 있다 GraphQL 게시글 CUD 테스트 시 `Authorization` 헤더에 포함시키면 된다.
+이제 좀 있다 GraphQL 게시글 CUD 테스트 시 `Authorization` 헤더에 포함시키면 된다. 
 
 ## (2) DynamoDB
 
@@ -280,7 +280,7 @@ type Query {
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ed2fc103-94fb-45da-af64-2afe75706caf/image.png)
 
-### getPost, listPosts Queries
+### getPost, listPosts Queries 
 
 이제 스키마의 쿼리와 뮤테이션에 Resolver를 작성하면서 해당 데이터 소스를 연결해줘야 한다.
 
@@ -292,7 +292,7 @@ type Query {
 
 ![](https://velog.velcdn.com/images/yulmwu/post/5b7a545a-3241-48f4-8b0a-894cab3148d8/image.png)
 
-Resolver 유형은 단위 Resolver로 선택한다. 파이프라인은 AppSync 함수를 여러개 붙여서 순차적으로 Resolve하는 기능이다.
+Resolver 유형은 단위 Resolver로 선택한다. 파이프라인은 AppSync 함수를 여러개 붙여서 순차적으로 Resolve하는 기능이다. 
 
 그리고 Resolver 런타임은 JavaScript로 선택한다.
 
@@ -308,8 +308,8 @@ Resolver 유형은 단위 Resolver로 선택한다. 파이프라인은 AppSync �
 import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => ({
-	operation: 'GetItem',
-	key: util.dynamodb.toMapValues({ id: ctx.args.id }),
+    operation: 'GetItem',
+    key: util.dynamodb.toMapValues({ id: ctx.args.id }),
 })
 
 export const response = (ctx) => ctx.result
@@ -327,7 +327,7 @@ export const response = (ctx) => ctx.result.items
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e0f164b6-d2df-47fd-b4f0-a9d5098e370b/image.png)
 
-저장을 해주고, 잘 실행되는지 확인해보자.
+저장을 해주고, 잘 실행되는지 확인해보자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4b79c1c7-d219-4690-ab82-77ff740a0f0f/image.png)
 
@@ -342,7 +342,7 @@ Postman으로 테스트해봐도 되지만 콘솔에서 쿼리를 날려볼 수 
 뮤테이션 코드들은 맨 처음 Cognito 인증 여부를 검사하도록 하였다. (지시자 미지정 방지)
 
 > 코드는 아래의 깃허브 레포지토리에 업로드해두었다.
->
+> 
 > https://github.com/eocndp/aws-appsync-example
 
 ```js
@@ -351,23 +351,23 @@ Postman으로 테스트해봐도 되지만 콘솔에서 쿼리를 날려볼 수 
 import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => {
-	const username = ctx.identity?.username
-	if (!username) util.error('Unauthorized', 'Unauthorized')
+    const username = ctx.identity?.username
+    if (!username) util.error('Unauthorized', 'Unauthorized')
 
-	const id = util.autoId()
-	const now = util.time.nowISO8601()
+    const id = util.autoId()
+    const now = util.time.nowISO8601()
 
-	return {
-		operation: 'PutItem',
-		key: util.dynamodb.toMapValues({ id }),
-		attributeValues: util.dynamodb.toMapValues({
-			title: ctx.args.title,
-			content: ctx.args.content,
-			author: username,
-			createdAt: now,
-		}),
-		condition: { expression: 'attribute_not_exists(id)' },
-	}
+    return {
+        operation: 'PutItem',
+        key: util.dynamodb.toMapValues({ id }),
+        attributeValues: util.dynamodb.toMapValues({
+            title: ctx.args.title,
+            content: ctx.args.content,
+            author: username,
+            createdAt: now,
+        }),
+        condition: { expression: 'attribute_not_exists(id)' },
+    }
 }
 
 export const response = (ctx) => ctx.result
@@ -379,50 +379,50 @@ export const response = (ctx) => ctx.result
 import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => {
-	const username = ctx.identity?.username
-	if (!username) util.error('Unauthorized', 'Unauthorized')
+    const username = ctx.identity?.username
+    if (!username) util.error('Unauthorized', 'Unauthorized')
 
-	const sets = []
-	const names = {}
-	const values = {}
+    const sets = []
+    const names = {}
+    const values = {}
 
-	if (ctx.args.title !== undefined) {
-		sets.push('#title = :title')
-		names['#title'] = 'title'
-		values[':title'] = ctx.args.title
-	}
-	if (ctx.args.content !== undefined) {
-		sets.push('#content = :content')
-		names['#content'] = 'content'
-		values[':content'] = ctx.args.content
-	}
-	if (sets.length === 0) util.error('Nothing to update', 'BadRequest')
+    if (ctx.args.title !== undefined) {
+        sets.push('#title = :title')
+        names['#title'] = 'title'
+        values[':title'] = ctx.args.title
+    }
+    if (ctx.args.content !== undefined) {
+        sets.push('#content = :content')
+        names['#content'] = 'content'
+        values[':content'] = ctx.args.content
+    }
+    if (sets.length === 0) util.error('Nothing to update', 'BadRequest')
 
-	return {
-		operation: 'UpdateItem',
-		key: util.dynamodb.toMapValues({ id: ctx.args.id }),
-		update: {
-			expression: `SET ${sets.join(', ')}`,
-			expressionNames: names,
-			expressionValues: util.dynamodb.toMapValues(values),
-		},
-		condition: {
-			expression: '#author = :u',
-			expressionNames: { '#author': 'author' },
-			expressionValues: util.dynamodb.toMapValues({ ':u': username }),
-		},
-	}
+    return {
+        operation: 'UpdateItem',
+        key: util.dynamodb.toMapValues({ id: ctx.args.id }),
+        update: {
+            expression: `SET ${sets.join(', ')}`,
+            expressionNames: names,
+            expressionValues: util.dynamodb.toMapValues(values),
+        },
+        condition: {
+            expression: '#author = :u',
+            expressionNames: { '#author': 'author' },
+            expressionValues: util.dynamodb.toMapValues({ ':u': username }),
+        },
+    }
 }
 
 export const response = (ctx) => {
-	if (ctx.error) {
-		const t = ctx.error.type || ''
-		if (t.includes('ConditionalCheckFailedException')) {
-			util.error('You are not the author of this post', 'Forbidden')
-		}
-		util.error(ctx.error.message, t)
-	}
-	return ctx.result
+    if (ctx.error) {
+        const t = ctx.error.type || ''
+        if (t.includes('ConditionalCheckFailedException')) {
+            util.error('You are not the author of this post', 'Forbidden')
+        }
+        util.error(ctx.error.message, t)
+    }
+    return ctx.result
 }
 ```
 
@@ -432,29 +432,29 @@ export const response = (ctx) => {
 import { util } from '@aws-appsync/utils'
 
 export const request = (ctx) => {
-	const username = ctx.identity?.username
-	if (!username) util.error('Unauthorized', 'Unauthorized')
+    const username = ctx.identity?.username
+    if (!username) util.error('Unauthorized', 'Unauthorized')
 
-	return {
-		operation: 'DeleteItem',
-		key: util.dynamodb.toMapValues({ id: ctx.args.id }),
-		condition: {
-			expression: '#author = :u',
-			expressionNames: { '#author': 'author' },
-			expressionValues: util.dynamodb.toMapValues({ ':u': username }),
-		},
-	}
+    return {
+        operation: 'DeleteItem',
+        key: util.dynamodb.toMapValues({ id: ctx.args.id }),
+        condition: {
+            expression: '#author = :u',
+            expressionNames: { '#author': 'author' },
+            expressionValues: util.dynamodb.toMapValues({ ':u': username }),
+        },
+    }
 }
 
 export const response = (ctx) => {
-	if (ctx.error) {
-		const t = ctx.error.type || ''
-		if (t.includes('ConditionalCheckFailedException')) {
-			util.error('You are not the author of this post', 'Forbidden')
-		}
-		util.error(ctx.error.message, t)
-	}
-	return ctx.result
+    if (ctx.error) {
+        const t = ctx.error.type || ''
+        if (t.includes('ConditionalCheckFailedException')) {
+            util.error('You are not the author of this post', 'Forbidden')
+        }
+        util.error(ctx.error.message, t)
+    }
+    return ctx.result
 }
 ```
 
@@ -464,7 +464,7 @@ export const response = (ctx) => {
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4cb9fcca-bdee-4312-966c-369eb2475766/image.png)
 
-이제 테스트를 해보자.
+이제 테스트를 해보자. 
 
 # 3. Testing
 
@@ -478,7 +478,7 @@ createPost 부터 테스트해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/1b5e8a42-12f5-4f1c-b661-f297b889e5f2/image.png)
 
-실행 후 listPosts 쿼리를 보내보면 에러가 날 것이다.
+실행 후 listPosts 쿼리를 보내보면 에러가 날 것이다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f84f1f8b-40dc-4e2f-88df-8d51e74b2ab8/image.png)
 
@@ -521,7 +521,7 @@ getPost도 테스트해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7c6ec3a6-d553-4ae4-9369-4c503408f51c/image.png)
 
-처음 10TB/월 기준으로 GB당 0.126\$가 청구된다. (서울 리전) 예를 들어 평균 응답 크기가 10KB라면 $10KB × 6,000,000 = 60GB$이므로
+처음 10TB/월 기준으로 GB당 0.126\$가 청구된다. (서울 리전) 예를 들어 평균 응답 크기가 10KB라면 $10KB × 6,000,000 = 60GB$이므로 
 
 - 전송량: $0.126\$ × 60 = 7.56\$$
 - 총합: $24\$ + 7.56\$ = 31.56\$$

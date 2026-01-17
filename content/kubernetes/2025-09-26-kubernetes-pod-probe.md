@@ -1,19 +1,19 @@
 ---
-title: '[Kubernetes] Pod Health Check with Readiness, Liveness Probes (Feat. Pod Lifecycle)'
-description: 'Readiness Probe 및 Liveness Probe를 통한 파드 Health Checking (Feat. Pod LifeCycle)'
-slug: '2025-09-26-kubernetes-pod-probe'
+title: "[Kubernetes] Pod Health Check with Readiness, Liveness Probes (Feat. Pod Lifecycle)"
+description: "Readiness Probe 및 Liveness Probe를 통한 파드 Health Checking (Feat. Pod LifeCycle)"
+slug: "2025-09-26-kubernetes-pod-probe"
 author: yulmwu
 date: 2025-09-26T08:51:23.736Z
-updated_at: 2025-12-20T17:50:51.752Z
-categories: ['Kubernetes']
-tags: ['kubernetes']
+updated_at: 2026-01-17T12:44:18.294Z
+categories: ["Kubernetes"]
+tags: ["kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-pod-probe.png
 linked_posts:
-    previous: 2025-09-26-kubernetes-cert-manager
-    next: 2025-09-26-kubernetes-operator
+  previous: 2025-09-26-kubernetes-cert-manager
+  next: 2025-09-26-kubernetes-operator
 is_private: false
 ---
 
@@ -45,28 +45,28 @@ Probe에 대해 배워보기 전 알아야할 중요 개념이 있다. 바로 �
 
 ```yaml
 status:
-    conditions:
-        - lastProbeTime: null
-          lastTransitionTime: '2025-09-28T00:41:03Z'
-          status: 'True'
-          type: PodReadyToStartContainers
-        - lastProbeTime: null
-          lastTransitionTime: '2025-09-28T00:41:01Z'
-          status: 'True'
-          type: Initialized
-        - lastProbeTime: null
-          lastTransitionTime: '2025-09-28T00:41:03Z'
-          status: 'True'
-          type: Ready
-        - lastProbeTime: null
-          lastTransitionTime: '2025-09-28T00:41:03Z'
-          status: 'True'
-          type: ContainersReady
-        - lastProbeTime: null
-          lastTransitionTime: '2025-09-28T00:41:01Z'
-          status: 'True'
-          type: PodScheduled
-    phase: Running
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2025-09-28T00:41:03Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2025-09-28T00:41:01Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2025-09-28T00:41:03Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2025-09-28T00:41:03Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2025-09-28T00:41:01Z"
+    status: "True"
+    type: PodScheduled
+  phase: Running
 ```
 
 그럼 위와 같이 `status` 필드가 보일 것이다. 맨 밑에 `phase`가 현재 파드의 상태로, 정상적으로 만들어졌다면 `Running`으로 나타날 것이다.
@@ -86,17 +86,17 @@ Service 오브젝트는 파드의 `Ready`가 True여야 엔드포인트가 연�
 파드 Phase, Condition과는 별개로 각 컨테이너에도 상태를 가진다. 아까 `kubectl get pods [POD] -o yaml` 명령어를 통해 나온 결과에서 `containerStatuses` 항목을 보자.
 
 ```yaml
-containerStatuses:
-    - containerID: ...
-      image: ...
-      imageID: ...
-      name: demo
-      ready: true
-      restartCount: 0
-      started: true
-      state:
-          running:
-              startedAt: '2025-09-28T00:41:02Z'
+  containerStatuses:
+  - containerID: ...
+    image: ...
+    imageID: ...
+    name: demo
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2025-09-28T00:41:02Z"
 ```
 
 여기서 `state`엔 아래와 같은 상태를 확인할 수 있고, `running` 상태를 제외하면 `reason`을 통해 어떠한 이유로 해당 상태가 되었는지 확인할 수 있다.
@@ -107,16 +107,16 @@ containerStatuses:
 
 `running`은 컨테이너가 성공적으로 실행되고 있는 상태를 말하고, 별다른 Reason은 없다.
 
-`waiting`은 컨테이너가 시작되기 전 대기 중이거나, 어떠한 이유로 인해 에러가 발생하여 컨테이너 재시작을 기다리는 중을 의미한다.
+`waiting`은 컨테이너가 시작되기 전 대기 중이거나, 어떠한 이유로 인해 에러가 발생하여 컨테이너 재시작을 기다리는 중을 의미한다. 
 
 대표적인 Reason으론 `ContainerCreating`, `CrashLoopBackOff`, `ImagePullBackOff` 등이 있는데, 여기서 `CrashLoopBackOff` 에러가 발생하면 일정한 간격을 두고 컨테이너를 재시작한다. (이때 대기 시간은 10초, 20초, 40초, 80초 등 점진적으로 증가한다.)
 
 마지막으로 `terminated`은 컨테이너가 종료된 상태로, 정상적으로 종료되었을 경우 `Completed`, Non Zero 에러 코드로 종료된 경우 `Error`, 메모리를 초과할 경우 `OOMKilled` 등의 Reason이 발생한다.
 
 > ### spec.restartPolicy
->
+> 
 > 파드 내 컨테이너가 종료되었을 때, 재시작 여부를 결정하는 옵션이다. 기본값은 `Always`로, 컨테이너가 정상적으로 종료되던 Non Zero Exit Code를 통해 에러로 끝다던 항상 재시작을 한다는 옵션이다.
->
+> 
 > 그리고 `Never`은 반대로 항상 재시작하지 않고, `OnFailure`은 에러가 발생하였을 때만 재시작을 시도한다.
 
 여기까지 파드의 라이프사이클에 대해 살짝만 다뤄보았는데, 하나의 파드에 여러개의 컨테이너를 가진 특성상 복잡할 수 밖에 없다. 이제 이번 블로그의 메인 주제인 Probe에 대해 다뤄보자.
@@ -129,11 +129,11 @@ Probe는 쿠버네티스에서 kubelet에 의해 특정 주기를 가지고 파�
 
 ## Readiness Probe
 
-Readiness Probe는 컨테이너가 요청을 처리할 준비가 되어있는지 여부를 확인한다. 만약 Readiness Probe가 실패된다면 서비스 엔드포인트에서 파드 IP가 제거되어 트래픽을 받을 수 없게 된다.
+Readiness Probe는 컨테이너가 요청을 처리할 준비가 되어있는지 여부를 확인한다. 만약 Readiness Probe가 실패된다면 서비스 엔드포인트에서 파드 IP가 제거되어 트래픽을 받을 수 없게 된다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/3ce60faa-0359-4825-b606-0c7e44f5132b/image.png)
 
-여기서 Readiness Probe에서 Health Check를 실패한다면 Ready Condition이 False가 되고, 그럼 서비스 엔드포인트에서 파드의 IP가 제거되어 트래픽을 받을 수 없게 된다.
+여기서 Readiness Probe에서 Health Check를 실패한다면 Ready Condition이 False가 되고, 그럼 서비스 엔드포인트에서 파드의 IP가 제거되어 트래픽을 받을 수 없게 된다. 
 
 `initialDelaySeconds`는 파드가 생성된 후 초기 대기 시간을, `periodSeconds`는 Health Check 간격을, `successThreshold`는 몇 번을 성공해야 Ready를 True로 만들지를 결정하는 옵션으로, 자세한 옵션은 다루지 않겠다.
 
@@ -165,15 +165,15 @@ Liveness Probe는 컨테이너의 애플리케이션이 정상적으로 동작�
 apiVersion: v1
 kind: Service
 metadata:
-    name: myapp-service
+  name: myapp-service
 spec:
-    selector:
-        app: myapp
-    ports:
-        - name: http
-          port: 80
-          targetPort: 8080
-    type: ClusterIP
+  selector:
+    app: myapp
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
 ```
 
 그리고 아래와 같은 Deployment를 적용해보자.
@@ -182,54 +182,54 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: myapp-deployment
+  name: myapp-deployment
 spec:
-    replicas: 1
-    selector:
-        matchLabels:
-            app: myapp
-    template:
-        metadata:
-            labels:
-                app: myapp
-        spec:
-            terminationGracePeriodSeconds: 1
-            containers:
-                - name: myapp
-                  image: rlawnsdud/demo:arm
-                  ports:
-                      - containerPort: 8080
-                  env:
-                      - name: HOST
-                        value: '0.0.0.0'
-                      - name: PORT
-                        value: '8080'
-                      - name: POD
-                        valueFrom:
-                            fieldRef:
-                                fieldPath: metadata.name
-                  volumeMounts:
-                      - name: data
-                        mountPath: /data
-                  readinessProbe:
-                      exec:
-                          command: ['sh', '-c', '[ -f /data/test.txt ]']
-                      initialDelaySeconds: 3
-                      periodSeconds: 5
-                      failureThreshold: 1
-                      successThreshold: 1
-                      timeoutSeconds: 1
-                  livenessProbe:
-                      exec:
-                          command: ['sh', '-c', '[ -f /data/test.txt ]']
-                      initialDelaySeconds: 10
-                      periodSeconds: 10
-                      failureThreshold: 2
-                      successThreshold: 1
-                      timeoutSeconds: 1
-            volumes:
-                - name: data
-                  emptyDir: {}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+        - name: myapp
+          image: rlawnsdud/demo:arm
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8080"
+            - name: POD
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "[ -f /data/test.txt ]"]
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            failureThreshold: 1
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "[ -f /data/test.txt ]"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+      volumes:
+        - name: data
+          emptyDir: {}
 ```
 
 적용 후 `kubectl get events -w | grep 'myapp-deployment-[...]'` 명령어를 통해 이벤트 로그를 확인해보자.
@@ -259,12 +259,13 @@ spec:
 그럼 Readiness Probe와 Liveness Probe 둘 모두 실패하는 것을 볼 수 있다. `kubectl describe pods` 명령어를 통해 확인해봐도 Ready가 False인걸 볼 수 있다.
 
 ```yaml
-Conditions: Type                        Status
-    PodReadyToStartContainers   True
-    Initialized                 True
-    Ready                       False
-    ContainersReady             False
-    PodScheduled                True
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True
 ```
 
 `kubectl describe endpointslice myapp-service` 명령어를 통해 엔드포인트(EndpointSlice)를 확인해봐도 Ready는 False로 나타난다.
@@ -326,11 +327,11 @@ Events:         <none>
 > kubectl describe pods
 Conditions:
   Type                        Status
-  PodReadyToStartContainers   True
-  Initialized                 True
-  Ready                       True
-  ContainersReady             True
-  PodScheduled                True
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
 ```
 
 그럼 Health Check가 정상적으로 되어 서비스 엔드포인트에 연결되는 것을 볼 수 있다.
@@ -346,3 +347,4 @@ myapp-deployment-7475dd7b6c-6nmsd   1/1     Running   7 (7m28s ago)   11m
 ---
 
 이상으로 파드의 라이프사이클과 Readiness Probe 및 Liveness Probe를 간단하게 실습해보았다. Readiness Probe 및 Liveness Probe는 파드의 안정성을 위한 중요한 기능이므로 까먹지 않고 사용하는 것을 추천한다.
+
