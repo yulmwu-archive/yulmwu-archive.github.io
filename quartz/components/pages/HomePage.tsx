@@ -2,9 +2,15 @@ import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } fro
 import { formatDate, getDate } from '../Date'
 import style from '../styles/homePage.scss'
 import { QuartzPluginData } from '../../plugins/vfile'
+// @ts-ignore
+import script from '../scripts/initLatestPostsSlider.inline'
 
 type PostsByDirectory = Map<string, QuartzPluginData[]>
 type DirectoryTitles = Map<string, string>
+
+const getLatestPosts = (posts: QuartzPluginData[], limit: number = 10): QuartzPluginData[] => {
+	return posts.slice(0, limit)
+}
 
 const groupPostsByDirectory = (posts: QuartzPluginData[]): PostsByDirectory => {
 	const postsByDirectory: PostsByDirectory = new Map()
@@ -113,6 +119,27 @@ const PostCard = ({ post, cfg }: { post: QuartzPluginData; cfg: any }) => {
 	)
 }
 
+const LatestPostsSlider = ({ posts, cfg }: { posts: QuartzPluginData[]; cfg: any }) => {
+	if (posts.length === 0) return null
+
+	return (
+		<div class="latest-posts-section">
+			<h2 class="latest-posts-title">최신 게시글 (10개)</h2>
+			<div class="swiper-container" id="latestPostsSwiper">
+				<div class="swiper-wrapper">
+					{posts.map((post) => (
+						<div class="swiper-slide">
+							<PostCard post={post} cfg={cfg} />
+						</div>
+					))}
+				</div>
+				<div class="swiper-button-prev"></div>
+				<div class="swiper-button-next"></div>
+			</div>
+		</div>
+	)
+}
+
 const CollapsibleSection = ({
 	directory,
 	posts,
@@ -152,6 +179,15 @@ const CollapsibleSection = ({
 const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 	const posts = allFiles.filter((file) => file.slug && file.slug !== 'index' && !file.slug.startsWith('tags/'))
 
+	const sortedPosts = posts.sort((a, b) => {
+		const dateA = getDate(cfg, a)
+		const dateB = getDate(cfg, b)
+		if (!dateA || !dateB) return 0
+		return dateB.getTime() - dateA.getTime()
+	})
+
+	const latestPosts = getLatestPosts(sortedPosts, 10)
+
 	const postsByDirectory = groupPostsByDirectory(posts)
 	sortPostsByDate(postsByDirectory, cfg)
 	const directoryTitles = extractDirectoryTitles(postsByDirectory, allFiles)
@@ -173,6 +209,10 @@ const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 				</p>
 			</header>
 
+			<LatestPostsSlider posts={latestPosts} cfg={cfg} />
+
+			<h2 class="all-posts-title">시리즈별 게시글</h2>
+
 			{sortedDirectories.map((directory) => (
 				<CollapsibleSection
 					key={directory}
@@ -186,6 +226,7 @@ const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 	)
 }
 
+HomePage.afterDOMLoaded = script
 HomePage.css = style
 
 export default (() => HomePage) satisfies QuartzComponentConstructor
