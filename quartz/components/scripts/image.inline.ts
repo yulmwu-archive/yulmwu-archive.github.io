@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			link.href = src
 			link.target = '_blank'
 			link.rel = 'noopener noreferrer'
+			link.style.margin = '3rem auto'
 
 			// Replace image with link-wrapped image
 			img.parentNode?.insertBefore(link, img)

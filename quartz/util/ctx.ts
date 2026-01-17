@@ -19,6 +19,7 @@ export type BuildTimeTrieData = QuartzPluginData & {
 	slug: string
 	title: string
 	filePath: string
+	seriesName?: string
 }
 
 export interface BuildCtx {
@@ -40,6 +41,7 @@ export function trieFromAllFiles(allFiles: QuartzPluginData[]): FileTrieNode<Bui
 				slug: file.slug!,
 				title: file.frontmatter.title,
 				filePath: file.filePath!,
+				seriesName: file.frontmatter.series?.name,
 			})
 		}
 	})

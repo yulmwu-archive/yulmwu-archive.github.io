@@ -17,9 +17,13 @@ export const sharedPageComponents: SharedLayout = {
 export const homePageLayout: PageLayout = {
 	beforeBody: [Component.HomePage()],
 	left: [
-		Component.Search(),
+		Component.PageTitle(),
 		Component.Flex({
-			components: [{ Component: Component.Darkmode() }, { Component: Component.ReaderMode() }],
+			components: [
+				{ Component: Component.Search(), grow: true },
+				{ Component: Component.Darkmode() },
+				{ Component: Component.ReaderMode() },
+			],
 		}),
 	],
 	right: [],
@@ -33,13 +37,17 @@ export const defaultContentPageLayout: PageLayout = {
 		}),
 		Component.ArticleTitle(),
 		Component.ContentMeta(),
-		Component.TagList(),
 		Component.SeriesNavigator(),
 	],
+	afterBody: [Component.TagList()],
 	left: [
-		Component.Search(),
+		Component.PageTitle(),
 		Component.Flex({
-			components: [{ Component: Component.Darkmode() }, { Component: Component.ReaderMode() }],
+			components: [
+				{ Component: Component.Search(), grow: true },
+				{ Component: Component.Darkmode() },
+				{ Component: Component.ReaderMode() },
+			],
 		}),
 	],
 	right: [Component.DesktopOnly(Component.TableOfContents())],
@@ -56,9 +64,13 @@ export const defaultListPageLayout: PageLayout = {
 		Component.TagList(),
 	],
 	left: [
-		Component.Search(),
+		Component.PageTitle(),
 		Component.Flex({
-			components: [{ Component: Component.Darkmode() }, { Component: Component.ReaderMode() }],
+			components: [
+				{ Component: Component.Search(), grow: true },
+				{ Component: Component.Darkmode() },
+				{ Component: Component.ReaderMode() },
+			],
 		}),
 	],
 	right: [Component.DesktopOnly(Component.TableOfContents())],

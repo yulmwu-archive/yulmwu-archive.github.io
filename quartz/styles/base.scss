@@ -4,9 +4,45 @@
 @use './syntax.scss';
 @use './callouts.scss';
 
+@font-face {
+	font-family: 'Pretendard';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
+	font-weight: 200;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
+	font-weight: 300;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
+	font-weight: 500;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
+	font-weight: 600;
+	font-display: swap;
+}
+
 html {
 	overflow-x: hidden;
 	width: 100%;
+	zoom: 90%;
 }
 
 *,
@@ -81,8 +117,13 @@ strong {
 	font-weight: $semiBoldWeight;
 }
 
+em {
+	font-style: italic;
+	margin-right: 0.15em;
+}
+
 a {
-	font-weight: $semiBoldWeight;
+	font-weight: $normalWeight;
 	text-decoration: none;
 	transition: color 0.2s ease;
 	color: var(--secondary);
@@ -161,6 +202,17 @@ a {
 	& article {
 		& > h1 {
 			font-size: 2rem;
+		}
+
+		@media all and ($mobile) {
+			ul,
+			ol {
+				padding-left: 0;
+			}
+
+			li {
+				margin-left: 1.5rem;
+			}
 		}
 
 		& li:has(> input[type='checkbox']) {
@@ -337,9 +389,9 @@ input[type='checkbox'] {
 
 blockquote {
 	margin: 1.5rem 0;
-	border-left: 4px solid var(--secondary);
+	border-left: 4px solid var(--gray);
 	padding: 1rem 1.25rem;
-	background: color-mix(in srgb, var(--secondary) 5%, var(--light));
+	background: color-mix(in srgb, var(--gray) 10%, var(--light));
 	border-radius: 4px;
 	transition: border-color 0.2s ease;
 
@@ -558,14 +610,14 @@ tr {
 }
 
 img {
-	max-width: 80%;
+	max-width: 95%;
 	display: block;
 	margin: 1.5rem auto;
 	border-radius: 5px;
 	content-visibility: auto;
 
 	@media all and ($mobile) {
-		max-width: 100%;
+		width: 100%;
 	}
 }
 

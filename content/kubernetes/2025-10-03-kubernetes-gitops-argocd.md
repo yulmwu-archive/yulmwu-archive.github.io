@@ -12,7 +12,7 @@ series:
     slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-gitops-argocd.png
 linked_posts:
-    previous: 2025-10-03-kubernetes-gc-ownerreferences-finalizer
+    previous: 2025-10-03-kubernetes-pac-with-gatekeeper-and-kyverno
     next: 2025-10-03-kubernetes-argocd-ci
 is_private: false
 ---

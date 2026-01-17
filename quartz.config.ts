@@ -24,7 +24,7 @@ const config: QuartzConfig = {
 			cdnCaching: true,
 			typography: {
 				header: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 나눔고딕, 'Nanum Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', arial, 돋움, Dotum, Tahoma, Geneva, sans-serif",
-				body: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 나눔고딕, 'Nanum Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', arial, 돋움, Dotum, Tahoma, Geneva, sans-serif",
+				body: 'Pretendard',
 				code: 'IBM Plex Mono',
 			},
 			colors: {
@@ -35,7 +35,7 @@ const config: QuartzConfig = {
 					darkgray: '#4e4e4e',
 					dark: '#2b2b2b',
 					secondary: '#284b63',
-					tertiary: '#84a59d',
+					tertiary: '#a2a2a2',
 					highlight: 'rgba(143, 159, 169, 0.15)',
 					textHighlight: '#fff23688',
 				},

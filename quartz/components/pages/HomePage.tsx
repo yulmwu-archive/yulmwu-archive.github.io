@@ -63,9 +63,22 @@ const sortPostsByDate = (postsByDirectory: PostsByDirectory, cfg: any) => {
 }
 
 const sortDirectories = (directories: string[]): string[] => {
+	const priority: Record<string, number> = {
+		aws: 0,
+		kubernetes: 1,
+		cloudflare: 2,
+		misc: 998,
+		root: 999,
+	}
+
 	return directories.sort((a, b) => {
-		if (a === 'root') return -1
-		if (b === 'root') return 1
+		const aPriority = priority[a.toLowerCase()] ?? 100
+		const bPriority = priority[b.toLowerCase()] ?? 100
+
+		if (aPriority !== bPriority) {
+			return aPriority - bPriority
+		}
+
 		return a.localeCompare(b)
 	})
 }
@@ -100,7 +113,43 @@ const PostCard = ({ post, cfg }: { post: QuartzPluginData; cfg: any }) => {
 	)
 }
 
-const HomePage: QuartzComponent = ({ allFiles, cfg, fileData }: QuartzComponentProps) => {
+const CollapsibleSection = ({
+	directory,
+	posts,
+	directoryTitles,
+	cfg,
+}: {
+	directory: string
+	posts: QuartzPluginData[]
+	directoryTitles: DirectoryTitles
+	cfg: any
+}) => {
+	const title = directoryTitles.get(directory) || directory.split('/').pop() || directory
+	const checkboxId = `section-${directory.replace(/\//g, '-')}`
+	const postCount = posts.length
+
+	return (
+		<div class="posts-section">
+			{directory !== 'root' && (
+				<>
+					<input type="checkbox" id={checkboxId} class="section-toggle" defaultChecked />
+					<label htmlFor={checkboxId} class="section-header">
+						<span class="expand-icon" aria-hidden="true"></span>
+						<h2 class="section-title">{title}</h2>
+						<span class="post-count">{postCount}</span>
+					</label>
+				</>
+			)}
+			<div class="posts-grid">
+				{posts.map((post) => (
+					<PostCard post={post} cfg={cfg} />
+				))}
+			</div>
+		</div>
+	)
+}
+
+const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 	const posts = allFiles.filter((file) => file.slug && file.slug !== 'index' && !file.slug.startsWith('tags/'))
 
 	const postsByDirectory = groupPostsByDirectory(posts)
@@ -112,21 +161,26 @@ const HomePage: QuartzComponent = ({ allFiles, cfg, fileData }: QuartzComponentP
 		<div class="home-page">
 			<header class="home-header">
 				<h1>Mirror of {cfg.pageTitle} Blog</h1>
+				<p>
+					원본 블로그 포스팅은{' '}
+					<a href="https://velog.io/@yulmwu" target="_blank" rel="noopener noreferrer">
+						Velog에서 확인하실 수 있습니다.
+					</a>
+				</p>
+				<p>
+					본 페이지는 아카이브/미러링 용도로 사용되며, 모든 컨텐츠의 저작권은 원저작자에게 있습니다.
+					(라이선스: CC-BY-SA)
+				</p>
 			</header>
 
 			{sortedDirectories.map((directory) => (
-				<div class="posts-section">
-					{directory !== 'root' && (
-						<h2 class="section-title">
-							{directoryTitles.get(directory) || directory.split('/').pop() || directory}
-						</h2>
-					)}
-					<div class="posts-grid">
-						{postsByDirectory.get(directory)!.map((post) => (
-							<PostCard post={post} cfg={cfg} />
-						))}
-					</div>
-				</div>
+				<CollapsibleSection
+					key={directory}
+					directory={directory}
+					posts={postsByDirectory.get(directory)!}
+					directoryTitles={directoryTitles}
+					cfg={cfg}
+				/>
 			))}
 		</div>
 	)

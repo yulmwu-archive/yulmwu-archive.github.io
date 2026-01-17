@@ -29,7 +29,7 @@ interface BreadcrumbOptions {
 }
 
 const defaultOptions: BreadcrumbOptions = {
-	spacerSymbol: '❯',
+	spacerSymbol: '/',
 	rootName: 'Home',
 	resolveFrontmatterTitle: true,
 	showCurrentPage: true,
@@ -53,8 +53,25 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
 			return null
 		}
 
+		const getSeriesNameFromFolder = (node: (typeof pathNodes)[0]): string | undefined => {
+			if (node.seriesName) return node.seriesName
+
+			if (node.isFolder && node.children.length > 0) {
+				for (const child of node.children) {
+					if (child.data?.seriesName) {
+						return child.data.seriesName
+					}
+
+					const seriesFromDeeper = getSeriesNameFromFolder(child)
+					if (seriesFromDeeper) return seriesFromDeeper
+				}
+			}
+			return undefined
+		}
+
 		const crumbs: CrumbData[] = pathNodes.map((node, idx) => {
-			const crumb = formatCrumb(node.displayName, fileData.slug!, simplifySlug(node.slug))
+			let displayNameToUse = getSeriesNameFromFolder(node) || node.displayName
+			const crumb = formatCrumb(displayNameToUse, fileData.slug!, simplifySlug(node.slug))
 			if (idx === 0) {
 				crumb.displayName = options.rootName
 			}
@@ -70,6 +87,8 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
 		if (!options.showCurrentPage) {
 			crumbs.pop()
 		}
+
+		// console.log(crumbs)
 
 		return (
 			<nav class={classNames(displayClass, 'breadcrumb-container')} aria-label="breadcrumbs">

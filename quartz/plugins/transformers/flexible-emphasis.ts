@@ -13,13 +13,13 @@ export const FlexibleEmphasis: QuartzTransformerPlugin = () => {
 							if (!parent || index === undefined) return
 
 							const text = node.value
-							// Match **"text"** or **'text'** patterns
-							const strongPattern = /\*\*([^*]+?)\*\*/g
+							// Match **text** (strong) or *text* (emphasis) patterns
+							const emphasisPattern = /(\*\*[^*]+?\*\*|\*[^*]+?\*)/g
 
-							if (strongPattern.test(text)) {
+							if (emphasisPattern.test(text)) {
 								const newNodes: any[] = []
 								let lastIndex = 0
-								const matches = text.matchAll(/\*\*([^*]+?)\*\*/g)
+								const matches = text.matchAll(/(\*\*([^*]+?)\*\*|\*([^*]+?)\*)/g)
 
 								for (const match of matches) {
 									const matchIndex = match.index!
@@ -32,16 +32,30 @@ export const FlexibleEmphasis: QuartzTransformerPlugin = () => {
 										})
 									}
 
-									// Add strong node
-									newNodes.push({
-										type: 'strong',
-										children: [
-											{
-												type: 'text',
-												value: match[1],
-											},
-										],
-									})
+									// Check if it's strong (**text**) or emphasis (*text*)
+									if (match[2]) {
+										// Strong pattern
+										newNodes.push({
+											type: 'strong',
+											children: [
+												{
+													type: 'text',
+													value: match[2],
+												},
+											],
+										})
+									} else if (match[3]) {
+										// Emphasis pattern
+										newNodes.push({
+											type: 'emphasis',
+											children: [
+												{
+													type: 'text',
+													value: match[3],
+												},
+											],
+										})
+									}
 
 									lastIndex = matchIndex + match[0].length
 								}

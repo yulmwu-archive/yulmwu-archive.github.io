@@ -13,7 +13,7 @@ series:
 thumbnail: ../../thumbnails/kubernetes/kubernetes-gc-ownerreferences-finalizer.png
 linked_posts:
     previous: 2025-12-09-kubernetes-csa-ssa
-    next: 2025-12-09-kubernetes-gitops-argocd
+    next: 2025-12-09-kubernetes-pac-with-gatekeeper-and-kyverno
 is_private: false
 ---
 

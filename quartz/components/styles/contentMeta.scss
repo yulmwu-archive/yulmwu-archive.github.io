@@ -1,14 +1,26 @@
 .content-meta {
 	margin-top: 1rem;
 	color: var(--darkgray);
+	padding-bottom: 1rem;
+	border-bottom: 1px solid var(--lightgray);
 
 	&[show-comma='true'] {
 		> *:not(:last-child) {
-			margin-right: 8px;
+			margin-right: 0;
 
 			&::after {
-				content: ',';
+				content: '';
+				display: inline-block;
+				width: 1.5px;
+				height: 1em;
+				background-color: var(--gray);
+				margin: 0 16px;
+				vertical-align: middle;
 			}
 		}
+	}
+
+	.content-meta-author {
+		font-weight: 600;
 	}
 }

@@ -5,6 +5,7 @@ interface FileTrieData {
 	slug: string
 	title: string
 	filePath: string
+	seriesName?: string
 }
 
 export class FileTrieNode<T extends FileTrieData = ContentDetails> {
@@ -47,6 +48,10 @@ export class FileTrieNode<T extends FileTrieData = ContentDetails> {
 
 	get slugSegment(): string {
 		return this.slugSegments[this.slugSegments.length - 1]
+	}
+
+	get seriesName(): string | undefined {
+		return this.data?.seriesName
 	}
 
 	private makeChild(path: string[], file?: T) {
