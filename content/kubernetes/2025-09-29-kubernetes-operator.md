@@ -1,19 +1,19 @@
 ---
-title: "[Kubernetes] Operator and Operator Pattern"
-description: "쿠버네티스 Operator 패턴을 통한 Day 2 Operation 자동화"
-slug: "2025-09-29-kubernetes-operator"
+title: '[Kubernetes] Operator and Operator Pattern'
+description: '쿠버네티스 Operator 패턴을 통한 Day 2 Operation 자동화'
+slug: '2025-09-29-kubernetes-operator'
 author: yulmwu
 date: 2025-09-29T23:24:51.261Z
 updated_at: 2026-01-13T04:04:54.115Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-operator.png
 linked_posts:
-  previous: 2025-09-29-kubernetes-pod-probe
-  next: 2025-09-29-kubernetes-operator-go
+    previous: 2025-09-29-kubernetes-pod-probe
+    next: 2025-09-29-kubernetes-operator-go
 is_private: false
 ---
 
@@ -22,13 +22,12 @@ is_private: false
 쿠버네티스에선 컨트롤러를 통해 클러스터의 리소스나 상태를 원하는 상태로 수렴하려는 특징을 가지고 있다.
 
 > [**Controller pattern**](https://kubernetes.io/docs/concepts/architecture/controller)
-> 
+>
 > A controller tracks at least one Kubernetes resource type. These objects have a spec field that represents the desired state. The controller(s) for that resource are responsible for making the current state come closer to that desired state.
-> 
-> The controller might carry the action out itself; more commonly, in Kubernetes, a controller will send messages to the API server that have useful side effects. 
-> 
+>
+> The controller might carry the action out itself; more commonly, in Kubernetes, a controller will send messages to the API server that have useful side effects.
+>
 > _출처: https://kubernetes.io/docs/concepts/architecture/controller_
-
 
 쿠버네티스에선 상태를 선언하고, 이러한 컨트롤러를 루프(Reconcile Loop)로 돌려 의도한 상태에 가깝게 만드는데, 이를 컨트롤러 패턴이라고 부른다.
 
@@ -43,7 +42,7 @@ is_private: false
 물론 StatefulSet과 같은 네이티브 오브젝트가 있겠지만 제한이 있고, DB와 같이 Primary/Replica 구성, Failover 시 대처, 백업/복구 등에서 쿠버네티스 네이티브 오브젝트를 수동으로 다뤄야한다.
 
 > 일반적인 클라우드 환경에선 Stateful한 데이터베이스는 주로 클라우드에서 제공되는 편이고, 쿠버네티스에선 Stateless 애플리케이션을 올리는 것이 적절하다.
-> 
+>
 > AWS 기준 RDS, DocumentDB, DynamoDB, OpenSearch(ElasticSearch), 그리고 인메모리 NoSQL의 대표적인 Redis (OSS)는 ElastiCache과 같은 완전 관리형 서비스로 제공된다.
 
 또한 ConfigMap, Secret, PVC 등의 설정 값이 자주 변경될 때 이를 적용하기 위해 파드를 수동으로 재시작하는 등의 귀찮은 작업을 거쳐야 한다.
@@ -56,7 +55,7 @@ is_private: false
 하지만 그러한 Day 2 Operation에 대해 쿠버네티스 네이티브 오브젝트를 통해 다루긴 어려웠는데, 그래서 복잡한 Day 2 Operation에서 운영자(Operator)의 Operational Knowledge를 컨트롤러 자체에 코드로 옮기자는 개념이 바로 **Operator 패턴**이다.
 
 > **Operational Knowledge**
-> 
+>
 > 필자가 한글로 번역하진 않았지만, 쉽게 말해 운영 시 필요한 메뉴얼이나 노하우라 생각하면 편할 것이다.
 > 실제로 여기엔 장애 발생 시 Failover, 백업/복구, 버전 업그레이드 등의 운영자가 수동으로 하던 절차를 말한다.
 
@@ -72,11 +71,11 @@ CRD(Custom Resource Definition)와 컨트롤러는 포스팅 후반에서 Go 언
 apiVersion: database.example.com/v1
 kind: SampleDB
 metadata:
-  name: my-db
+    name: my-db
 spec:
-  version: "1.2.3"
-  replicas: 3
-  backupSchedule: "0 2 * * *"
+    version: '1.2.3'
+    replicas: 3
+    backupSchedule: '0 2 * * *'
 ```
 
 이를 위해선 CRD와 이 CR 매니페스트를 보고 Operation 동작(StatefulSet, PVC, Service 자동 생성/조정, 버전 업그레이드, 백업 등 자동화)을 위한 비즈니스 로직은 Operator 컨트롤러를 통해 구현된다.
@@ -108,48 +107,48 @@ helm repo update
 # kps-values.yaml
 
 global:
-  rbac:
-    create: true
+    rbac:
+        create: true
 
 prometheus:
-  service:
-    type: ClusterIP
-  prometheusSpec:
-    retention: 15d
-    scrapeInterval: 30s
-    evaluationInterval: 30s
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 20Gi
-          # storageClassName: gp3
-    serviceMonitorSelector: {}
-    serviceMonitorNamespaceSelector: {}
-    podMonitorSelector: {}
-    podMonitorNamespaceSelector: {}
-    probeSelector: {}
-    probeNamespaceSelector: {}
-    scrapeConfigSelector: {}
-    scrapeConfigNamespaceSelector: {}
+    service:
+        type: ClusterIP
+    prometheusSpec:
+        retention: 15d
+        scrapeInterval: 30s
+        evaluationInterval: 30s
+        storageSpec:
+            volumeClaimTemplate:
+                spec:
+                    accessModes: ['ReadWriteOnce']
+                    resources:
+                        requests:
+                            storage: 20Gi
+                    # storageClassName: gp3
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
+        probeSelector: {}
+        probeNamespaceSelector: {}
+        scrapeConfigSelector: {}
+        scrapeConfigNamespaceSelector: {}
 
 alertmanager:
-  alertmanagerSpec:
-    replicas: 1
+    alertmanagerSpec:
+        replicas: 1
 
 grafana:
-  adminUser: admin
-  service:
-    type: ClusterIP
-  defaultDashboardsEnabled: true
+    adminUser: admin
+    service:
+        type: ClusterIP
+    defaultDashboardsEnabled: true
 
 kube-state-metrics:
-  enabled: true
+    enabled: true
 
 nodeExporter:
-  enabled: true
+    enabled: true
 ```
 
 그리고 아래의 Helm 명령어로 Prometheus Stack을 설치한다.
@@ -190,40 +189,40 @@ kubectl --namespace monitoring get secrets kps-grafana -o jsonpath="{.data.admin
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: example-app
-  namespace: default
-  labels: { app: example-app }
+    name: example-app
+    namespace: default
+    labels: { app: example-app }
 spec:
-  replicas: 1
-  selector:
-    matchLabels: { app: example-app }
-  template:
-    metadata:
-      labels: { app: example-app }
-    spec:
-      containers:
-        - name: app
-          image: rlawnsdud/demo
-          ports:
-            - containerPort: 8080
-          env:
-            - name: HOST
-              value: "0.0.0.0"
-            - name: PORT
-              value: "8080"
+    replicas: 1
+    selector:
+        matchLabels: { app: example-app }
+    template:
+        metadata:
+            labels: { app: example-app }
+        spec:
+            containers:
+                - name: app
+                  image: rlawnsdud/demo
+                  ports:
+                      - containerPort: 8080
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '8080'
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: example-app
-  namespace: default
-  labels: { app: example-app }
+    name: example-app
+    namespace: default
+    labels: { app: example-app }
 spec:
-  selector: { app: example-app }
-  ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
+    selector: { app: example-app }
+    ports:
+        - name: http
+          port: 8080
+          targetPort: 8080
 ```
 
 여기까지 만들었다면 아직 Grafana Prometheus 대시보드에 데이터가 없을 것이다.
@@ -238,21 +237,21 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: example-app
-  namespace: default
-  labels:
-    release: kps
-    app: example-app
+    name: example-app
+    namespace: default
+    labels:
+        release: kps
+        app: example-app
 spec:
-  selector:
-    matchLabels:
-      app: example-app
-  namespaceSelector:
-    matchNames: ["default"]
-  endpoints:
-    - port: http
-      interval: 30s
-      path: /metrics
+    selector:
+        matchLabels:
+            app: example-app
+    namespaceSelector:
+        matchNames: ['default']
+    endpoints:
+        - port: http
+          interval: 30s
+          path: /metrics
 ```
 
 ```shell

@@ -1,24 +1,24 @@
 ---
-title: "[NestJS] Using AWS S3 Presigned URL (POST)"
-description: "NestJS에서 AWS S3 Presigned URL 사용하기 (POST 방식)"
-slug: "2025-08-08-nestjs-s3-presigned-url-post"
+title: '[NestJS] Using AWS S3 Presigned URL (POST)'
+description: 'NestJS에서 AWS S3 Presigned URL 사용하기 (POST 방식)'
+slug: '2025-08-08-nestjs-s3-presigned-url-post'
 author: yulmwu
 date: 2025-08-08T11:43:35.057Z
 updated_at: 2026-01-15T18:54:32.111Z
-categories: ["NestJS"]
-tags: ["NestJS", "aws"]
+categories: ['NestJS']
+tags: ['NestJS', 'aws']
 series:
-  name: NestJS
-  slug: nestjs
+    name: NestJS
+    slug: nestjs
 thumbnail: ../../thumbnails/nestjs/nestjs-s3-presigned-url-post.png
 linked_posts:
-  previous: 2025-08-08-nestjs-s3-presigned-url
-  next: 
+    previous: 2025-08-08-nestjs-s3-presigned-url
+    next:
 is_private: false
 ---
 
-> 저번 포스팅 [[NestJS] Using AWS S3 Presigned URL](https://velog.io/@yulmwu/nestjs-s3-presigned-url)에서 이어집니다. 
-> 
+> 저번 포스팅 [[NestJS] Using AWS S3 Presigned URL](https://velog.io/@yulmwu/nestjs-s3-presigned-url)에서 이어집니다.
+>
 > 위 포스팅에서 Presigned URL 개념에 대해 다루니 참고하시길 바랍니다.
 
 # 0. Overview
@@ -75,24 +75,24 @@ import { ConfigService } from '@nestjs/config'
 import { S3Client } from '@aws-sdk/client-s3'
 
 @Module({
-    controllers: [UploadController],
-    providers: [
-        {
-            provide: 'S3_CLIENT',
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => {
-                return new S3Client({
-                    region: configService.get<string>('AWS_REGION') ?? 'ap-northeast-2',
-                    credentials: {
-                        accessKeyId: configService.get('AWS_ACCESS_KEY_ID') ?? '',
-                        secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY') ?? '',
-                    },
-                })
-            },
-        },
-        UploadService,
-    ],
-    exports: [UploadService],
+	controllers: [UploadController],
+	providers: [
+		{
+			provide: 'S3_CLIENT',
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => {
+				return new S3Client({
+					region: configService.get<string>('AWS_REGION') ?? 'ap-northeast-2',
+					credentials: {
+						accessKeyId: configService.get('AWS_ACCESS_KEY_ID') ?? '',
+						secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY') ?? '',
+					},
+				})
+			},
+		},
+		UploadService,
+	],
+	exports: [UploadService],
 })
 export class UploadModule {}
 ```
@@ -111,30 +111,30 @@ import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UploadService {
-    constructor(
-        @Inject('S3_CLIENT')
-        private readonly s3: S3Client,
-        private readonly configService: ConfigService,
-    ) {}
+	constructor(
+		@Inject('S3_CLIENT')
+		private readonly s3: S3Client,
+		private readonly configService: ConfigService,
+	) {}
 
-    async generatePresignedUrl(dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
-        const key = `uploads/${uuidv4()}/${dto.filename}`
+	async generatePresignedUrl(dto: GeneratePresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
+		const key = `uploads/${uuidv4()}/${dto.filename}`
 
-        const { url, fields } = await createPresignedPost(this.s3, {
-            Bucket: this.configService.get<string>('AWS_S3_BUCKET_NAME') ?? '',
-            Key: key,
-            Fields: {
-                'Content-Type': dto.contentType,
-            },
-            Conditions: [
-                ['content-length-range', 0, 3 * 1024 * 1024], // Max 3MB
-                ['starts-with', '$Content-Type', 'image/'],
-            ],
-            Expires: 600, // 10 minutes
-        })
+		const { url, fields } = await createPresignedPost(this.s3, {
+			Bucket: this.configService.get<string>('AWS_S3_BUCKET_NAME') ?? '',
+			Key: key,
+			Fields: {
+				'Content-Type': dto.contentType,
+			},
+			Conditions: [
+				['content-length-range', 0, 3 * 1024 * 1024], // Max 3MB
+				['starts-with', '$Content-Type', 'image/'],
+			],
+			Expires: 600, // 10 minutes
+		})
 
-        return { url, key, fields }
-    }
+		return { url, key, fields }
+	}
 }
 ```
 
@@ -176,4 +176,4 @@ https://github.com/yulmwu/0725/tree/main/backend/src/modules/upload
 
 이처럼 Presigned URL을 PUT 방식으로 보내는 방식보단 POST 방식으로 보내면서 크기 제한까지 걸어두는걸 추천한다. 누군가의 공짜 파일 저장소나 S3 요금 폭탄을 경험하고 싶지 않다며 말이다.
 
-끝. 
+끝.

@@ -1,24 +1,24 @@
 ---
-title: "[AWS CI/CD] EC2 Deployment with CodeDeploy + Github Actions #2 (with Auto Scaling)"
-description: "AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (EC2 Auto Scaling)"
-slug: "2025-07-25-aws-codedeploy-asg"
+title: '[AWS CI/CD] EC2 Deployment with CodeDeploy + Github Actions #2 (with Auto Scaling)'
+description: 'AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (EC2 Auto Scaling)'
+slug: '2025-07-25-aws-codedeploy-asg'
 author: yulmwu
 date: 2025-07-25T02:30:31.679Z
 updated_at: 2026-01-02T02:36:31.454Z
-categories: ["AWS"]
-tags: ["CI/CD", "aws"]
+categories: ['AWS']
+tags: ['CI/CD', 'aws']
 series:
-  name: AWS
-  slug: aws
+    name: AWS
+    slug: aws
 thumbnail: ../../thumbnails/aws/aws-codedeploy-asg.png
 linked_posts:
-  previous: 2025-07-25-aws-codedeploy-single-ec2
-  next: 2025-07-25-aws-codepipeline
+    previous: 2025-07-25-aws-codedeploy-single-ec2
+    next: 2025-07-25-aws-codepipeline
 is_private: false
 ---
 
 > 본 블로그의 [[AWS] EC2 Deployment with CodeDeploy + Github Actions (Single EC2 Instance)](https://velog.io/@yulmwu/aws-codedeploy-single-ec2) 글과 연계되며, 단일 EC2 인스턴스에 CodeDeploy를 적용하는 것을 응용하여 오토 스케일링이 적용된 아키텍처에 CodeDeploy를 적용하는 포스팅입니다.
-> 
+>
 > 개념 설명은 위 글에서 다루며, 본 포스팅에선 아키텍처를 구축하는 과정만 제공합니다.
 
 # 0. Overview
@@ -29,7 +29,7 @@ is_private: false
 
 초반 구축 과정과 AppSpec, 스크립트 등은 비슷하나 Blue/Green 방식이기 때문에 살짝의 차이는 있다.
 
-소스 코드의 경우 전 포스팅과 구분하여 아래의 깃허브 레포지토리에 올려두었다. 
+소스 코드의 경우 전 포스팅과 구분하여 아래의 깃허브 레포지토리에 올려두었다.
 
 https://github.com/eocndp/aws-codedeploy-example-asg
 
@@ -43,7 +43,7 @@ https://github.com/eocndp/aws-codedeploy-example-asg
 
 필자는 NAT Gateway를 사용할 것이고, 각 퍼블릭 서브넷에 NAT Gateway를 올려둬도 되지만 NAT Gateway 요금이 살짝 빡세기 때문에 하나만 만들고 라우팅 테이블을 고쳐 사용할 것이다.
 
-그리고 앞서 설명했듯 배포 방식은 Blue/Green으로 사용하며, 이를 위해선 CodeDeploy 설정을 하기 전 로드밸런싱(ALB) 설정이 꼭 필요하다. 
+그리고 앞서 설명했듯 배포 방식은 Blue/Green으로 사용하며, 이를 위해선 CodeDeploy 설정을 하기 전 로드밸런싱(ALB) 설정이 꼭 필요하다.
 
 # 2. Let's build the Infra
 
@@ -92,7 +92,7 @@ pm2 -v
 
 ![](https://velog.velcdn.com/images/yulmwu/post/58a0e874-b0e7-4cde-b25d-6f12cb917a17/image.png)
 
-다음으로 이 EC2의 AMI를 만들자. 
+다음으로 이 EC2의 AMI를 만들자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/a086b227-3bce-4497-b18b-225afe2f6030/image.png)
 
@@ -104,7 +104,7 @@ Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 �
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ab30af34-e26c-494b-aa98-c938d2898f1b/image.png)
 
-만들어둔 VPC의 퍼블릭 서브넷에 만들고 퍼블릭 IP를 할당한다. 
+만들어둔 VPC의 퍼블릭 서브넷에 만들고 퍼블릭 IP를 할당한다.
 
 그리고 SSH로 접속한 뒤 AMI를 만들때 생성하였던 키페어 파일을 옮겨놓도록 하자.
 
@@ -113,7 +113,6 @@ Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 �
 ![](https://velog.velcdn.com/images/yulmwu/post/76a53353-e24b-405f-9d94-6648caf8ccf4/image.png)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/48e889a3-c2a2-475e-b357-cb3ea6bb3b24/image.png)
-
 
 ## Launch Template
 
@@ -131,7 +130,7 @@ Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 �
 
 ## Auto Scaling Group
 
-다음으로 오토스케일링 그룹을 설정해보자. 
+다음으로 오토스케일링 그룹을 설정해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/d5a3895b-5f2b-4365-8f70-d6f8e588a0bd/image.png)
 
@@ -175,7 +174,7 @@ Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 �
 
 ## CodeDeploy
 
-이제 CodeDeploy 세팅을 해보자. 
+이제 CodeDeploy 세팅을 해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e3b1888b-fc46-462f-b26a-f454ff77de03/image.png)
 
@@ -223,7 +222,6 @@ CodeDeploy에서 그 과정을 확인할 수 있으며, 아래와 같이 인스�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c6636e61-5498-4899-9e2b-c782edd5bfd9/image.png)
 
-
 ![](https://velog.velcdn.com/images/yulmwu/post/c651d368-a0cc-4a17-9de1-2c6c7bc0cbde/image.png)
 
 또한 CodeDeploy에서 Lifecycle 이벤트에 대한 과정도 볼 수 있으며, In Place에선 없던 AllowTraffic과 AfterAllowTraffic이 보이는 것을 볼 수 있다.
@@ -242,7 +240,7 @@ CodeDeploy에서 그 과정을 확인할 수 있으며, 아래와 같이 인스�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/76557b8f-2806-41c7-b795-dbee8eccc18e/image.png)
 
-위와 같이 코드를 수정한 뒤 다시 Push해보자. 
+위와 같이 코드를 수정한 뒤 다시 Push해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c893887a-7bd6-4f83-8e05-ee9e4962fb2a/image.png)
 
@@ -254,7 +252,7 @@ CodeDeploy에서 그 과정을 확인할 수 있으며, 아래와 같이 인스�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/1f46b13f-574c-4f56-bffc-f103c73ae8a5/image.png)
 
-CodeDeploy에서 배포 시 위와 같은 에러가 발생할 수 있다. 
+CodeDeploy에서 배포 시 위와 같은 에러가 발생할 수 있다.
 
 해외 포럼을 찾아보니 관련 오류가 있는 듯 하다.
 
@@ -273,6 +271,6 @@ CodeDeploy에서 배포 시 위와 같은 에러가 발생할 수 있다.
 
 ## Error #2 - Health Check Fail
 
-그리고 `AllowTraffic`이나 `BlockTraffic` 과정에서 무한 로딩이 걸려 넘어가지 않을 때가 있다. 그럴땐 원본 인스턴스나 새롭게 생성된 인스턴스가 Health한지 체크해보도록 하자. 
+그리고 `AllowTraffic`이나 `BlockTraffic` 과정에서 무한 로딩이 걸려 넘어가지 않을 때가 있다. 그럴땐 원본 인스턴스나 새롭게 생성된 인스턴스가 Health한지 체크해보도록 하자.
 
 ALB 대상 그룹에서 Health하지 않으면 무한로딩이 되는 듯 싶다. 특히 필자는 테스트로 서버에서 3000번 포트로 열었기 때문에 대상 그룹에서 3000번 포트로 설정되어 있는지 체크해보자.

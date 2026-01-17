@@ -1,19 +1,19 @@
 ---
-title: "[AWS Computing] Configure EC2 Bastion Host"
-description: "AWS EC2 Bastion Host 구성 방법"
-slug: "2025-07-18-ec2-bastion-host"
+title: '[AWS Computing] Configure EC2 Bastion Host'
+description: 'AWS EC2 Bastion Host 구성 방법'
+slug: '2025-07-18-ec2-bastion-host'
 author: yulmwu
 date: 2025-07-18T11:55:33.318Z
 updated_at: 2026-01-14T08:59:36.167Z
-categories: ["AWS"]
-tags: ["Computing", "aws"]
+categories: ['AWS']
+tags: ['Computing', 'aws']
 series:
-  name: AWS
-  slug: aws
+    name: AWS
+    slug: aws
 thumbnail: ../../thumbnails/aws/ec2-bastion-host.png
 linked_posts:
-  previous: 2025-07-18-ecs-deploy
-  next: 2025-07-18-aws-deployment-with-ec2-ecs-and-documentdb-elasticache
+    previous: 2025-07-18-ecs-deploy
+    next: 2025-07-18-aws-deployment-with-ec2-ecs-and-documentdb-elasticache
 is_private: false
 ---
 
@@ -29,7 +29,7 @@ is_private: false
 
 그리고 다음날 인터넷 상에 돌아다니는 수많은 봇들에 의해 하나의 EC2가 공격을 받아 뻗어버렸다.
 
-여기에 만약 WAF와 같은 방화벽을 도입한다 해도, ELB(ALB) 앞에 붙이는 것은 무용지물이다. 
+여기에 만약 WAF와 같은 방화벽을 도입한다 해도, ELB(ALB) 앞에 붙이는 것은 무용지물이다.
 
 각 EC2는 퍼블릭 서브넷에 있고 퍼블릭 IP가 부여된 상태이기 때문에 그 IP로 공격하면 그만이기 때문이다.
 
@@ -43,7 +43,7 @@ is_private: false
 
 다만 그럴 경우 프라이빗 서브넷의 EC2 입장에선 외부(인터넷)과 통신 할 방법이 없어지므로(퍼블릭 IP도, IGW도 없음) NAT Gateway 등을 도입해야 한다.
 
-아무튼, 그런데 어떠한 이유로 EC2에 SSH나 SCP 등의 작업으로 프라이빗 서브넷의 EC2에 접근해야 되는 상황이 있을 수 있다. 
+아무튼, 그런데 어떠한 이유로 EC2에 SSH나 SCP 등의 작업으로 프라이빗 서브넷의 EC2에 접근해야 되는 상황이 있을 수 있다.
 
 그런데 EC2들은 프라이빗 서브넷에 위치하여 퍼블릭 IP 없이 프라이빗 IP만 가지고 있기 때문에 VPC 외부에서 직접 접근할 순 없다.
 
@@ -94,7 +94,7 @@ Bastion Host를 만들 땐 위와 같이 퍼블릭 서브넷에 만들고, 퍼�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/d94888ee-f097-4f16-85a6-619baba010c6/image.png)
 
-이렇게 Bastion Host EC2에 접속하였다. 
+이렇게 Bastion Host EC2에 접속하였다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/d2bd3124-e94b-4a3c-8d2d-2c49fd9b9d7d/image.png)
 
@@ -125,4 +125,3 @@ Bastion Host EC2의 프라이빗 IPv4 주소도 잘 나온다. 그럼 다음으�
 ![](https://velog.velcdn.com/images/yulmwu/post/8c72be9d-a91d-418d-9a49-1cc58dd1ff29/image.png)
 
 NAT Gateway 등을 달아주지 않았기 때문이다.
-

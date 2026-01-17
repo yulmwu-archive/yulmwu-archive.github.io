@@ -1,19 +1,19 @@
 ---
-title: "[Kubernetes] Service Mesh with Istio and Envoy Sidecar Proxy"
-description: "쿠버네티스에서 Istio 및 Envoy 사이드카 프록시를 통한 고급 서비스 메시 구성하기"
-slug: "2025-10-13-kubernetes-istio-envoy"
+title: '[Kubernetes] Service Mesh with Istio and Envoy Sidecar Proxy'
+description: '쿠버네티스에서 Istio 및 Envoy 사이드카 프록시를 통한 고급 서비스 메시 구성하기'
+slug: '2025-10-13-kubernetes-istio-envoy'
 author: yulmwu
 date: 2025-10-13T00:01:35.748Z
 updated_at: 2026-01-12T17:23:26.387Z
-categories: ["Kubernetes"]
-tags: ["kubernetes", "networking"]
+categories: ['Kubernetes']
+tags: ['kubernetes', 'networking']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-istio-envoy.png
 linked_posts:
-  previous: 2025-10-13-kubernetes-sealed-secrets
-  next: 2025-10-13-kubernetes-serviceaccount
+    previous: 2025-10-13-kubernetes-sealed-secrets
+    next: 2025-10-13-kubernetes-serviceaccount
 is_private: false
 ---
 
@@ -91,21 +91,21 @@ Istio에서 제공하는 쿠버네티스 CRD인 VirtualService, DestinationRule 
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: eks-istio-demo
-  region: ap-northeast-2
-  version: "1.33"
+    name: eks-istio-demo
+    region: ap-northeast-2
+    version: '1.33'
 vpc:
-  cidr: 10.1.0.0/16
-  nat:
-    gateway: Single
+    cidr: 10.1.0.0/16
+    nat:
+        gateway: Single
 managedNodeGroups:
-  - name: ng-1
-    instanceType: t3.medium
-    desiredCapacity: 1
-    privateNetworking: false
-    iam:
-      withAddonPolicies:
-        ebs: true
+    - name: ng-1
+      instanceType: t3.medium
+      desiredCapacity: 1
+      privateNetworking: false
+      iam:
+          withAddonPolicies:
+              ebs: true
 ```
 
 ```shell
@@ -127,20 +127,20 @@ aws eks update-kubeconfig --name eks-istio-demo --region ap-northeast-2
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 metadata:
-  name: istio-gwapi
+    name: istio-gwapi
 spec:
-  profile: default
-  meshConfig:
-    enableTracing: false
-    accessLogFile: /dev/stdout
-  values:
-    gateways:
-      istio-ingressgateway:
-        type: NodePort
-        enabled: true
-    pilot:
-      env:
-        PILOT_ENABLE_GATEWAY_API: "true"
+    profile: default
+    meshConfig:
+        enableTracing: false
+        accessLogFile: /dev/stdout
+    values:
+        gateways:
+            istio-ingressgateway:
+                type: NodePort
+                enabled: true
+        pilot:
+            env:
+                PILOT_ENABLE_GATEWAY_API: 'true'
 ```
 
 아래의 명령어로 이를 적용하고 설치한다.
@@ -167,127 +167,127 @@ kubectl label ns demo istio-injection=enabled
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp-v1
+    name: myapp-v1
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: myapp
-      version: v1
-  template:
-    metadata:
-      labels:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: myapp
+            version: v1
+    template:
+        metadata:
+            labels:
+                app: myapp
+                version: v1
+        spec:
+            containers:
+                - name: myapp
+                  image: rlawnsdud/demo
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '5678'
+                      - name: APP_NAME
+                        value: 'myapp v1'
+                  ports:
+                      - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: myapp-v1
+spec:
+    selector:
         app: myapp
         version: v1
-    spec:
-      containers:
-        - name: myapp
-          image: rlawnsdud/demo
-          env:
-            - name: HOST
-              value: "0.0.0.0"
-            - name: PORT
-              value: "5678"
-            - name: APP_NAME
-              value: "myapp v1"
-          ports:
-            - containerPort: 5678
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapp-v1
-spec:
-  selector:
-    app: myapp
-    version: v1
-  ports:
-    - name: http
-      port: 80
-      targetPort: 5678
+    ports:
+        - name: http
+          port: 80
+          targetPort: 5678
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp-v2
+    name: myapp-v2
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: myapp
-      version: v2
-  template:
-    metadata:
-      labels:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: myapp
+            version: v2
+    template:
+        metadata:
+            labels:
+                app: myapp
+                version: v2
+        spec:
+            containers:
+                - name: myapp
+                  image: rlawnsdud/demo
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '5678'
+                      - name: APP_NAME
+                        value: 'myapp v2'
+                  ports:
+                      - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: myapp-v2
+spec:
+    selector:
         app: myapp
         version: v2
-    spec:
-      containers:
-        - name: myapp
-          image: rlawnsdud/demo
-          env:
-            - name: HOST
-              value: "0.0.0.0"
-            - name: PORT
-              value: "5678"
-            - name: APP_NAME
-              value: "myapp v2"
-          ports:
-            - containerPort: 5678
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapp-v2
-spec:
-  selector:
-    app: myapp
-    version: v2
-  ports:
-    - name: http
-      port: 80
-      targetPort: 5678
+    ports:
+        - name: http
+          port: 80
+          targetPort: 5678
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: otherapp
+    name: otherapp
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: otherapp
-  template:
-    metadata:
-      labels:
-        app: otherapp
-    spec:
-      containers:
-        - name: otherapp
-          image: rlawnsdud/demo
-          env:
-            - name: HOST
-              value: "0.0.0.0"
-            - name: PORT
-              value: "5678"
-            - name: APP_NAME
-              value: "otherapp"
-            - name: GLOBAL_PREFIX
-              value: "/other"
-          ports:
-            - containerPort: 5678
+    replicas: 1
+    selector:
+        matchLabels:
+            app: otherapp
+    template:
+        metadata:
+            labels:
+                app: otherapp
+        spec:
+            containers:
+                - name: otherapp
+                  image: rlawnsdud/demo
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '5678'
+                      - name: APP_NAME
+                        value: 'otherapp'
+                      - name: GLOBAL_PREFIX
+                        value: '/other'
+                  ports:
+                      - containerPort: 5678
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: otherapp
+    name: otherapp
 spec:
-  selector:
-    app: otherapp
-  ports:
-    - name: http
-      port: 80
-      targetPort: 5678
+    selector:
+        app: otherapp
+    ports:
+        - name: http
+          port: 80
+          targetPort: 5678
 ```
 
 적용 후 생성된 파드를 선택하여 describe하면 아래와 같이 Istio Envoy 사이드카 프록시가 자동으로 인젝션 된 것을 볼 수 있다.
@@ -314,24 +314,25 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: istio
+    name: istio
 spec:
-  controllerName: istio.io/gateway-controller
+    controllerName: istio.io/gateway-controller
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: istio-gwapi
+    name: istio-gwapi
 spec:
-  gatewayClassName: istio
-  listeners:
-  - name: http
-    protocol: HTTP
-    port: 80
-    allowedRoutes:
-      namespaces: 
-        from: All
+    gatewayClassName: istio
+    listeners:
+        - name: http
+          protocol: HTTP
+          port: 80
+          allowedRoutes:
+              namespaces:
+                  from: All
 ```
+
 ```shell
 kubectl apply -n demo -f gateway.yaml
 ```
@@ -344,60 +345,61 @@ kubectl apply -n demo -f gateway.yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: myapp-route
+    name: myapp-route
 spec:
-  parentRefs:
-  - kind: Gateway
-    name: istio-gwapi
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
-    - name: myapp-v1
-      port: 80
-      weight: 80
-    - name: myapp-v2
-      port: 80
-      weight: 20
-    filters:
-    - type: RequestHeaderModifier
-      requestHeaderModifier:
-        add:
-          - name: X-Mesh
-            value: istio
-        set:
-          - name: X-Canary
-            value: "v2-20pct"
-    - type: ResponseHeaderModifier
-      responseHeaderModifier:
-        add:
-          - name: X-Mesh
-            value: istio
-        set:
-          - name: X-Canary
-            value: "v2-20pct"
+    parentRefs:
+        - kind: Gateway
+          name: istio-gwapi
+    rules:
+        - matches:
+              - path:
+                    type: PathPrefix
+                    value: /
+          backendRefs:
+              - name: myapp-v1
+                port: 80
+                weight: 80
+              - name: myapp-v2
+                port: 80
+                weight: 20
+          filters:
+              - type: RequestHeaderModifier
+                requestHeaderModifier:
+                    add:
+                        - name: X-Mesh
+                          value: istio
+                    set:
+                        - name: X-Canary
+                          value: 'v2-20pct'
+              - type: ResponseHeaderModifier
+                responseHeaderModifier:
+                    add:
+                        - name: X-Mesh
+                          value: istio
+                    set:
+                        - name: X-Canary
+                          value: 'v2-20pct'
 ```
+
 ```yaml
 # httproute-otherapp.yaml
 
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: other-route
+    name: other-route
 spec:
-  parentRefs:
-  - kind: Gateway
-    name: istio-gwapi
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /other
-    backendRefs:
-    - name: otherapp
-      port: 80
+    parentRefs:
+        - kind: Gateway
+          name: istio-gwapi
+    rules:
+        - matches:
+              - path:
+                    type: PathPrefix
+                    value: /other
+          backendRefs:
+              - name: otherapp
+                port: 80
 ```
 
 ```shell
@@ -444,6 +446,7 @@ if total > 0:
 else:
     print("No valid responses.")
 ```
+
 ```shell
 > python3 check_canary.py
 v1: 79, v2: 21
@@ -460,49 +463,49 @@ v1: 79.0% / v2: 21.0%
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: ingress-local-ratelimit
+    name: ingress-local-ratelimit
 spec:
-  workloadSelector:
-    labels:
-      istio: ingressgateway
-  configPatches:
-    - applyTo: HTTP_FILTER
-      match:
-        context: SIDECAR_INBOUND
-        listener:
-          filterChain:
-            filter:
-              name: "envoy.filters.network.http_connection_manager"
-      patch:
-        operation: INSERT_BEFORE
-        value:
-          name: envoy.filters.http.local_ratelimit
-          typed_config:
-            "@type": type.googleapis.com/udpa.type.v1.TypedStruct
-            type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
-            value:
-              stat_prefix: http_local_rate_limiter
-              token_bucket:
-                max_tokens: 10
-                tokens_per_fill: 5
-                fill_interval: 60s
-              filter_enabled:
-                runtime_key: local_rate_limit_enabled
-                default_value:
-                  numerator: 100
-                  denominator: HUNDRED
-              filter_enforced:
-                runtime_key: local_rate_limit_enforced
-                default_value:
-                  numerator: 100
-                  denominator: HUNDRED
-              response_headers_to_add:
-                - append_action: APPEND_IF_EXISTS_OR_ADD
-                  header:
-                    key: x-rate-limited
-                    value: TOO_MANY_REQUESTS
-              status:
-                code: 429
+    workloadSelector:
+        labels:
+            istio: ingressgateway
+    configPatches:
+        - applyTo: HTTP_FILTER
+          match:
+              context: SIDECAR_INBOUND
+              listener:
+                  filterChain:
+                      filter:
+                          name: 'envoy.filters.network.http_connection_manager'
+          patch:
+              operation: INSERT_BEFORE
+              value:
+                  name: envoy.filters.http.local_ratelimit
+                  typed_config:
+                      '@type': type.googleapis.com/udpa.type.v1.TypedStruct
+                      type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+                      value:
+                          stat_prefix: http_local_rate_limiter
+                          token_bucket:
+                              max_tokens: 10
+                              tokens_per_fill: 5
+                              fill_interval: 60s
+                          filter_enabled:
+                              runtime_key: local_rate_limit_enabled
+                              default_value:
+                                  numerator: 100
+                                  denominator: HUNDRED
+                          filter_enforced:
+                              runtime_key: local_rate_limit_enforced
+                              default_value:
+                                  numerator: 100
+                                  denominator: HUNDRED
+                          response_headers_to_add:
+                              - append_action: APPEND_IF_EXISTS_OR_ADD
+                                header:
+                                    key: x-rate-limited
+                                    value: TOO_MANY_REQUESTS
+                          status:
+                              code: 429
 ```
 
 ```shell
@@ -528,7 +531,7 @@ curl -I http://3.34.180.38:32165
 
 그러면 아래와 같은 결과가 나타날 것이다.
 
-```  
+```
   20 200
   80 429
 HTTP/1.1 429 Too Many Requests
@@ -551,6 +554,7 @@ x-mesh: istio
 ```shell
 > seq 1 100 | xargs -I{} -P100 curl -s -o /dev/null -w "%{http_code}\n" http://3.34.180.38:32165/other | sort | uniq -c && curl -I http://3.34.180.38:32165/other
 ```
+
 ```
   10 200
   90 429

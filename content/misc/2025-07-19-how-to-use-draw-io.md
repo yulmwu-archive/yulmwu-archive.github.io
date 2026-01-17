@@ -1,19 +1,19 @@
 ---
-title: "[Tools] AWS 다이어그램 만드는 방법 (draw.io)"
-description: "다이어그램 도구, draw.io 사용법 (AWS 다이어그램 만드는 방법)"
-slug: "2025-07-19-how-to-use-draw-io"
+title: '[Tools] AWS 다이어그램 만드는 방법 (draw.io)'
+description: '다이어그램 도구, draw.io 사용법 (AWS 다이어그램 만드는 방법)'
+slug: '2025-07-19-how-to-use-draw-io'
 author: yulmwu
 date: 2025-07-19T06:05:51.558Z
 updated_at: 2026-01-17T05:17:20.007Z
-categories: ["Misc"]
-tags: ["aws"]
+categories: ['Misc']
+tags: ['aws']
 series:
-  name: Misc
-  slug: misc
+    name: Misc
+    slug: misc
 thumbnail: ../../thumbnails/misc/how-to-use-draw-io.png
 linked_posts:
-  previous: 2025-07-19-refund-aws
-  next: 2025-07-19-memoir-2025
+    previous: 2025-07-19-refund-aws
+    next: 2025-07-19-memoir-2025
 is_private: false
 ---
 
@@ -90,11 +90,11 @@ EC2를 가져왔는데, 기본적으로 너무 크다. 필자는 40x40 사이즈
 
 ![](https://velog.velcdn.com/images/yulmwu/post/5ac385ac-47dd-4c57-ae99-230abeb8d9a8/image.png)
 
-요소도 더블 클릭하면 이름을 바꿀 수 있다. 
+요소도 더블 클릭하면 이름을 바꿀 수 있다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4ee9e22f-3128-40bb-b6b0-74baeee954f5/image.png)
 
-그런식으로 요소(도형)들을 배치한다. 
+그런식으로 요소(도형)들을 배치한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b6f09147-ee61-48ac-a3e9-79c74985a49e/image.png)
 

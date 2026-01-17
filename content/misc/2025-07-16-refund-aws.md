@@ -1,19 +1,19 @@
 ---
-title: "[AWS Misc] 요금 환불 요청기"
-description: "Feat. 공중분해 될 뻔한 20달러 돌려받기"
-slug: "2025-07-16-refund-aws"
+title: '[AWS Misc] 요금 환불 요청기'
+description: 'Feat. 공중분해 될 뻔한 20달러 돌려받기'
+slug: '2025-07-16-refund-aws'
 author: yulmwu
 date: 2025-07-16T01:06:24.694Z
 updated_at: 2026-01-13T02:15:38.902Z
-categories: ["Misc"]
-tags: ["aws", "일상"]
+categories: ['Misc']
+tags: ['aws', '일상']
 series:
-  name: Misc
-  slug: misc
+    name: Misc
+    slug: misc
 thumbnail: ../../thumbnails/misc/refund-aws.png
 linked_posts:
-  previous: 
-  next: 2025-07-16-how-to-use-draw-io
+    previous:
+    next: 2025-07-16-how-to-use-draw-io
 is_private: false
 ---
 
@@ -67,7 +67,7 @@ Fargate는 프리티어가 아니란걸 알고 있었긴 했으니 여기에 대
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f17850f9-72a9-4641-b73a-0f6a26e3bad6/image.png)
 
-내용을 적어주고, 관련 이미지 2개도 첨부하였다. 
+내용을 적어주고, 관련 이미지 2개도 첨부하였다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e69dc713-fdfa-40cf-b48d-4a3bd555d025/image.png)
 
@@ -109,4 +109,3 @@ NAT Gateway 비용과 ECS Fargate 비용이 환불된 듯 하다.
 
 그리고 교내에서 했던 프로젝트였는데, 공동 2등으로 상금 10만원을 받아 손해는 없었긴 했다.
 (팀원이 3명인데 조장이라 4만원을 받기로 했음)
-

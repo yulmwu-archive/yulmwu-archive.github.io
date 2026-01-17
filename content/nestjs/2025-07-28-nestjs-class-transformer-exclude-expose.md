@@ -1,19 +1,19 @@
 ---
-title: "[NestJS] class-transformer @Exclude(), @Expose() Decorators and NestJS Interceptor"
-description: "NestJS Response DTO에서 특정 필드만 제외시킬 수 있을까? (Class Transformer)"
-slug: "2025-07-28-nestjs-class-transformer-exclude-expose"
+title: '[NestJS] class-transformer @Exclude(), @Expose() Decorators and NestJS Interceptor'
+description: 'NestJS Response DTO에서 특정 필드만 제외시킬 수 있을까? (Class Transformer)'
+slug: '2025-07-28-nestjs-class-transformer-exclude-expose'
 author: yulmwu
 date: 2025-07-28T05:31:07.318Z
 updated_at: 2026-01-13T04:05:06.876Z
-categories: ["NestJS"]
-tags: ["NestJS"]
+categories: ['NestJS']
+tags: ['NestJS']
 series:
-  name: NestJS
-  slug: nestjs
+    name: NestJS
+    slug: nestjs
 thumbnail: ../../thumbnails/nestjs/nestjs-class-transformer-exclude-expose.png
 linked_posts:
-  previous: 
-  next: 2025-07-28-nestjs-intersectiontype
+    previous:
+    next: 2025-07-28-nestjs-intersectiontype
 is_private: false
 ---
 
@@ -28,20 +28,20 @@ NestJS를 사용하여 API 서버 개발을 하고 있는데, 아래와 같은 �
 ```ts
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number
+	@PrimaryGeneratedColumn()
+	id: number
 
-    @Column({ unique: true })
-    username: string
+	@Column({ unique: true })
+	username: string
 
-    @Column()
-    password: string
+	@Column()
+	password: string
 
-    @Column()
-    email: string
+	@Column()
+	email: string
 
-    @OneToMany(() => Post, (post) => post.author)
-    posts: Post[]
+	@OneToMany(() => Post, (post) => post.author)
+	posts: Post[]
 }
 ```
 
@@ -72,15 +72,19 @@ async findByUsername(username: string) {
 
 ```ts
 class User {
-    constructor(public id: number, public username: string, public email: string) {}
+	constructor(
+		public id: number,
+		public username: string,
+		public email: string,
+	) {}
 
-    is_admin(): boolean {
-        return this.id === 1
-    }
+	is_admin(): boolean {
+		return this.id === 1
+	}
 
-    is_gmail(): boolean {
-        return this.email.endsWith('@gmail.com')
-    }
+	is_gmail(): boolean {
+		return this.email.endsWith('@gmail.com')
+	}
 }
 ```
 
@@ -88,9 +92,9 @@ class User {
 
 ```ts
 const obj = {
-    id: 1,
-    username: 'admin',
-    email: 'normal8781@gmail.com'
+	id: 1,
+	username: 'admin',
+	email: 'normal8781@gmail.com',
 }
 ```
 
@@ -112,7 +116,7 @@ import { plainToInstance } from 'class-transformer'
 const user = plainToInstance(User, obj) // User { ... }
 ```
 
-반대로 객체를 JSON Plain 데이터로 직렬화할 수 도 있다. 
+반대로 객체를 JSON Plain 데이터로 직렬화할 수 도 있다.
 
 ```ts
 import { plainToInstance } from 'class-transformer'
@@ -129,7 +133,7 @@ const plain = instanceToPlain(user) // { ... }
 우리가 개요에서 직면했던 문제가 클라이언트에게 반환할땐 특정 프로퍼티를 제거하는 것이였는데, `class-transformer`에서 데코레이터로 그러한 기능을 제공한다.
 
 > 데코레이터 사용 시 타입스크립트 설정(`tsconfig.json`)에서 아래 두가지 옵션을 활성화해줘야 한다.
-> 
+>
 > ```js
 > {
 >   "compilerOptions": {
@@ -143,20 +147,24 @@ const plain = instanceToPlain(user) // { ... }
 
 ```typescript
 class User {
-    @Exclude()
-    public email: string
+	@Exclude()
+	public email: string
 
-    constructor(public id: number, public username: string, email: string) {
-        this.email = email
-    }
+	constructor(
+		public id: number,
+		public username: string,
+		email: string,
+	) {
+		this.email = email
+	}
 
-    is_admin(): boolean {
-        return this.id === 1
-    }
+	is_admin(): boolean {
+		return this.id === 1
+	}
 
-    is_gmail(): boolean {
-        return this.email.endsWith('@gmail.com')
-    }
+	is_gmail(): boolean {
+		return this.email.endsWith('@gmail.com')
+	}
 }
 ```
 
@@ -176,7 +184,7 @@ import { Exclude, instanceToPlain, plainToInstance } from 'class-transformer'
 // class User {
 //    @Exclude()
 //    public email: string
-// 
+//
 // .. 생략
 
 const old = new User(obj.id, obj.username, obj.email) // 기존 방식
@@ -227,9 +235,9 @@ User { id: 1, username: 'admin', email: undefined }
 
 ## @Expose()
 
-`@Expose()` 데코레이터도 `@Exclude` 데코레이터와 같이 특정 프로퍼티를 제외시키는 상황에서 쓰이는데, 동작하는 것이 그 반대이다. 
+`@Expose()` 데코레이터도 `@Exclude` 데코레이터와 같이 특정 프로퍼티를 제외시키는 상황에서 쓰이는데, 동작하는 것이 그 반대이다.
 
-이게 무슨 말이냐, 쉽게 말해 `@Exclude()`가 붙은 프로퍼티만 제외되었다면 `@Expose()`는 이 데코레이터가 붙지 않은 데코레이터를 제외시킨다. 
+이게 무슨 말이냐, 쉽게 말해 `@Exclude()`가 붙은 프로퍼티만 제외되었다면 `@Expose()`는 이 데코레이터가 붙지 않은 데코레이터를 제외시킨다.
 
 아래의 코드는 위에서 `@Exclude()` 데코레이터 예제와 같은 동작을 한다.
 
@@ -238,31 +246,31 @@ import { Exclude, Expose } from 'class-transformer'
 
 @Exclude()
 class User {
-    @Expose()
-    public id: number
+	@Expose()
+	public id: number
 
-    @Expose()
-    public username: string
+	@Expose()
+	public username: string
 
-    public email: string
+	public email: string
 
-    constructor(id: number, username: string, email: string) {
-        this.id = id
-        this.username = username
-        this.email = email
-    }
+	constructor(id: number, username: string, email: string) {
+		this.id = id
+		this.username = username
+		this.email = email
+	}
 
-    is_admin(): boolean {
-        return this.id === 1
-    }
+	is_admin(): boolean {
+		return this.id === 1
+	}
 
-    is_gmail(): boolean {
-        return this.email.endsWith('@gmail.com')
-    }
+	is_gmail(): boolean {
+		return this.email.endsWith('@gmail.com')
+	}
 }
 ```
 
-다만 클래스 자체에 `@Exclude()` 데코레이터를 붙여줘야 하고, `@Expose()`의 경우 제외시킬 항목이 많은 경우 사용하면 유용하다. 
+다만 클래스 자체에 `@Exclude()` 데코레이터를 붙여줘야 하고, `@Expose()`의 경우 제외시킬 항목이 많은 경우 사용하면 유용하다.
 
 다만 클래스 상속에서 두 클래스가 각각 `@Exclude()` 방식과 `@Expose()` 방식으로 다르게 사용하고 있다면 상속에서 조심해야 한다.
 
@@ -303,9 +311,9 @@ import { map } from 'rxjs/operators'
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
-    intercept(_: ExecutionContext, next: CallHandler): Observable<any> {
-        return next.handle().pipe(map((data) => instanceToPlain(data)))
-    }
+	intercept(_: ExecutionContext, next: CallHandler): Observable<any> {
+		return next.handle().pipe(map((data) => instanceToPlain(data)))
+	}
 }
 ```
 
@@ -324,4 +332,3 @@ app.useGlobalInterceptors(new TransformInterceptor())
 ```
 
 그럼 된다. 끝.
-

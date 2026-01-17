@@ -1,32 +1,32 @@
 ---
-title: "[AWS CI/CD] ECS, S3 Deployment with CodePipeline"
-description: "AWS CodePipeline CI/CD를 통한 ECS, S3(정적 웹 호스팅) 배포 자동화 실습"
-slug: "2025-07-04-aws-codepipeline"
+title: '[AWS CI/CD] ECS, S3 Deployment with CodePipeline'
+description: 'AWS CodePipeline CI/CD를 통한 ECS, S3(정적 웹 호스팅) 배포 자동화 실습'
+slug: '2025-07-04-aws-codepipeline'
 author: yulmwu
 date: 2025-07-04T12:53:29.547Z
 updated_at: 2026-01-16T09:58:42.333Z
-categories: ["AWS"]
-tags: ["CI/CD", "aws"]
+categories: ['AWS']
+tags: ['CI/CD', 'aws']
 series:
-  name: AWS
-  slug: aws
+    name: AWS
+    slug: aws
 thumbnail: ../../thumbnails/aws/aws-codepipeline.png
 linked_posts:
-  previous: 2025-07-04-aws-codedeploy-asg
-  next: 2025-07-04-aws-sqs-sns
+    previous: 2025-07-04-aws-codedeploy-asg
+    next: 2025-07-04-aws-sqs-sns
 is_private: false
 ---
 
 # 0. Overview
 
 > 이 포스팅에서 사용된 아키텍처는 마이스터넷 지방기능경기대회 클라우드 부분 2024 1과제를 참고하였으며, 저작권은 마이스터넷(한국산업인력공단)에 있음을 미리 알립니다.
-> 
+>
 > ![](https://velog.velcdn.com/images/yulmwu/post/cfccee72-b147-4427-949d-b0a003e93666/image.png)
-> 
+>
 > 사용된 자료는 마이스터넷 "시행자료 및 공개 과제"를 참고하였습니다.
-> 
+>
 > 배포 파일은 따로 제공하지 않아 직접 배포할 코드를 작성하였고, 아래의 깃허브 레포지토리에서 확인할 수 있습니다.
-> 
+>
 > https://github.com/eocndp/aws-codepipeline-example-fe
 > https://github.com/eocndp/aws-codepipeline-example-be
 
@@ -35,24 +35,24 @@ is_private: false
 ![](https://velog.velcdn.com/images/yulmwu/post/882bc9d0-d719-4925-b035-49e05915f545/image.png)
 
 > ### ~~CodeCommit~~, CodeBuild, CodeDeploy: **CodePipeline**
-> 
-> AWS에서 제공하는 CI/CD 서비스들이다. 먼저 **CodeCommit**은 AWS에서 제공하는 Git 기반의 레포지토리이다. 쉽게 말해 AWS에서 제공하는 Github 레포지토리와 같은 것이다. 
-> 
+>
+> AWS에서 제공하는 CI/CD 서비스들이다. 먼저 **CodeCommit**은 AWS에서 제공하는 Git 기반의 레포지토리이다. 쉽게 말해 AWS에서 제공하는 Github 레포지토리와 같은 것이다.
+>
 > 다만 2024년 7월 25일 부로 CodeCommit의 신규 고객에 대한 접근이 종료되어 사실상 서비스 지원이 중단되었다. 그래서 본 포스팅에선 CodeCommit 대신 Github 레포지토리를 통해 CodePipeline과 연동하는 방식으로 진행한다.
 >
 > Github에선 CI/CD로 Github Actions를 제공하는데, AWS CodeCommit도 그러한 CI/CD 서비스를 제공한다.
-> 
+>
 > 그 중 **CodeBuild**는 CI(Continuous Integration, 지속적 통합) 서비스로, 코드 의존성 설치나 빌드, 테스트 등을 수행한다. 해당 포스팅에선 ECS에 배포하기 위해 ECR에 컨테이너 이미지를 올려야하므로 CodeBuild에서 이미지를 빌드한다.
-> 
+>
 > CodeBuild에선 소스 코드 내의 `buildspec.yml`를 참고하여 빌드를 하게 된다. 여기서 도커 이미지를 빌드하고 ECR에 배포까지 하게 된다.
-> 
+>
 > 다음으로 **CodeDeploy**는 CD(Continuous Deployment, 지속적 배포) 서비스로, CodeDeploy Agent가 설치된 EC2나 온프레미스 서버, 혹은 람다나 ECS 등에 배포한다.
-> 
+>
 > CodeDeploy에 대한 설명은 이전에 다른 포스팅에서 다뤘으니 아래의 링크를 참고해보자.
-> 
+>
 > https://velog.io/@yulmwu/aws-codedeploy-single-ec2
 > https://velog.io/@yulmwu/aws-codedeploy-asg
-> 
+>
 > 마지막으로 **CodePipeline**은 CodeCommit, CodeBuild, CodeDeploy를 하나의 프로세스로 통합시켜주는 서비스이다. 쉽게 말해 위 3개의 서비스를 모아다가 쉽게 진행될 수 있게 하는 서비스라는 것이다.
 
 프론트엔드의 경우 정적 웹 페이지 코드를 깃허브 레포지토리에 올린다. 이후 연동된 CodePipeline이 트리거되어 자동으로 S3에 그 코드들을 업로드한다.
@@ -76,7 +76,7 @@ S3는 정적 웹 페이지 호스팅 옵션이 켜져있고, 맨 앞단의 Cloud
 ### (1) S3
 
 > S3, CloudFront 파트는 세팅은 아래의 포스팅을 참고해도 좋다. 해당 포스팅에서도 CloudFront OAC를 만들어 S3에 연동하는데, 아래의 포스팅에서 설명되어 있다.
-> 
+>
 > https://velog.io/@yulmwu/aws-serverless#6-7-frontend-with-s3--cloudfront
 
 먼저 S3 버킷을 만들어보겠다.
@@ -121,7 +121,6 @@ CloudFront 배포 생성 UI가 좀 간단하게 바뀌어서 위 사진에서 Cr
 
 ![](https://velog.velcdn.com/images/yulmwu/post/28c38bd8-eee2-4ceb-aecd-a580d7c6992c/image.png)
 
-
 나머지는 그대로 냅두거나 알아서 설정하고 CloudFront를 생성한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/64daed9f-bd25-45f4-b773-284ec518c1b6/image.png)
@@ -130,24 +129,23 @@ CloudFront 배포 생성 UI가 좀 간단하게 바뀌어서 위 사진에서 Cr
 
 ```yml
 {
-  "Version": "2008-10-17",
-  "Id": "PolicyForCloudFrontPrivateContent",
-  "Statement": [
-      {
-          "Sid": "AllowCloudFrontServicePrincipal",
-          "Effect": "Allow",
-          "Principal": {
-              "Service": "cloudfront.amazonaws.com"
-          },
-          "Action": "s3:GetObject",
-          "Resource": "arn:aws:s3:::0801-test-bucket/*",
-          "Condition": {
-              "StringEquals": {
-                "AWS:SourceArn": "arn:aws:cloudfront::986129558966:distribution/E3O3HHFQ0EYZSL"
-              }
-          }
-      }
-  ]
+    'Version': '2008-10-17',
+    'Id': 'PolicyForCloudFrontPrivateContent',
+    'Statement':
+        [
+            {
+                'Sid': 'AllowCloudFrontServicePrincipal',
+                'Effect': 'Allow',
+                'Principal': { 'Service': 'cloudfront.amazonaws.com' },
+                'Action': 's3:GetObject',
+                'Resource': 'arn:aws:s3:::0801-test-bucket/*',
+                'Condition':
+                    {
+                        'StringEquals':
+                            { 'AWS:SourceArn': 'arn:aws:cloudfront::986129558966:distribution/E3O3HHFQ0EYZSL' },
+                    },
+            },
+        ],
 }
 ```
 
@@ -218,9 +216,9 @@ CodeCommit은 지원이 종료되었으나 CodePipeline에서 Github와 연동�
 
 ```yml
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 ```
 
 그리고 다음 버튼을 클릭한다. 그럼 빌드 스테이지와 테스트 스테이지 설정을 할 수 있는 화면이 나오는데, 둘 다 스킵한다.
@@ -233,7 +231,7 @@ on:
 
 ![](https://velog.velcdn.com/images/yulmwu/post/04c75b1d-a5cf-47e5-94f0-afbc5d82e8bf/image.png)
 
-그리고 파이프라인을 생성해보면 배포가 진행되는 것을 볼 수 있다. 
+그리고 파이프라인을 생성해보면 배포가 진행되는 것을 볼 수 있다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7d6cfe94-98e7-4de0-ab9b-bdb4f94d826f/image.png)
 
@@ -258,13 +256,13 @@ on:
 ```yml
 version: 0.2
 phases:
-  build:
-    commands:
-      - echo "Invalidating CloudFront cache..."
-      - |
-        aws cloudfront create-invalidation \
-          --distribution-id [DISTRIBUTION_ID] \
-          --paths "/*"
+    build:
+        commands:
+            - echo "Invalidating CloudFront cache..."
+            - |
+                aws cloudfront create-invalidation \
+                  --distribution-id [DISTRIBUTION_ID] \
+                  --paths "/*"
 ```
 
 이 과정은 포스팅에서 생략하였으며, 필요시 직접 해볼 수 있다.
@@ -275,7 +273,7 @@ phases:
 
 ### (1) Github Repository
 
-만찬가지로 깃허브 레포지토리를 생성해주었다. 
+만찬가지로 깃허브 레포지토리를 생성해주었다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/1f68d16d-e422-41f5-ad62-f92107b5ecf0/image.png)
 
@@ -326,7 +324,7 @@ ECR 레포지토리 설정과 이미지 업로드는 끝났다.
 
 ### (3) ALB(ELB)
 
-다음으로 ECS를 설정하기 전, 원활한 진행을 위해 ALB부터 설정해보겠다. 
+다음으로 ECS를 설정하기 전, 원활한 진행을 위해 ALB부터 설정해보겠다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/3c123586-6cca-44aa-9bbd-6bf69fb13ab5/image.png)
 
@@ -400,7 +398,6 @@ CodeBuild를 따로 만들고 CodePipeline에서 연결해야 편하다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/46ecbd64-64bc-481b-a49c-7c68ebe87ef2/image.png)
 
-
 그리고 Buildspec 파일 사용을 선택한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/6963d22d-0251-4008-96dd-96e81d74746e/image.png)
@@ -415,27 +412,27 @@ CodePipeline이나 CodeBuild를 사용하기 위해선 `buildspec.yml`이라는 
 version: 0.2
 
 phases:
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR
-      - aws --version
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      - IMAGE_TAG=latest
-  build:
-    commands:
-      - echo Building Docker image
-      - docker build -t $ECR_REPO_NAME:$IMAGE_TAG .
-      - docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
-  post_build:
-    commands:
-      - echo Pushing Docker image to ECR
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
-      - echo Writing image definition file
-      - printf '[{"name":"%s","imageUri":"%s"}]' $ECS_CONTAINER_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG > imagedefinitions.json
+    pre_build:
+        commands:
+            - echo Logging in to Amazon ECR
+            - aws --version
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+            - IMAGE_TAG=latest
+    build:
+        commands:
+            - echo Building Docker image
+            - docker build -t $ECR_REPO_NAME:$IMAGE_TAG .
+            - docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+    post_build:
+        commands:
+            - echo Pushing Docker image to ECR
+            - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+            - echo Writing image definition file
+            - printf '[{"name":"%s","imageUri":"%s"}]' $ECS_CONTAINER_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
-  files:
-    - imagedefinitions.json
+    files:
+        - imagedefinitions.json
 ```
 
 필자는 위 코드처럼 작성해주었다. `pre_build`는 빌드 전 단계로, 도커 로그인을 한다. (이때 IAM 권한이 필요한데, `AmazonEC2ContainerRegistryPowerUser` 등을 사용한다.)
@@ -457,7 +454,7 @@ ECS Fargate 빌드업 과정이 좀 길었다. 이제 본격적으로 CodePipeli
 템플릿 중에 ECS Fargate에 배포라고 있지만, 사용자 지정 템플릿을 만들어서 사용해보겠다.
 
 > Github Actions에서 컨테이너 이미지 생성, 그리고 ECR 배포 후 ECS 업데이트 방법도 있지만 그건 아래의 글에서 살짝 다뤘다.
-> 
+>
 > https://velog.io/@yulmwu/ecs-deploy
 
 ![](https://velog.velcdn.com/images/yulmwu/post/84372cd8-0e2c-49c5-aad7-6330434d9f27/image.png)
@@ -468,7 +465,7 @@ ECS Fargate 빌드업 과정이 좀 길었다. 이제 본격적으로 CodePipeli
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ede217e8-c6cf-4850-af21-19c579130c0f/image.png)
 
-빌드 스테이지는 만들었던 만들었던 CodeBuild 프로젝트를 선택한다. 
+빌드 스테이지는 만들었던 만들었던 CodeBuild 프로젝트를 선택한다.
 
 테스트 스테이지는 건너뛴다.
 
@@ -494,7 +491,7 @@ ECS Fargate 빌드업 과정이 좀 길었다. 이제 본격적으로 CodePipeli
 
 물론 간단하게 한다면 그냥 Github Actions에서 도커 이미지를 만들고 ECR에 업로드한 후, ECS에 롤링 업데이트 명령어를 통해 업데이트하는 방법도 괜찮긴 하다.
 
-다만 CodePipeline(또는 CodeDeploy)에서는 롤백 등의 부가적인 기능을 제공하기 때문에 더욱 효율적으로 사용할 수 있다. 
+다만 CodePipeline(또는 CodeDeploy)에서는 롤백 등의 부가적인 기능을 제공하기 때문에 더욱 효율적으로 사용할 수 있다.
 
 CodeBuild 과정에선 컴퓨팅 사용에 대한 요금이 나가니 참고하길 바란다.
 
@@ -503,5 +500,5 @@ CodeBuild 과정에선 컴퓨팅 사용에 대한 요금이 나가니 참고하�
 ---
 
 > CodePipeline은 써본적이 많이 없어 오류가 있거나 잘못된 부분이 있을 수 있습니다.
-> 
+>
 > 이러한 문제가 있다면 댓글로 피드백 해주시면 감사드리겠습니다.

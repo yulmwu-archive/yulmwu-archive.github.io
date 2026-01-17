@@ -1,19 +1,19 @@
 ---
-title: "[AWS Misc] Secrets Manager Key Rotation Lambda"
-description: "AWS Lambda를 사용한 Secrets Manager 키 로테이션 "
-slug: "2025-08-12-aws-secrets-manager-key-rotation-lambda"
+title: '[AWS Misc] Secrets Manager Key Rotation Lambda'
+description: 'AWS Lambda를 사용한 Secrets Manager 키 로테이션 '
+slug: '2025-08-12-aws-secrets-manager-key-rotation-lambda'
 author: yulmwu
 date: 2025-08-12T13:35:35.857Z
 updated_at: 2026-01-16T06:56:40.443Z
-categories: ["AWS"]
-tags: ["Misc", "aws"]
+categories: ['AWS']
+tags: ['Misc', 'aws']
 series:
-  name: AWS
-  slug: aws
+    name: AWS
+    slug: aws
 thumbnail: ../../thumbnails/aws/aws-secrets-manager-key-rotation-lambda.png
 linked_posts:
-  previous: 2025-08-12-velog-backup-with-eventbridge
-  next: 
+    previous: 2025-08-12-velog-backup-with-eventbridge
+    next:
 is_private: false
 ---
 
@@ -42,7 +42,7 @@ AWS에선 RDS, DocumentDB, ElastiCache 등의 데이터베이스 자격증명이
 1. `createSecret` : 처음으로 실행되는 스텝으로, 교체하려는 키에 대해 새로운 값을 만든다. 여기선 랜덤한 값으로 변경한다. 그리고 이때 Pending 스테이지에 새로운 값이 저장되는데, 이후 마지막 `finishSecret`에서 이전의 Current 스테이지를 삭제하고 Pending 스테이지를 Current 스테이지로 만든다.
 2. `setSecret` : Secrets Manager를 사용하는 데이터베이스나 서비스에 값을 변경하는 코드가 위치한다.
 3. `testSecret` : 변경한 시크릿 키가 잘 적용되고 서비스가 잘 작동하는지 테스트하는 코드가 위치한다. 필요 시 여기서 롤백하는 등의 로직을 작성할 수 도 있다.
-4. `finishSecret` : 최종적으로 Pending 스테이지를 Current 스테이지로 변경한다. 
+4. `finishSecret` : 최종적으로 Pending 스테이지를 Current 스테이지로 변경한다.
 
 백문이 불여일견, 직접 코드를 보도록 하자.
 
@@ -57,11 +57,11 @@ AWS에선 RDS, DocumentDB, ElastiCache 등의 데이터베이스 자격증명이
 
 ```js
 import {
-    SecretsManagerClient,
-    PutSecretValueCommand,
-    GetSecretValueCommand,
-    DescribeSecretCommand,
-    UpdateSecretVersionStageCommand,
+	SecretsManagerClient,
+	PutSecretValueCommand,
+	GetSecretValueCommand,
+	DescribeSecretCommand,
+	UpdateSecretVersionStageCommand,
 } from '@aws-sdk/client-secrets-manager'
 import crypto from 'crypto'
 ```
@@ -75,28 +75,28 @@ const SECRET_LENGTH = 32
 const secretsManager = new SecretsManagerClient()
 ```
 
-다음으로 먼저 핸들러(`handler()`) 함수를 보자. 
+다음으로 먼저 핸들러(`handler()`) 함수를 보자.
 
 ```js
 export const handler = async (event) => {
-    console.log(`Step: ${event.Step} for secret: ${event.SecretId}`)
+	console.log(`Step: ${event.Step} for secret: ${event.SecretId}`)
 
-    switch (event.Step) {
-        case 'createSecret':
-            await createSecret(event)
-            break
-        case 'setSecret':
-            await setSecret(event)
-            break
-        case 'testSecret':
-            await testSecret(event)
-            break
-        case 'finishSecret':
-            await finishSecret(event)
-            break
-        default:
-            throw new Error(`Unknown step: ${event.Step}`)
-    }
+	switch (event.Step) {
+		case 'createSecret':
+			await createSecret(event)
+			break
+		case 'setSecret':
+			await setSecret(event)
+			break
+		case 'testSecret':
+			await testSecret(event)
+			break
+		case 'finishSecret':
+			await finishSecret(event)
+			break
+		default:
+			throw new Error(`Unknown step: ${event.Step}`)
+	}
 }
 ```
 
@@ -106,22 +106,22 @@ export const handler = async (event) => {
 
 ```js
 const createSecret = async (event) => {
-    const newSecretValue = {}
+	const newSecretValue = {}
 
-    SECRET_KEYS.forEach((key) => {
-        newSecretValue[key] = crypto.randomBytes(SECRET_LENGTH).toString('base64').slice(0, SECRET_LENGTH)
-    })
+	SECRET_KEYS.forEach((key) => {
+		newSecretValue[key] = crypto.randomBytes(SECRET_LENGTH).toString('base64').slice(0, SECRET_LENGTH)
+	})
 
-    await secretsManager.send(
-        new PutSecretValueCommand({
-            SecretId: event.SecretId,
-            ClientRequestToken: event.ClientRequestToken,
-            SecretString: JSON.stringify(newSecretValue),
-            VersionStages: ['AWSPENDING'],
-        })
-    )
+	await secretsManager.send(
+		new PutSecretValueCommand({
+			SecretId: event.SecretId,
+			ClientRequestToken: event.ClientRequestToken,
+			SecretString: JSON.stringify(newSecretValue),
+			VersionStages: ['AWSPENDING'],
+		}),
+	)
 
-    console.log(`Created new secret version with ${JSON.stringify(newSecretValue)}`)
+	console.log(`Created new secret version with ${JSON.stringify(newSecretValue)}`)
 }
 ```
 
@@ -131,7 +131,7 @@ const createSecret = async (event) => {
 
 ```js
 const setSecret = async (event) => {
-    console.log('Set secret step - If needed, apply AWSPENDING to your app/service')
+	console.log('Set secret step - If needed, apply AWSPENDING to your app/service')
 }
 ```
 
@@ -141,25 +141,25 @@ const setSecret = async (event) => {
 
 ```js
 const testSecret = async (event) => {
-    const data = await secretsManager.send(
-        new GetSecretValueCommand({
-            SecretId: event.SecretId,
-            VersionStage: 'AWSPENDING',
-        })
-    )
+	const data = await secretsManager.send(
+		new GetSecretValueCommand({
+			SecretId: event.SecretId,
+			VersionStage: 'AWSPENDING',
+		}),
+	)
 
-    try {
-        const parsed = JSON.parse(data.SecretString)
-        SECRET_KEYS.forEach((key) => {
-            if (!parsed[key]) {
-                throw new Error(`${key} missing in secret`)
-            }
-        })
+	try {
+		const parsed = JSON.parse(data.SecretString)
+		SECRET_KEYS.forEach((key) => {
+			if (!parsed[key]) {
+				throw new Error(`${key} missing in secret`)
+			}
+		})
 
-        console.log('Test passed for pending secret.')
-    } catch (err) {
-        throw new Error(`Test failed: ${err.message}`)
-    }
+		console.log('Test passed for pending secret.')
+	} catch (err) {
+		throw new Error(`Test failed: ${err.message}`)
+	}
 }
 ```
 
@@ -169,30 +169,30 @@ const testSecret = async (event) => {
 
 ```js
 const finishSecret = async (event) => {
-    const currentVersion = await secretsManager.send(
-        new DescribeSecretCommand({
-            SecretId: event.SecretId,
-        })
-    )
+	const currentVersion = await secretsManager.send(
+		new DescribeSecretCommand({
+			SecretId: event.SecretId,
+		}),
+	)
 
-    const currentVersionId = Object.keys(currentVersion.VersionIdsToStages).find((vId) =>
-        currentVersion.VersionIdsToStages[vId].includes('AWSCURRENT')
-    )
+	const currentVersionId = Object.keys(currentVersion.VersionIdsToStages).find((vId) =>
+		currentVersion.VersionIdsToStages[vId].includes('AWSCURRENT'),
+	)
 
-    await secretsManager.send(
-        new UpdateSecretVersionStageCommand({
-            SecretId: event.SecretId,
-            VersionStage: 'AWSCURRENT',
-            MoveToVersionId: event.ClientRequestToken,
-            RemoveFromVersionId: currentVersionId,
-        })
-    )
+	await secretsManager.send(
+		new UpdateSecretVersionStageCommand({
+			SecretId: event.SecretId,
+			VersionStage: 'AWSCURRENT',
+			MoveToVersionId: event.ClientRequestToken,
+			RemoveFromVersionId: currentVersionId,
+		}),
+	)
 
-    console.log('Secret rotation finished.')
+	console.log('Secret rotation finished.')
 }
 ```
 
-마지막으로 이전 Current 스테이지을 삭제하고 Pending 스테이지를 Current로 만들도록 한다. 
+마지막으로 이전 Current 스테이지을 삭제하고 Pending 스테이지를 Current로 만들도록 한다.
 
 코드는 여기까지로 간단한데, 아래의 Github Gist에 올려두었으니 참고하자.
 
@@ -242,15 +242,16 @@ Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
 ```yaml
 {
-    "Sid": "SecretsManagerRotationPermissions",
-    "Effect": "Allow",
-    "Action": [
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:PutSecretValue",
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:UpdateSecretVersionStage"
-    ],
-    "Resource": "arn:aws:secretsmanager:ap-northeast-2:986129558966:secret:TestSecret-mMbwEt"
+    'Sid': 'SecretsManagerRotationPermissions',
+    'Effect': 'Allow',
+    'Action':
+        [
+            'secretsmanager:GetSecretValue',
+            'secretsmanager:PutSecretValue',
+            'secretsmanager:DescribeSecret',
+            'secretsmanager:UpdateSecretVersionStage',
+        ],
+    'Resource': 'arn:aws:secretsmanager:ap-northeast-2:986129558966:secret:TestSecret-mMbwEt',
 }
 ```
 
@@ -262,7 +263,7 @@ Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
 이렇게 설정해주자. `secretsmanager.amazonaws.com`(Secrets Manager)가 이 람다 함수를 호출할 수 있도록 명시하는 것이다.
 
-## (3) Secrets Manager Key Rotation 
+## (3) Secrets Manager Key Rotation
 
 그리고 최종적으로 키 로테이션 설정을 해보자. 다시 Secrets Manager로 돌아가, 교체 메뉴로 가보자.
 
@@ -285,7 +286,6 @@ Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b5e8c614-f94b-403e-86d7-90eb200dc651/image.png)
 
-람다 함수도 잘 실행되고, 값도 랜덤하게 바뀌었다. 
+람다 함수도 잘 실행되고, 값도 랜덤하게 바뀌었다.
 
 끝.
-

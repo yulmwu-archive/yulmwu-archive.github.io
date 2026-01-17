@@ -26,9 +26,7 @@ export const homePageLayout: PageLayout = {
 			],
 		}),
 	],
-	right: [
-        Component.Graph(),
-    ],
+	right: [Component.Graph()],
 }
 
 export const defaultContentPageLayout: PageLayout = {

@@ -1,19 +1,19 @@
 ---
-title: "[Kubernetes w/ EKS] Managing TLS/SSL Certificates with cert-manager"
+title: '[Kubernetes w/ EKS] Managing TLS/SSL Certificates with cert-manager'
 description: "cert-manager를 통한 쿠버네티스 TLS/SSL 인증서 관리 (Feat. Let's Encrypt, DNS-01 ACME 및 AWS Route53 연동 실습)"
-slug: "2026-01-09-kubernetes-cert-manager"
+slug: '2026-01-09-kubernetes-cert-manager'
 author: yulmwu
 date: 2026-01-09T06:37:47.568Z
 updated_at: 2026-01-17T11:27:26.392Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-cert-manager.png
 linked_posts:
-  previous: 2026-01-09-kubernetes-eks-max-pods
-  next: 2026-01-09-kubernetes-pod-probe
+    previous: 2026-01-09-kubernetes-eks-max-pods
+    next: 2026-01-09-kubernetes-pod-probe
 is_private: false
 ---
 
@@ -27,9 +27,9 @@ is_private: false
 이 포스팅에서는 Kubernetes에서 TLS Termination을 위한 TLS/SSL 인증서 관리에 대해서 Kubernetes 네이티브 오브젝트를 사용하는 방법과 그 한계와 단점, 그리고 **cert-manager**를 이용한 방법(사실상 표준)에 대해 다뤄보겠다.
 
 > 물론 Ingress나 Gateway API의 Controller를 AWS LoadBalancer Controller로 둔다면 AWS ACM을 사용해볼 수도 있으나, 앞서 설명하였듯 클라우드 벤더가 아닌 Kubernetes에서 TLS Termination이 필요한 경우가 있다.
-> 
+>
 > 실습에서는 Nginx Ingress Controller를 사용하고, AWS NLB는 TLS Passthrough가 되도록 설정하겠다.
-> 
+>
 > ![](https://velog.velcdn.com/images/yulmwu/post/f74958ec-ca61-41ba-8460-e364cafd834f/image.png)
 
 # 1. Kubernetes Native Objects
@@ -40,13 +40,13 @@ Kubernetes에서 네이티브 오브젝트로 TLS/SSL 인증서를 관리하는 
 apiVersion: v1
 kind: Secret
 metadata:
-  name: tls-demo
+    name: tls-demo
 type: kubernetes.io/tls
 data:
-  tls.crt: |
-    MIIC2DCCAcCgAwIBAgIBATANBgkqh...
-  tls.key: |
-    MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ...
+    tls.crt: |
+        MIIC2DCCAcCgAwIBAgIBATANBgkqh...
+    tls.key: |
+        MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ...
 ```
 
 인증서 체인(`tls.crt`)과 개인 키(`tls.key`)가 포함된 X.509 인증서를 생성해야 하는데, 특정 도메인(`host`)을 연결하지 않고 NLB 주소로만 간단하게 테스트를 하기 위해 Passthrough NLB를 먼저 프로비저닝하고 X.509 인증서를 생성하도록 하겠다. (NLB 주소를 SAN으로 넣는건 권장하지 않는다.)
@@ -59,23 +59,23 @@ data:
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: demo-cluster
-  region: ap-northeast-2
-  version: "1.33"
+    name: demo-cluster
+    region: ap-northeast-2
+    version: '1.33'
 vpc:
-  cidr: 10.1.0.0/16
-  nat:
-    gateway: Single
+    cidr: 10.1.0.0/16
+    nat:
+        gateway: Single
 iam:
-  withOIDC: true
+    withOIDC: true
 managedNodeGroups:
-  - name: ng-1
-    instanceType: t3.medium
-    desiredCapacity: 1
-    privateNetworking: false
-    iam:
-      withAddonPolicies:
-        ebs: true
+    - name: ng-1
+      instanceType: t3.medium
+      desiredCapacity: 1
+      privateNetworking: false
+      iam:
+          withAddonPolicies:
+              ebs: true
 ```
 
 ```shell
@@ -93,35 +93,35 @@ kubectl get nodes -o wide
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: echo
-  namespace: default
+    name: echo
+    namespace: default
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: echo
-  template:
-    metadata:
-      labels:
-        app: echo
-    spec:
-      containers:
-      - name: echo
-        image: ealen/echo-server
-        ports:
-        - containerPort: 80
+    replicas: 2
+    selector:
+        matchLabels:
+            app: echo
+    template:
+        metadata:
+            labels:
+                app: echo
+        spec:
+            containers:
+                - name: echo
+                  image: ealen/echo-server
+                  ports:
+                      - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: echo-svc
-  namespace: default
+    name: echo-svc
+    namespace: default
 spec:
-  selector:
-    app: echo
-  ports:
-  - port: 80
-    targetPort: 80
+    selector:
+        app: echo
+    ports:
+        - port: 80
+          targetPort: 80
 ```
 
 ```shell
@@ -131,9 +131,9 @@ kubectl apply -f app.yaml
 ## (3) Nginx Ingress Controller
 
 > Nginx Ingress Controller에 대한 유지보수는 2026년 3월까지 진행되고, 이후 유지보수가 종료된다. [[참고 1]](https://github.com/kubernetes/ingress-nginx?tab=readme-ov-file#ingress-nginx-retirement) [[참고 2]](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/)
-> 
+>
 > 기존의 Helm Chart나 Nginx Ingress Controller로 운영중이던 서비스가 종료되는건 아니지만 보안 취약점 대응이나 버그 수정 등의 작업이 진행되지 않는다.
-> 
+>
 > 때문에 [Gateway API](https://velog.io/@yulmwu/kubernetes-gateway)로 마이그레이션을 권장하고 있지만, 이 포스팅에선 실습을 위해 [Nginx Ingress Controller](https://velog.io/@yulmwu/kubernetes-service-ingress)를 그대로 사용할 예정이다.
 
 Nginx Ingress Controller는 Helm Chart를 통해서 설치할 예정인데, values는 아래와 같다.
@@ -233,25 +233,25 @@ Ingress 리소스는 아래와 같다. `spec.tls.hosts`와 `spec.rules.host`는 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nlb-tls-ingress
-  namespace: default
+    name: nlb-tls-ingress
+    namespace: default
 spec:
-  ingressClassName: nginx
-  tls:
-  - hosts:
-    - a071b61083c384e84819a1d27f4050e9-433acf7b26e84c96.elb.ap-northeast-2.amazonaws.com
-    secretName: nlb-tls-secret
-  rules:
-  - host: a071b61083c384e84819a1d27f4050e9-433acf7b26e84c96.elb.ap-northeast-2.amazonaws.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: echo-svc
-            port:
-              number: 80
+    ingressClassName: nginx
+    tls:
+        - hosts:
+              - a071b61083c384e84819a1d27f4050e9-433acf7b26e84c96.elb.ap-northeast-2.amazonaws.com
+          secretName: nlb-tls-secret
+    rules:
+        - host: a071b61083c384e84819a1d27f4050e9-433acf7b26e84c96.elb.ap-northeast-2.amazonaws.com
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: echo-svc
+                            port:
+                                number: 80
 ```
 
 ```shell
@@ -268,7 +268,7 @@ kubectl apply -f ingress.yaml
 
 ![](https://velog.velcdn.com/images/yulmwu/post/02e04989-ea72-4329-8a93-440c551b9c2c/image.png)
 
-그럼에도 에러가 발생하는 이유는 Self Signed 인증서이기 때문인데, `openssl s_client -connect $NLB_DNS:443 -servername $NLB_DNS` 명령어를 통해서 테스트해봐도 Self Signed라면서 에러를 반환하는 것을 확인해볼 수 있다. 
+그럼에도 에러가 발생하는 이유는 Self Signed 인증서이기 때문인데, `openssl s_client -connect $NLB_DNS:443 -servername $NLB_DNS` 명령어를 통해서 테스트해봐도 Self Signed라면서 에러를 반환하는 것을 확인해볼 수 있다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7938649a-8914-4a71-9f2d-f7b2f0f43002/image.png)
 
@@ -299,7 +299,7 @@ kubectl apply -f ingress.yaml
 
 ## Webhook, CA Injector
 
-Kubernetes API 서버와 연결된 cert-manager **Webhook**은 cert-manager 관련 CRD 리소스 생성 시 유효성 검사(Validating)나 변환(Mutating)과 같은 Admission Webhook이다. 
+Kubernetes API 서버와 연결된 cert-manager **Webhook**은 cert-manager 관련 CRD 리소스 생성 시 유효성 검사(Validating)나 변환(Mutating)과 같은 Admission Webhook이다.
 
 Kubernetes 리소스들 중에는 caBundle와 같은 필드에 신뢰할 CA 인증서를 필요로 하는 경우가 있다.
 
@@ -323,7 +323,7 @@ CRD 중 어디에서 인증서 발급 방식 정의하는 **Issuer** 또는 **Cl
 
 # 4. cert-manager Demo
 
-실습은 마찬가지로 AWS NLB(TLS Passthrough) 및 Nginx Ingress Controller를 사용하며, Issuer는 Let's Encrypt(ACME) 및 DNS-01 방식, 도메인 서버는 AWS Route53을 사용해보겠다. 
+실습은 마찬가지로 AWS NLB(TLS Passthrough) 및 Nginx Ingress Controller를 사용하며, Issuer는 Let's Encrypt(ACME) 및 DNS-01 방식, 도메인 서버는 AWS Route53을 사용해보겠다.
 
 Cloudflare(No Proxied, DNS Only)를 사용할 수도 있지만, EKS 환경에선 IRSA를 통해 Route53과 통합되기 쉬우니 Route53을 사용하였다. cert-manager 공식적으로 Route53 및 Cloudflare 등을 지원하니 필요시 참고하자.
 
@@ -354,7 +354,7 @@ Route53 DNS 서버를 사용하기 위해서는 호스팅 영역(Hosted Zone)이
 Helm Chart를 통해 Nginx Ingress Controller를 설치하였다면, 마찬가지로 아래의 명령어를 통해 NLB 주소를 얻을 수 있다.
 
 ```shell
-> kubectl get svc -n ingress-nginx -w          
+> kubectl get svc -n ingress-nginx -w
 NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP                                                                          PORT(S)                      AGE
 ingress-nginx-controller             LoadBalancer   172.20.49.176   ae9b30d9bd40447f3a4507cd2bffdc14-f86832c25ee1bbb4.elb.ap-northeast-2.amazonaws.com   80:31605/TCP,443:30486/TCP   30s
 
@@ -384,27 +384,17 @@ helm install cert-manager oci://quay.io/jetstack/charts/cert-manager \
 
 ```yaml
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "route53:GetChange",
-      "Resource": "arn:aws:route53:::change/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ChangeResourceRecordSets",
-        "route53:ListResourceRecordSets"
-      ],
-      "Resource": "arn:aws:route53:::hostedzone/Z0136818OELW4IM10AE4"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "route53:ListHostedZonesByName",
-      "Resource": "*"
-    }
-  ]
+    'Version': '2012-10-17',
+    'Statement':
+        [
+            { 'Effect': 'Allow', 'Action': 'route53:GetChange', 'Resource': 'arn:aws:route53:::change/*' },
+            {
+                'Effect': 'Allow',
+                'Action': ['route53:ChangeResourceRecordSets', 'route53:ListResourceRecordSets'],
+                'Resource': 'arn:aws:route53:::hostedzone/Z0136818OELW4IM10AE4',
+            },
+            { 'Effect': 'Allow', 'Action': 'route53:ListHostedZonesByName', 'Resource': '*' },
+        ],
 }
 ```
 
@@ -422,9 +412,9 @@ eksctl create iamserviceaccount \
   --attach-policy-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:policy/cert-manager-route53-policy" \
   --approve \
   --override-existing-serviceaccounts
-  
+
 kubectl -n cert-manager rollout restart deploy cert-manager
-  
+
 kubectl -n cert-manager get sa cert-manager -o yaml | yq '.metadata.annotations'
 ```
 
@@ -442,21 +432,21 @@ kubectl -n cert-manager get sa cert-manager -o yaml | yq '.metadata.annotations'
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-staging
+    name: letsencrypt-staging
 spec:
-  acme:
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    email: <메일 주소>
-    privateKeySecretRef:
-      name: letsencrypt-staging-account-key
-    solvers:
-    - selector:
-        dnsZones:
-        - rlawnsdud.shop
-      dns01:
-        route53:
-          region: us-east-1
-          hostedZoneID: <Route53 호스팅 영역 ID>
+    acme:
+        server: https://acme-staging-v02.api.letsencrypt.org/directory
+        email: <메일 주소>
+        privateKeySecretRef:
+            name: letsencrypt-staging-account-key
+        solvers:
+            - selector:
+                  dnsZones:
+                      - rlawnsdud.shop
+              dns01:
+                  route53:
+                      region: us-east-1
+                      hostedZoneID: <Route53 호스팅 영역 ID>
 ```
 
 ```shell
@@ -468,7 +458,7 @@ kubectl apply -f cert-manager/clusterissuer-staging.yaml
 
 ![](https://velog.velcdn.com/images/yulmwu/post/2b90b901-217c-43a1-93d9-d08f94608ab0/image.png)
 
-Ingress 매니페스트에서 변경할 부분은 `metadata.annotations`의 `cert-manager.io/cluster-issuer` 어노테이션과 `hosts`, `host` 필드이다. 
+Ingress 매니페스트에서 변경할 부분은 `metadata.annotations`의 `cert-manager.io/cluster-issuer` 어노테이션과 `hosts`, `host` 필드이다.
 
 `cert-manager.io/cluster-issuer` 어노테이션은 `ingress-shim`을 통해 자동으로 TLS/SSL 인증서를 발급받고 관리할 수 있도록 한다. (즉 Certificate 리소스를 자동으로 만들어줌)
 
@@ -478,27 +468,27 @@ Ingress 매니페스트에서 변경할 부분은 `metadata.annotations`의 `cer
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nlb-tls-ingress
-  namespace: default
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging # Ingress-shim
+    name: nlb-tls-ingress
+    namespace: default
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-staging # Ingress-shim
 spec:
-  ingressClassName: nginx
-  tls:
-  - hosts:
-    - demo.rlawnsdud.shop
-    secretName: demo-rlawnsdud-shop-tls
-  rules:
-  - host: demo.rlawnsdud.shop
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: echo-svc
-            port:
-              number: 80
+    ingressClassName: nginx
+    tls:
+        - hosts:
+              - demo.rlawnsdud.shop
+          secretName: demo-rlawnsdud-shop-tls
+    rules:
+        - host: demo.rlawnsdud.shop
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: echo-svc
+                            port:
+                                number: 80
 ```
 
 ```shell
@@ -521,9 +511,9 @@ kubectl apply -f cert-manager/ingress.yaml
 
 ![](https://velog.velcdn.com/images/yulmwu/post/32077031-b9d2-42d0-999a-4ee56fff38b8/image.png)
 
-스테이징 환경을 분리해둔 이유는 Let's Encrypt의 프로덕션 환경에서는 발급/실패 제한이 있고, 이를 반복하면 발급에 제한이 걸릴 수 있다. 
+스테이징 환경을 분리해둔 이유는 Let's Encrypt의 프로덕션 환경에서는 발급/실패 제한이 있고, 이를 반복하면 발급에 제한이 걸릴 수 있다.
 
-하지만 스테이징은 그 제한이 없지만 Fake 체인을 사용하기 때문에 위와 같은 경고 메시지가 나타나는 것이다. 이는 아래와 같은 ClusterIssuer 리소스를 만들고, 프로덕션 환경으로 변경하면 된다.  발급 제한이 있으므로 스테이징 환경에서 동작하는지 확인 후 변경하자.
+하지만 스테이징은 그 제한이 없지만 Fake 체인을 사용하기 때문에 위와 같은 경고 메시지가 나타나는 것이다. 이는 아래와 같은 ClusterIssuer 리소스를 만들고, 프로덕션 환경으로 변경하면 된다. 발급 제한이 있으므로 스테이징 환경에서 동작하는지 확인 후 변경하자.
 
 ```yaml
 # clusterissuer-prod.yaml
@@ -531,21 +521,21 @@ kubectl apply -f cert-manager/ingress.yaml
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod
+    name: letsencrypt-prod
 spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: <메일 주소>
-    privateKeySecretRef:
-      name: letsencrypt-prod-account-key
-    solvers:
-    - selector:
-        dnsZones:
-        - rlawnsdud.shop
-      dns01:
-        route53:
-          region: us-east-1
-          hostedZoneID: <Route53 호스팅 영역 ID>
+    acme:
+        server: https://acme-v02.api.letsencrypt.org/directory
+        email: <메일 주소>
+        privateKeySecretRef:
+            name: letsencrypt-prod-account-key
+        solvers:
+            - selector:
+                  dnsZones:
+                      - rlawnsdud.shop
+              dns01:
+                  route53:
+                      region: us-east-1
+                      hostedZoneID: <Route53 호스팅 영역 ID>
 ```
 
 ```shell

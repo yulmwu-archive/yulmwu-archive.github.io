@@ -1,19 +1,19 @@
 ---
-title: "[Kubernetes w/ EKS] Cluster Autoscaling with CA"
-description: "CA를 통한 쿠버네티스(EKS) Cluster Autoscaling 구성하기"
-slug: "2025-11-23-kubernetes-ca"
+title: '[Kubernetes w/ EKS] Cluster Autoscaling with CA'
+description: 'CA를 통한 쿠버네티스(EKS) Cluster Autoscaling 구성하기'
+slug: '2025-11-23-kubernetes-ca'
 author: yulmwu
 date: 2025-11-23T23:30:46.163Z
 updated_at: 2026-01-17T12:57:03.050Z
-categories: ["Kubernetes"]
-tags: ["eks", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['eks', 'kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-ca.png
 linked_posts:
-  previous: 2025-11-23-kubernetes-keda
-  next: 2025-11-23-kubernetes-eks-fargate
+    previous: 2025-11-23-kubernetes-keda
+    next: 2025-11-23-kubernetes-eks-fargate
 is_private: false
 ---
 
@@ -27,7 +27,7 @@ HPA는 위 사진과 같이 파드의 수를 수평적으로 증가시키거나 
 
 위 포스팅에서도 언급이 있었지만, 노드의 수는 그대로인데 파드의 수만 늘어나고 노드에 더 이상 스케줄링 될 수 없을 경우 그러한 파드는 Pending 상태로 들어가게 된다.
 
-말 그대로 어느 노드에 스케줄링되지 않아 대기 상태에 있다는 것인데, 이때 Cluster Autoscaling을 통해 노드의 수를 수평적으로 증가시킨다. 
+말 그대로 어느 노드에 스케줄링되지 않아 대기 상태에 있다는 것인데, 이때 Cluster Autoscaling을 통해 노드의 수를 수평적으로 증가시킨다.
 
 # 1. Cluster Autoscaling
 
@@ -80,36 +80,36 @@ eksctl을 위한 ClusterConfig는 아래와 같다.
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: ca-lab-eks
-  region: ap-northeast-2
-  version: "1.33"
+    name: ca-lab-eks
+    region: ap-northeast-2
+    version: '1.33'
 iam:
-  withOIDC: true
-  serviceAccounts:
-    - metadata:
-        name: cluster-autoscaler
-        namespace: kube-system
-        labels:
-          app.kubernetes.io/name: cluster-autoscaler
-      wellKnownPolicies:
-        autoScaler: true
+    withOIDC: true
+    serviceAccounts:
+        - metadata:
+              name: cluster-autoscaler
+              namespace: kube-system
+              labels:
+                  app.kubernetes.io/name: cluster-autoscaler
+          wellKnownPolicies:
+              autoScaler: true
 managedNodeGroups:
-  - name: ca-ng
-    instanceType: t3.medium
-    desiredCapacity: 1
-    minSize: 1
-    maxSize: 3
-    privateNetworking: false
-    ssh:
-      enableSsm: true
-    iam:
-      withAddonPolicies:
-        autoScaler: true
-    labels:
-      role: ca-ng
-    tags:
-      k8s.io/cluster-autoscaler/enabled: "true"
-      k8s.io/cluster-autoscaler/ca-lab-eks: "owned"
+    - name: ca-ng
+      instanceType: t3.medium
+      desiredCapacity: 1
+      minSize: 1
+      maxSize: 3
+      privateNetworking: false
+      ssh:
+          enableSsm: true
+      iam:
+          withAddonPolicies:
+              autoScaler: true
+      labels:
+          role: ca-ng
+      tags:
+          k8s.io/cluster-autoscaler/enabled: 'true'
+          k8s.io/cluster-autoscaler/ca-lab-eks: 'owned'
 ```
 
 ```shell
@@ -125,25 +125,25 @@ aws eks update-kubeconfig --name ca-lab-eks
 awsRegion: ap-northeast-2
 cloudProvider: aws
 autoDiscovery:
-  clusterName: ca-lab-eks
-  tags:
-    - k8s.io/cluster-autoscaler/enabled
-    - k8s.io/cluster-autoscaler/ca-lab-eks
+    clusterName: ca-lab-eks
+    tags:
+        - k8s.io/cluster-autoscaler/enabled
+        - k8s.io/cluster-autoscaler/ca-lab-eks
 rbac:
-  serviceAccount:
-    create: false
-    name: cluster-autoscaler
+    serviceAccount:
+        create: false
+        name: cluster-autoscaler
 image:
-  repository: registry.k8s.io/autoscaling/cluster-autoscaler
-  tag: v1.33.0
+    repository: registry.k8s.io/autoscaling/cluster-autoscaler
+    tag: v1.33.0
 extraArgs:
-  logtostderr: "true"
-  stderrthreshold: info
-  v: "4"
-  balance-similar-node-groups: "true"
-  skip-nodes-with-local-storage: "false"
-  skip-nodes-with-system-pods: "false"
-  expander: least-waste
+    logtostderr: 'true'
+    stderrthreshold: info
+    v: '4'
+    balance-similar-node-groups: 'true'
+    skip-nodes-with-local-storage: 'false'
+    skip-nodes-with-system-pods: 'false'
+    expander: least-waste
 ```
 
 ```shell
@@ -167,28 +167,28 @@ CA 실습 및 Karpenter 실습에서 공통적으로 사용할 Deployment는 아
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inflate
-  namespace: default
+    name: inflate
+    namespace: default
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: inflate
-  template:
-    metadata:
-      labels:
-        app: inflate
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          resources:
-            requests:
-              cpu: "500m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
+    replicas: 1
+    selector:
+        matchLabels:
+            app: inflate
+    template:
+        metadata:
+            labels:
+                app: inflate
+        spec:
+            containers:
+                - name: nginx
+                  image: nginx:latest
+                  resources:
+                      requests:
+                          cpu: '500m'
+                          memory: '256Mi'
+                      limits:
+                          cpu: '500m'
+                          memory: '256Mi'
 ```
 
 그리고 프로비저닝 속도 측정을 위한 스크립트를 작성해보자. `t3.medium` 인스턴스가 가질 수 있는 최대 파드의 수는 17개고, 시스템에 필요한 파드도 있어야 하니 스크립트에서 Deployment의 `replicas`를 30 정도로 늘린다면 CA가 작동해야 한다.
@@ -275,7 +275,7 @@ NAME                                                     STATUS   ROLES    AGE  
 node/ip-192-168-19-145.ap-northeast-2.compute.internal   Ready    <none>   6m30s   v1.33.5-eks-ecaa3a6
 ```
 
-그러면 몇개의 파드는 Running 상태이지만, 대부분의 파드가 Pending, 즉 아직 노드에 스케줄링이 되지 않은 모습이다. 이제 5분 정도 기다려서 새로운 인스턴스가 만들어질 때 까지 기다려보자. 
+그러면 몇개의 파드는 Running 상태이지만, 대부분의 파드가 Pending, 즉 아직 노드에 스케줄링이 되지 않은 모습이다. 이제 5분 정도 기다려서 새로운 인스턴스가 만들어질 때 까지 기다려보자.
 
 참고로 `kubectl -n kube-system logs -f deploy/cluster-autoscaler-aws-cluster-autoscaler`를 통해 CA 로그를 확인해볼 수 있다.
 
@@ -291,7 +291,7 @@ node/ip-192-168-19-145.ap-northeast-2.compute.internal   Ready    <none>   6m30s
 Elapsed time: 93.2 seconds
 ```
 
-약 1분 30초 정도가 소요된 것을 확인할 수 있었다. 
+약 1분 30초 정도가 소요된 것을 확인할 수 있었다.
 
 노드가 저렇게 많이 생성된 이유는 우리가 CPU `500m`, 메모리 `256Mi`로 고정해두었기 때문에 t3.medium의 vCPU는 2, 실질적으로 사용가능한 vCPU를 1.5 정도로 생각한다면 하나의 노드 당 약 3개의 파드, 그래서 10개 내외의 노드가 생성된 것은 정상이라 볼 수 있다.
 

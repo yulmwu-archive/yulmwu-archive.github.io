@@ -1,19 +1,19 @@
 ---
-title: "[Kubernetes CI/CD] GitOps with ArgoCD (Kustomize Demo) "
-description: "ArgoCD를 통한 쿠버네티스 GitOps 구성 및 Kustomize 배포"
-slug: "2025-10-03-kubernetes-gitops-argocd"
+title: '[Kubernetes CI/CD] GitOps with ArgoCD (Kustomize Demo) '
+description: 'ArgoCD를 통한 쿠버네티스 GitOps 구성 및 Kustomize 배포'
+slug: '2025-10-03-kubernetes-gitops-argocd'
 author: yulmwu
 date: 2025-10-03T12:07:32.658Z
 updated_at: 2026-01-14T19:37:48.649Z
-categories: ["Kubernetes"]
-tags: ["CI/CD", "argocd", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['CI/CD', 'argocd', 'kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-gitops-argocd.png
 linked_posts:
-  previous: 2025-10-03-kubernetes-pac-with-gatekeeper-and-kyverno
-  next: 2025-10-03-kubernetes-argocd-ci
+    previous: 2025-10-03-kubernetes-pac-with-gatekeeper-and-kyverno
+    next: 2025-10-03-kubernetes-argocd-ci
 is_private: false
 ---
 
@@ -40,7 +40,7 @@ is_private: false
 - 워크플로우에서 단순히 Push로 클러스터 상태를 적용하기 때문에 감사/추적의 어려움, 즉 레포지토리에서 선언된 상태와 클러스터 상태의 불일치 가능성 있음 (드리프트 발생 시 방치)
 - 이전 상태로 롤백의 어려움
 
-물론 클러스터 내에선 따로 설치해야할 Operator나 컨트롤러가 필요하지 않지만, 단점들이 너무 크기 때문에 실사용하기엔 어려움이 있다. 
+물론 클러스터 내에선 따로 설치해야할 Operator나 컨트롤러가 필요하지 않지만, 단점들이 너무 크기 때문에 실사용하기엔 어려움이 있다.
 
 그래서 이번 포스팅에서 다뤄볼 주제인 GitOps가 2번째 방식을 사용한다.
 
@@ -63,7 +63,7 @@ GitOps의 기본적인 원칙은 아래와 같다. (자료마다 다르게 작�
 
 # 2. What is ArgoCD?
 
-여태까지 몇 번 등장했던 이름으로 유추할 수 있듯이, ArgoCD는 쿠버네티스 GitOps 도구 중 하나이다. 
+여태까지 몇 번 등장했던 이름으로 유추할 수 있듯이, ArgoCD는 쿠버네티스 GitOps 도구 중 하나이다.
 
 다른 GitOps 도구로 FluxCD 등이 있는데, ArgoCD는 중앙 집중식으로 애플리케이션을 선언하여 클러스터를 관리한다면, FluxCD는 비교적 더 가볍고 실시간으로 동기화하고 모니터링하는데 집중을 둔 도구이다.
 
@@ -79,7 +79,7 @@ Kustomize는 쿠버네티스 매니페스트를 커스터마이징하는 도구�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e1df7475-882a-4e48-9a72-47afde572499/image.png)
 
-물론 ArgoCD나 FluxCD를 사용하는데 있어 반드시 Helm 차트 또는 Kustomize를 사용해야 하는 것은 아니다. 
+물론 ArgoCD나 FluxCD를 사용하는데 있어 반드시 Helm 차트 또는 Kustomize를 사용해야 하는 것은 아니다.
 
 바닐라 매니페스트들만 사용하여 GitOps를 운영할 순 있지만 이러한 Helm 차트 또는 Kustomize를 사용하게 될 경우 더욱 더 효율적으로 운영할 수 있기 때문에 자주 사용되고, 이 포스팅에선 간단하게 Kustomize를 사용해볼 것이다.
 
@@ -132,25 +132,25 @@ kubectl -n argocd port-forward svc/argocd-server 8080:80
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: demo-proj
-  namespace: argocd
+    name: demo-proj
+    namespace: argocd
 spec:
-  description: "Demo project"
-  sourceRepos:
-    - '*'
-  destinations:
-    - namespace: dev
-      server: https://kubernetes.default.svc
-    - namespace: prod
-      server: https://kubernetes.default.svc
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    description: 'Demo project'
+    sourceRepos:
+        - '*'
+    destinations:
+        - namespace: dev
+          server: https://kubernetes.default.svc
+        - namespace: prod
+          server: https://kubernetes.default.svc
+    clusterResourceWhitelist:
+        - group: '*'
+          kind: '*'
 ```
 
 AppProject를 만들지 않으면 default 프로젝트에 애플리케이션이 만들어지는데, 프로젝트를 따로 만들 수 있다.
 
-다음으로 애플리케이션(Application CRD)을 만들어볼건데, 그 전에 깃허브 레포지토리를 만들어줘야 한다. 
+다음으로 애플리케이션(Application CRD)을 만들어볼건데, 그 전에 깃허브 레포지토리를 만들어줘야 한다.
 
 ## (2) Github Repository, Kustomize
 
@@ -180,38 +180,38 @@ Base는 각 환경의 Overlay가 사용할 기본 매니페스트로, 일반적�
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo
-  labels: { app: demo }
+    name: demo
+    labels: { app: demo }
 spec:
-  replicas: 1
-  selector:
-    matchLabels: { app: demo }
-  template:
-    metadata:
-      labels: { app: demo }
-    spec:
-      containers:
-      - name: web
-        image: rlawnsdud/demo
-        ports:
-        - containerPort: 3030
-        env:
-        - name: HOST
-          value: "0.0.0.0"
-        - name: PORT
-          value: "3030"
+    replicas: 1
+    selector:
+        matchLabels: { app: demo }
+    template:
+        metadata:
+            labels: { app: demo }
+        spec:
+            containers:
+                - name: web
+                  image: rlawnsdud/demo
+                  ports:
+                      - containerPort: 3030
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '3030'
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo
-  labels: { app: demo }
+    name: demo
+    labels: { app: demo }
 spec:
-  selector: { app: demo }
-  ports:
-  - name: http
-    port: 80
-    targetPort: 3030
+    selector: { app: demo }
+    ports:
+        - name: http
+          port: 80
+          targetPort: 3030
 ```
 
 그리고 Kustomize에선 `kustomization.yaml`을 선언하여 해당 Base 또는 Overlay가 사용할 리소스나 관련 설정을 할 수 있다.
@@ -220,7 +220,7 @@ spec:
 # base/kustomization.yaml
 
 resources:
-  - deployment.yaml
+    - deployment.yaml
 ```
 
 다음으로 각 Overlay를 선언해준다. `patches` 필드를 통해 환경 별로 Base 매니페스트의 구성을 오버레이할 수 있다.
@@ -229,40 +229,40 @@ resources:
 # overlays/dev/kustomization.yaml
 
 resources:
-  - ../../base
+    - ../../base
 namePrefix: dev-
 commonLabels:
-  env: dev
+    env: dev
 patches:
-  - target:
-      kind: Deployment
-      name: demo
-    patch: |-
-      - op: add
-        path: /spec/template/spec/containers/0/env/-
-        value:
-          name: APP_NAME
-          value: "Dev"
+    - target:
+          kind: Deployment
+          name: demo
+      patch: |-
+          - op: add
+            path: /spec/template/spec/containers/0/env/-
+            value:
+              name: APP_NAME
+              value: "Dev"
 ```
 
 ```yaml
 # overlays/prod/kustomization.yaml
 
 resources:
-  - ../../base
+    - ../../base
 namePrefix: prod-
 commonLabels:
-  env: prod
+    env: prod
 patches:
-  - target:
-      kind: Deployment
-      name: demo
-    patch: |-
-      - op: add
-        path: /spec/template/spec/containers/0/env/-
-        value:
-          name: APP_NAME
-          value: "Prod"
+    - target:
+          kind: Deployment
+          name: demo
+      patch: |-
+          - op: add
+            path: /spec/template/spec/containers/0/env/-
+            value:
+              name: APP_NAME
+              value: "Prod"
 ```
 
 이렇게 Development 및 Production 환경에 대한 다른 설정을 적용해주었고, 이를 깃허브 레포지토리에 Push 하자.
@@ -279,24 +279,24 @@ patches:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: demo-dev
-  namespace: argocd
+    name: demo-dev
+    namespace: argocd
 spec:
-  project: demo-proj
-  source:
-    repoURL: https://github.com/eocndp/argocd-kustomize-demo # 깃허브 레포지토리 URL
-    targetRevision: main
-    path: overlays/dev # Overlay 경로
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: dev
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - timeout.reconcile=30s # Pulling 및 Reconcile 간격
+    project: demo-proj
+    source:
+        repoURL: https://github.com/eocndp/argocd-kustomize-demo # 깃허브 레포지토리 URL
+        targetRevision: main
+        path: overlays/dev # Overlay 경로
+    destination:
+        server: https://kubernetes.default.svc
+        namespace: dev
+    syncPolicy:
+        automated:
+            prune: true
+            selfHeal: true
+        syncOptions:
+            - CreateNamespace=true
+            - timeout.reconcile=30s # Pulling 및 Reconcile 간격
 ```
 
 마찬가지로 Prod 애플리케이션도 정의하고 적용하자.
@@ -305,24 +305,24 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: demo-prod
-  namespace: argocd
+    name: demo-prod
+    namespace: argocd
 spec:
-  project: demo-proj
-  source:
-    repoURL: https://github.com/eocndp/argocd-kustomize-demo
-    targetRevision: main
-    path: overlays/prod
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: prod
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - timeout.reconcile=30s
+    project: demo-proj
+    source:
+        repoURL: https://github.com/eocndp/argocd-kustomize-demo
+        targetRevision: main
+        path: overlays/prod
+    destination:
+        server: https://kubernetes.default.svc
+        namespace: prod
+    syncPolicy:
+        automated:
+            prune: true
+            selfHeal: true
+        syncOptions:
+            - CreateNamespace=true
+            - timeout.reconcile=30s
 ```
 
 ![](https://velog.velcdn.com/images/yulmwu/post/80a4bd42-196a-4ccd-ac69-e0305fd49ecb/image.png)

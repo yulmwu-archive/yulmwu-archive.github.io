@@ -1,24 +1,24 @@
 ---
-title: "[Kubernetes] Operator Implemented using the Go language and Operator SDK"
-description: "Go 언어에서 Operator SDK를 통한 쿠버네티스 Operator 구현 실습"
-slug: "2025-10-01-kubernetes-operator-go"
+title: '[Kubernetes] Operator Implemented using the Go language and Operator SDK'
+description: 'Go 언어에서 Operator SDK를 통한 쿠버네티스 Operator 구현 실습'
+slug: '2025-10-01-kubernetes-operator-go'
 author: yulmwu
 date: 2025-10-01T08:16:26.908Z
 updated_at: 2026-01-08T08:18:03.446Z
-categories: ["Kubernetes"]
-tags: ["kubernetes"]
+categories: ['Kubernetes']
+tags: ['kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-operator-go.png
 linked_posts:
-  previous: 2025-10-01-kubernetes-operator
-  next: 2025-10-01-kubernetes-sealed-secrets
+    previous: 2025-10-01-kubernetes-operator
+    next: 2025-10-01-kubernetes-sealed-secrets
 is_private: false
 ---
 
 > 이전 포스팅의 후속 포스팅입니다.
-> 
+>
 > https://velog.io/@yulmwu/kubernetes-operator
 
 # Example Demo
@@ -34,14 +34,14 @@ is_private: false
 - MyCRD 생성, `replicas` 및 `image` 필드 추가
 - Controller는 해당 필드를 보고 Deployment를 생성해줌
 
-## (1) Initiation Project 
+## (1) Initiation Project
 
 > `go`, `make`, `operator-sdk` 명령어가 필요하니 적절히 설치해주자. 필자와 같은 맥이라면 `make`는 XCode를 설치하면서 자동으로 설치되고, 나머지는 Homebrew로 간단히 설치할 수 있다.
 
 먼저 아래의 `operator-sdk` 명령어를 통해 프로젝트를 세팅해주자.
 
 ```shell
-operator-sdk init \      
+operator-sdk init \
   --domain example.com \
   --repo mycrd-operator
 ```
@@ -201,12 +201,13 @@ func init() {
 apiVersion: demo.example.com/v1alpha1
 kind: MyCRD
 metadata:
-  name: mycrd-sample
-  namespace: default
+    name: mycrd-sample
+    namespace: default
 spec:
-  replicas: 1
-  image: nginx:1.25.3
+    replicas: 1
+    image: nginx:1.25.3
 ```
+
 ```shell
 > kubectl describe mycrd
 Name:         mycrd-sample
@@ -242,37 +243,37 @@ make manifests
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
-  name: mycrds.demo.example.com
+    annotations:
+        controller-gen.kubebuilder.io/version: v0.18.0
+    name: mycrds.demo.example.com
 spec:
-  group: demo.example.com
-  names:
-    kind: MyCRD
-    listKind: MyCRDList
-    plural: mycrds
-    shortNames:
-    - myc
-    singular: mycrd
-  scope: Namespaced
-  versions:
-  - additionalPrinterColumns:
-    - description: Desired replicas
-      jsonPath: .spec.replicas
-      name: Desired
-      type: integer
-    - description: Available replicas
-      jsonPath: .status.availableReplicas
-      name: Available
-      type: integer
-    - description: Container image
-      jsonPath: .spec.image
-      name: Image
-      priority: 1
-      type: string
-    name: v1alpha1
-    schema:
-      openAPIV3Schema: ... # (생략)
+    group: demo.example.com
+    names:
+        kind: MyCRD
+        listKind: MyCRDList
+        plural: mycrds
+        shortNames:
+            - myc
+        singular: mycrd
+    scope: Namespaced
+    versions:
+        - additionalPrinterColumns:
+              - description: Desired replicas
+                jsonPath: .spec.replicas
+                name: Desired
+                type: integer
+              - description: Available replicas
+                jsonPath: .status.availableReplicas
+                name: Available
+                type: integer
+              - description: Container image
+                jsonPath: .spec.image
+                name: Image
+                priority: 1
+                type: string
+          name: v1alpha1
+          schema:
+              openAPIV3Schema: ... # (생략)
 ```
 
 다음으로 Controller, 즉 Reconcile 로직을 작성해보자.
@@ -406,7 +407,7 @@ make manifests
 이제 `make install` 및 `make run` 명령어로 Controller를 실행시켜보자. 그럼 아래와 같이 Controller가 실행되는 것을 볼 수 있다.
 
 ```yaml
-> make run                       
+> make run
 /Users/workspace5/blog-example-demo/k8s-operator-example/go-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 /Users/workspace5/blog-example-demo/k8s-operator-example/go-operator/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
 go fmt ./...
@@ -426,11 +427,11 @@ go run ./cmd/main.go
 apiVersion: demo.example.com/v1alpha1
 kind: MyCRD
 metadata:
-  name: mycrd-sample
-  namespace: default
+    name: mycrd-sample
+    namespace: default
 spec:
-  replicas: 1
-  image: nginx:1.25.3
+    replicas: 1
+    image: nginx:1.25.3
 ```
 
 ```shell
@@ -465,7 +466,7 @@ mycrd.demo.example.com/mycrd-sample   1         1
 > kubectl apply -f config/samples/demo_v1alpha1_mycrd.yaml
 mycrd.demo.example.com/mycrd-sample configured
 
-> kubectl get deployment,pods,mycrd                       
+> kubectl get deployment,pods,mycrd
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/mycrd-sample-deploy   3/3     3            3           2m20s
 
@@ -504,7 +505,7 @@ make docker-push  IMG=docker.io/rlawnsdud/mycrd-operator:v0.1.0
 ```shell
 make deploy IMG=docker.io/rlawnsdud/mycrd-operator:v0.1.0
 
-> kubectl get all -n go-operator-system 
+> kubectl get all -n go-operator-system
 NAME                                                  READY   STATUS    RESTARTS   AGE
 pod/go-operator-controller-manager-6f9dcd6c98-zgbcb   1/1     Running   0          55s
 
@@ -523,7 +524,7 @@ replicaset.apps/go-operator-controller-manager-6f9dcd6c98   1         1         
 ```yaml
 # spec.replicas: 2로 수정
 
-> kubectl get deployment,pods,mycrd                       
+> kubectl get deployment,pods,mycrd
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/mycrd-sample-deploy   2/2     2            2           16m
 

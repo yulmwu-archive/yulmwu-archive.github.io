@@ -1,19 +1,19 @@
 ---
-title: "[DB/SQL] Recursive CTE(Common Table Expression)을 통한 N+1 문제 개선해보기"
-description: "Recursive CTE를 통해 Directory Breadcrumb를 구현하면서 Depth 만큼의 N+1 문제 해결해보기"
-slug: "2025-11-15-db-recursive-cte-feat-breadcrumb"
+title: '[DB/SQL] Recursive CTE(Common Table Expression)을 통한 N+1 문제 개선해보기'
+description: 'Recursive CTE를 통해 Directory Breadcrumb를 구현하면서 Depth 만큼의 N+1 문제 해결해보기'
+slug: '2025-11-15-db-recursive-cte-feat-breadcrumb'
 author: yulmwu
 date: 2025-11-15T11:08:28.310Z
 updated_at: 2026-01-16T19:22:03.859Z
-categories: ["DB/SQL"]
-tags: ["PostgreSQL", "db", "sql", "typeOrm"]
+categories: ['DB/SQL']
+tags: ['PostgreSQL', 'db', 'sql', 'typeOrm']
 series:
-  name: DB/SQL
-  slug: database
+    name: DB/SQL
+    slug: database
 thumbnail: ../../thumbnails/db/sql/db-recursive-cte-feat-breadcrumb.png
 linked_posts:
-  previous: 
-  next: 
+    previous:
+    next:
 is_private: false
 ---
 
@@ -49,7 +49,7 @@ _(사진 허락 받음)_
 
 필자도 그게 뭔지 몰랐는데, 쉽게 말해서 웹 사이트나 애플리케이션에서 사용자의 현재 위치(이동 경로)를 나타내는 것이라고 한다.
 
-어렵게 생각할 필요도 없이 
+어렵게 생각할 필요도 없이
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c0133cf4-78a2-436f-bd29-6fd298c8bde8/image.png)
 
@@ -96,7 +96,7 @@ async getBreadcrumb(uuid: string, userId: number): Promise<FileResponseDto[]> {
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c843c95b-417a-49f0-9d9f-541cf9f709c1/image.png)
 
-로직은 현재 디렉토리를 기준으로 하여 부모 디렉토리를 가져오고(findOne), 또 부모 요소의 부모 요소.. 이걸 부모 요소가 없을 때 까지 반복한다. 
+로직은 현재 디렉토리를 기준으로 하여 부모 디렉토리를 가져오고(findOne), 또 부모 요소의 부모 요소.. 이걸 부모 요소가 없을 때 까지 반복한다.
 
 즉 상당히 비효율적인, Depth 만큼의 N+1 문제가 발생하고 DB 쿼리나 네트워크 면에서도 매우 비효율적으로 동작한다.
 
@@ -113,7 +113,7 @@ Nested Set이나 Closure Table 등 다른 방법이 있을 수 있겠지만, 필
 - Materialized Path
 - Recursive CTE(Common Table Expression)
 
-먼저 Materialized Path는 계층 구조를 DB에 저장하는 방법 중 하나인데, 시작 노드 부터 끝의 노드까지 전체 경로를 문자열로 저장한다. 
+먼저 Materialized Path는 계층 구조를 DB에 저장하는 방법 중 하나인데, 시작 노드 부터 끝의 노드까지 전체 경로를 문자열로 저장한다.
 
 예를 들어 필자의 상황이라면 `uuidPath`와 같은 컬럼을 추가하고
 `/6c7d457a-fe2a-45fd-bbec-fb57c058ddfe/acb2610d-e73f-4240-b01b-aa98d15e608c/...`
@@ -213,9 +213,9 @@ WITH RECURSIVE parent_chain AS (
     SELECT id, uuid, name, type, "s3Key", "mimeType", size, path, "parentId", "userId", "createdAt", "updatedAt"
     FROM files
     WHERE id = $1 AND "userId" = $2 -- [file.id, userId]
-    
+
     UNION ALL
-    
+
 ... (TODO)
 ```
 
@@ -241,7 +241,7 @@ async getBreadcrumb(uuid: string, userId: number): Promise<FileResponseDto[]> {
             SELECT id, uuid, name, type, "s3Key", "mimeType", size, path, "parentId", "userId", "createdAt", "updatedAt"
             FROM files
             WHERE id = $1 AND "userId" = $2
-            
+
             UNION ALL
 
             SELECT f.id, f.uuid, f.name, f.type, f."s3Key", f."mimeType", f.size, f.path, f."parentId", f."userId", f."createdAt", f."updatedAt"
@@ -299,7 +299,7 @@ avg_ms=10.02
 p95_ms=10.61
 ```
 
-단순히 봐도 5배 가량 빨라진 것을 볼 수 있으며, 심지어 네트워크 접근 또한 200번이 아닌 1번의 접근으로 쿼리 실행이 가능하기 때문에 안 쓸 이유가 전혀 없다. 
+단순히 봐도 5배 가량 빨라진 것을 볼 수 있으며, 심지어 네트워크 접근 또한 200번이 아닌 1번의 접근으로 쿼리 실행이 가능하기 때문에 안 쓸 이유가 전혀 없다.
 
 DBMS 내부적으로 Recursive CTE를 최적화한다고 하는데, 그건 따로 찾아보시길 바란다.
 
@@ -317,7 +317,7 @@ async getBreadcrumb(uuid: string, userId: number): Promise<FileResponseDto[]> {
 	// ... (중략)
 
 	await this.redisService.set(cacheKey, JSON.stringify(breadcrumb), 3600)
-	
+
 	return breadcrumb
 }
 ```

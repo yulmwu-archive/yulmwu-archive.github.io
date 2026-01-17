@@ -1,31 +1,31 @@
 ---
-title: "[Kubernetes w/ EKS] EKS Fargate Cluster"
-description: "AWS EC2 노드 프로비저닝 없이 EKS 클러스터 구성하기 (AWS Fargate)"
-slug: "2025-09-23-kubernetes-eks-fargate"
+title: '[Kubernetes w/ EKS] EKS Fargate Cluster'
+description: 'AWS EC2 노드 프로비저닝 없이 EKS 클러스터 구성하기 (AWS Fargate)'
+slug: '2025-09-23-kubernetes-eks-fargate'
 author: yulmwu
 date: 2025-09-23T03:09:18.966Z
 updated_at: 2025-12-20T17:54:28.428Z
-categories: ["Kubernetes"]
-tags: ["aws", "eks", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['aws', 'eks', 'kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-eks-fargate.png
 linked_posts:
-  previous: 2025-09-23-kubernetes-ca
-  next: 2025-09-23-kubernetes-eks-max-pods
+    previous: 2025-09-23-kubernetes-ca
+    next: 2025-09-23-kubernetes-eks-max-pods
 is_private: false
 ---
 
 # 0. Overview
 
-전통적인 쿠버네티스 환경에선 클러스터는 하나의 컨트롤 플레인(Control Plane)와 하나 이상의 워커 노드(Worker Node)로 구성된다. 
+전통적인 쿠버네티스 환경에선 클러스터는 하나의 컨트롤 플레인(Control Plane)와 하나 이상의 워커 노드(Worker Node)로 구성된다.
 
 즉 아래와 같이 클러스터가 구성되는 것이다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/713bc0b7-99d7-4911-b1a7-bc3ae22c0ce2/image.png)
 
-만약 AWS EKS(Elastic Kubernetes Service)를 사용하게 될 경우 완전 관리형 서비스이기 때문에 컨트롤 플레인은 AWS에서 자체적으로 관리하고, 워커 노드는 EC2를 프로비저닝하여 구성한다. 
+만약 AWS EKS(Elastic Kubernetes Service)를 사용하게 될 경우 완전 관리형 서비스이기 때문에 컨트롤 플레인은 AWS에서 자체적으로 관리하고, 워커 노드는 EC2를 프로비저닝하여 구성한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7cc8ff72-bcbf-4de6-aa00-d2d653e36907/image.png)
 
@@ -39,7 +39,7 @@ AWS에서 제공하는 컨테이너 오케스트레이션 서비스인 ECS나 EK
 
 ![](https://velog.velcdn.com/images/yulmwu/post/5a0bb551-b9eb-474b-b8b6-811b770fe556/image.png)
 
-때문에 노드에 설치되는 kubelet과 kube-proxy 등이 설치되지 않고 AWS에서 관리한다. 
+때문에 노드에 설치되는 kubelet과 kube-proxy 등이 설치되지 않고 AWS에서 관리한다.
 
 또한 노드마다 특정 파드를 실행되게 하는 DaemonSet이 동작하지 않고, 서비스 중 NodePort는 사용이 불가하며 Ingress나 Gateway API에선 DaemonSet이 필요한 컨트롤러 또는 NodePort를 경유하는 방식이라면 이 또한 불가능하다.
 
@@ -66,23 +66,23 @@ AWS에서 제공하는 컨테이너 오케스트레이션 서비스인 ECS나 EK
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: eks-fargate-demo
-  region: ap-northeast-2
-  version: "1.33"
+    name: eks-fargate-demo
+    region: ap-northeast-2
+    version: '1.33'
 vpc:
-  cidr: "10.0.0.0/16"
+    cidr: '10.0.0.0/16'
 iam:
-  withOIDC: true
+    withOIDC: true
 fargateProfiles:
-  - name: default-fargate-profile
-    selectors:
-      - namespace: default
-      - namespace: kube-system
-  - name: apps-fargate-profile
-    selectors:
-      - namespace: apps
-        labels:
-          run: on-fargate
+    - name: default-fargate-profile
+      selectors:
+          - namespace: default
+          - namespace: kube-system
+    - name: apps-fargate-profile
+      selectors:
+          - namespace: apps
+            labels:
+                run: on-fargate
 ```
 
 여기서 EC2 기반의 노드 클러스터를 구성한다면 `managedNodeGroups`를 작성했지만, Fargate 클러스터는 `fargateProfiles`을 통해 Fargate 프로필을 구성한다.
@@ -91,9 +91,9 @@ fargateProfiles:
 
 ```yaml
 selectors:
-  - namespace: apps
-    labels:
-      run: on-fargate # 물론 다른 이름도 가능함
+    - namespace: apps
+      labels:
+          run: on-fargate # 물론 다른 이름도 가능함
 ```
 
 그 밖에 옵션은 이 포스팅에서 자세히 다루지 않고, 간단하게 클러스터를 구성하고 파드를 올려보도록 하겠다. 아래의 명령어를 통해 클러스터를 구성하자.
@@ -121,7 +121,6 @@ aws eks update-kubeconfig --name eks-fargate-demo --region ap-northeast-2
 
 ![](https://velog.velcdn.com/images/yulmwu/post/2d2c60b6-4a15-48bf-8d84-90f637de5ba5/image.png)
 
-
 ## (2) Deployment
 
 이제 Deployment(또는 ReplicaSet)으로 파드를 만들어 Fargate로 동작시켜보자.
@@ -132,39 +131,39 @@ aws eks update-kubeconfig --name eks-fargate-demo --region ap-northeast-2
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
-  namespace: apps
-  labels:
-    run: on-fargate
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: web
-      run: on-fargate
-  template:
-    metadata:
-      labels:
-        app: web
+    name: web
+    namespace: apps
+    labels:
         run: on-fargate
-    spec:
-      containers:
-        - name: nginx
-          image: public.ecr.aws/nginx/nginx:latest
-          ports:
-            - containerPort: 80
-          resources:
-            requests:
-              cpu: "0.25"
-              memory: "512Mi"
-              ephemeral-storage: "10Gi"
-            limits:
-              cpu: "0.25"
-              memory: "512Mi"
-              ephemeral-storage: "10Gi"
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: web
+            run: on-fargate
+    template:
+        metadata:
+            labels:
+                app: web
+                run: on-fargate
+        spec:
+            containers:
+                - name: nginx
+                  image: public.ecr.aws/nginx/nginx:latest
+                  ports:
+                      - containerPort: 80
+                  resources:
+                      requests:
+                          cpu: '0.25'
+                          memory: '512Mi'
+                          ephemeral-storage: '10Gi'
+                      limits:
+                          cpu: '0.25'
+                          memory: '512Mi'
+                          ephemeral-storage: '10Gi'
 ```
 
-마찬가지로 `apps` 네임스페이스에 `run: on-fargate` 라벨을 붙여 파드를 생성하도록 한다. 
+마찬가지로 `apps` 네임스페이스에 `run: on-fargate` 라벨을 붙여 파드를 생성하도록 한다.
 
 여기서 Fargate는 EC2와 다르게 정해진 성능 용량이 없고 사용된 vCPU와 메모리 사용 시간을 바탕으로 요금이 계산되기 때문에 `resources.requests`와 자원 낭비를 막기 위한 `resources.limits`를 적어두는 것이 좋다.
 
@@ -185,6 +184,6 @@ kubectl get pods -o wide -n apps
 
 ![](https://velog.velcdn.com/images/yulmwu/post/2257f405-f050-4674-9713-d493e5a7bbd1/image.png)
 
-잘 동작하는 것을 볼 수 있다. Fargate에 대한 개념만 설명하는 간단한 포스팅이였기 때문에 실습은 여기까지 매우 간단하게 진행해보았다. 
+잘 동작하는 것을 볼 수 있다. Fargate에 대한 개념만 설명하는 간단한 포스팅이였기 때문에 실습은 여기까지 매우 간단하게 진행해보았다.
 
 DaemonSet이나 NodePort를 사용하는 LoadBalancer Service/Ingress/Gateway API 등을 제외한다면 거의 동일하게 동작하니 적절하게 사용하면 될 것 이다.

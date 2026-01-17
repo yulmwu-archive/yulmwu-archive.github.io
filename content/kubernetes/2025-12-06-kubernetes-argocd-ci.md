@@ -1,19 +1,19 @@
 ---
-title: "[Kubernetes CI/CD] ArgoCD + CI with Github Actions and Kind"
-description: "Github Actions 및 Kind를 통한 쿠버네티스 ArgoCD CI(Continuous integration) 구성하기"
-slug: "2025-12-06-kubernetes-argocd-ci"
+title: '[Kubernetes CI/CD] ArgoCD + CI with Github Actions and Kind'
+description: 'Github Actions 및 Kind를 통한 쿠버네티스 ArgoCD CI(Continuous integration) 구성하기'
+slug: '2025-12-06-kubernetes-argocd-ci'
 author: yulmwu
 date: 2025-12-06T09:52:15.245Z
 updated_at: 2026-01-15T00:55:27.229Z
-categories: ["Kubernetes"]
-tags: ["CI/CD", "argocd", "kubernetes"]
+categories: ['Kubernetes']
+tags: ['CI/CD', 'argocd', 'kubernetes']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-argocd-ci.png
 linked_posts:
-  previous: 2025-12-06-kubernetes-gitops-argocd
-  next: 
+    previous: 2025-12-06-kubernetes-gitops-argocd
+    next:
 is_private: false
 ---
 
@@ -25,7 +25,7 @@ https://velog.io/@yulmwu/kubernetes-gitops-argocd
 
 ![](https://velog.velcdn.com/images/yulmwu/post/7248b32c-9fa4-4d97-801f-e6db7e49794f/image.png)
 
-이 포스팅에선 실제로 운영하는 클러스터에 배포하는 CD(ArgoCD가 그걸 대신 해주는 것이다)가 아닌 배포 전 Helm 차트 등에 문제가 있는지, Sync가 잘 되는지, 그리고 애플리케이션이 잘 동작하는지 Health Check 등을 수행하는 **CI(Continuous integration)**를 구축해보겠다. 
+이 포스팅에선 실제로 운영하는 클러스터에 배포하는 CD(ArgoCD가 그걸 대신 해주는 것이다)가 아닌 배포 전 Helm 차트 등에 문제가 있는지, Sync가 잘 되는지, 그리고 애플리케이션이 잘 동작하는지 Health Check 등을 수행하는 **CI(Continuous integration)**를 구축해보겠다.
 
 그렇게 되면 전 포스팅과 더불어 대략적인 GitOps CI/CD 파이프라인을 구축하게 되는 것이다. 이 포스팅에선 Kustomize가 아닌 Helm Chart를 예제로 사용한다.
 
@@ -46,14 +46,14 @@ https://velog.io/@yulmwu/kubernetes-gitops-argocd
 
 **Kind**(정확히는 Kubernetes in Docker=KinD)는 이름 그대로 Docker 컨테이너 위에서 가볍게 쿠버네티스 클러스터를 생성할 수 있는 도구이다.
 
-Minikube나 K3s와는 다르게 노드마다 호스트에 VM을 만드는 것이 아닌 Docker 컨테이너를 노드처럼 취급하면서 쿠버네티스를 구동한다. 
+Minikube나 K3s와는 다르게 노드마다 호스트에 VM을 만드는 것이 아닌 Docker 컨테이너를 노드처럼 취급하면서 쿠버네티스를 구동한다.
 
-때문에 매우 가벼워서 CI 파이프라인에 쓰기에 매우 최적화되어 있고, e2e 테스트 환경에서도 쓰이는데, 다만 노드가 호스트가 아닌 Docker 컨테이너로 구동되기 때문에 네트워크 구성이나 로드밸런서 등의 일부 영역에서는 컨테이너 기반 아키텍처 특유의 제한이 있을 수 있다. 
+때문에 매우 가벼워서 CI 파이프라인에 쓰기에 매우 최적화되어 있고, e2e 테스트 환경에서도 쓰이는데, 다만 노드가 호스트가 아닌 Docker 컨테이너로 구동되기 때문에 네트워크 구성이나 로드밸런서 등의 일부 영역에서는 컨테이너 기반 아키텍처 특유의 제한이 있을 수 있다.
 
 # 1. Practice — Helm Chart
 
 > 실습에 있어, 이 포스팅에선 프로덕션 또는 스테이징 환경을 구성하는 실습이 아니다.
-> 
+>
 > 그건 이전 포스팅의 내용이니 참고를 바라며, 이 포스팅에선 Github Actions Workflows를 작성하는 것이 주된 실습이다.
 
 먼저 ArgoCD가 바라보며 배포할 Helm Chart 소스를 만들어보겠다. Kustomize나 도구 없이 생으로 매니페스트를 만들어 테스트 할 수 있지만 이 포스팅에선 Helm Chart를 만들도록 하겠다.
@@ -87,7 +87,7 @@ name: demo-app
 description: A demo application
 type: application
 version: 0.1.0
-appVersion: "1.0.0"
+appVersion: '1.0.0'
 ```
 
 ```yaml
@@ -95,12 +95,12 @@ appVersion: "1.0.0"
 
 replicaCount: 1
 image:
-  repository: nginx
-  tag: "1.25"
-  pullPolicy: IfNotPresent
+    repository: nginx
+    tag: '1.25'
+    pullPolicy: IfNotPresent
 service:
-  type: ClusterIP
-  port: 80
+    type: ClusterIP
+    port: 80
 podAnnotations: {}
 resources: {}
 nodeSelector: {}
@@ -168,15 +168,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-app
+    name: demo-app
 spec:
-  selector:
-    app: demo-app
-  ports:
-    - name: http
-      port: {{ .Values.service.port }}
-      targetPort: 80
-  type: {{ .Values.service.type }}
+    selector:
+        app: demo-app
+    ports:
+        - name: http
+          port: { { .Values.service.port } }
+          targetPort: 80
+    type: { { .Values.service.type } }
 ```
 
 그리고 아래는 ArgoCD Application CRD인데, 각자의 Git 레포지토리(예: 깃허브) 주소를 지정하면 된다.
@@ -187,25 +187,25 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: demo-app
-  namespace: argocd
+    name: demo-app
+    namespace: argocd
 spec:
-  project: default
-  source:
-    repoURL: https://github.com/<OWNER/REPO>.git
-    targetRevision: HEAD # 또는 main 등
-    path: charts/demo-app
-    helm:
-      releaseName: demo-app
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: demo-app
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+    project: default
+    source:
+        repoURL: https://github.com/<OWNER/REPO>.git
+        targetRevision: HEAD # 또는 main 등
+        path: charts/demo-app
+        helm:
+            releaseName: demo-app
+    destination:
+        server: https://kubernetes.default.svc
+        namespace: demo-app
+    syncPolicy:
+        automated:
+            prune: true
+            selfHeal: true
+        syncOptions:
+            - CreateNamespace=true
 ```
 
 필자는 아래와 같은 주소와 `main` 브랜치를 사용하니 아래와 같이 명시해주었다. 다만 `.github/workflows`는 그대로 루트 디렉토리에 둬야한다.
@@ -214,12 +214,12 @@ _(별개의 깃 레포지토리 서버가 있거나 비공개 레포지토리인
 
 ```yaml
 # spec:
-  source:
+source:
     repoURL: https://github.com/yulmwu/blog-example-demo.git
     targetRevision: main
     path: k8s-argocd-ci-example/charts/demo-app
     helm:
-      releaseName: demo-app
+        releaseName: demo-app
 ```
 
 # 2. Practice — Github Actions Workflows
@@ -236,10 +236,10 @@ _(별개의 깃 레포지토리 서버가 있거나 비공개 레포지토리인
 name: ArgoCD CI with Kind
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 ```
 
 ## 2-2. kubectl, Kind Installation
@@ -248,23 +248,23 @@ on:
 
 ```yaml
 jobs:
-  argocd-kind-test:
-    runs-on: ubuntu-latest
+    argocd-kind-test:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: 'latest'
+            - name: Set up kubectl
+              uses: azure/setup-kubectl@v4
+              with:
+                  version: 'latest'
 
-      - name: Set up kind
-        uses: helm/kind-action@v1
-        with:
-          cluster_name: argocd-ci-cluster
-          kubectl_version: 'v1.33.0'
+            - name: Set up kind
+              uses: helm/kind-action@v1
+              with:
+                  cluster_name: argocd-ci-cluster
+                  kubectl_version: 'v1.33.0'
 ```
 
 ## 2-3. ArgoCD Installation
@@ -272,31 +272,31 @@ jobs:
 ArgoCD는 공식적으로 제공하는 설치용 매니페스트를 사용하겠다. 사용하는 쿠버네티스 버전에 따라 버전을 고정해야 될 수 있다.
 
 ```yaml
-      - name: Install ArgoCD
-        run: |
-          kubectl create namespace argocd
-          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+- name: Install ArgoCD
+  run: |
+      kubectl create namespace argocd
+      kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-      - name: Wait for ArgoCD components to be ready
-        run: |
-          kubectl wait --namespace argocd \
-            --for=condition=Available deployment/argocd-redis \
-            --timeout=120s
-          kubectl wait --namespace argocd \
-            --for=condition=Available deployment/argocd-server \
-            --timeout=120s
-          kubectl wait --namespace argocd \
-            --for=condition=Available deployment/argocd-repo-server \
-            --timeout=120s
-          kubectl wait --namespace argocd \
-            --for=condition=Available deployment/argocd-dex-server \
-            --timeout=120s
-          kubectl wait --namespace argocd \
-            --for=condition=Available deployment/argocd-applicationset-controller \
-            --timeout=120s
-          kubectl wait --namespace argocd \
-            --for=condition=Available deployment/argocd-notifications-controller \
-            --timeout=120s
+- name: Wait for ArgoCD components to be ready
+  run: |
+      kubectl wait --namespace argocd \
+        --for=condition=Available deployment/argocd-redis \
+        --timeout=120s
+      kubectl wait --namespace argocd \
+        --for=condition=Available deployment/argocd-server \
+        --timeout=120s
+      kubectl wait --namespace argocd \
+        --for=condition=Available deployment/argocd-repo-server \
+        --timeout=120s
+      kubectl wait --namespace argocd \
+        --for=condition=Available deployment/argocd-dex-server \
+        --timeout=120s
+      kubectl wait --namespace argocd \
+        --for=condition=Available deployment/argocd-applicationset-controller \
+        --timeout=120s
+      kubectl wait --namespace argocd \
+        --for=condition=Available deployment/argocd-notifications-controller \
+        --timeout=120s
 ```
 
 ArgoCD 설치가 완료될 때 까지 기다리는 명령을 주었다. Deployment를 기준으로 확인하며 이름이 바뀔 수 있으니 참고하자.
@@ -306,52 +306,52 @@ ArgoCD 설치가 완료될 때 까지 기다리는 명령을 주었다. Deployme
 ArgoCD Application CRD를 적용한다. 필자는 아래와 같이 적용했지만, 실습을 따라한다면 경로가 다를 것이다.
 
 ```yaml
-      - name: Apply ArgoCD Application
-        run: |
-          kubectl apply -f k8s-argocd-ci-example/argocd/application.yaml
+- name: Apply ArgoCD Application
+  run: |
+      kubectl apply -f k8s-argocd-ci-example/argocd/application.yaml
 ```
 
 ## 2-5. Sync/Health Check
 
-여기부턴 이 실습을 위해 작성된 쉘 스크립트인데, 필요에 따라 직접 수정해도 된다. 필자는 간단하게 kubectl로 상태를 Polling 하고, ArgoCD 애플리케이션이 Sync/Healthy 한지 체크한다. 
+여기부턴 이 실습을 위해 작성된 쉘 스크립트인데, 필요에 따라 직접 수정해도 된다. 필자는 간단하게 kubectl로 상태를 Polling 하고, ArgoCD 애플리케이션이 Sync/Healthy 한지 체크한다.
 
 추가적으로 Deployment나 다른 리소스를 wait하여 체크해볼 수 도 있고, 애플리케이션으로 직접 요청을 보내 확인해볼 수 도 있을 것이다.
 
 ```yaml
-      - name: Wait for ArgoCD Application Sync & Healthy
-        run: |
-          APP_NAME="demo-app"
-          NAMESPACE="argocd"
+- name: Wait for ArgoCD Application Sync & Healthy
+  run: |
+      APP_NAME="demo-app"
+      NAMESPACE="argocd"
 
-          echo "Waiting for ArgoCD Application/${APP_NAME} to be Synced and Healthy..."
+      echo "Waiting for ArgoCD Application/${APP_NAME} to be Synced and Healthy..."
 
-          for i in {1..10}; do
-            SYNC_STATUS=$(kubectl get application ${APP_NAME} -n ${NAMESPACE} -o jsonpath='{.status.sync.status}' || echo "Unknown")
-            HEALTH_STATUS=$(kubectl get application ${APP_NAME} -n ${NAMESPACE} -o jsonpath='{.status.health.status}' || echo "Unknown")
+      for i in {1..10}; do
+        SYNC_STATUS=$(kubectl get application ${APP_NAME} -n ${NAMESPACE} -o jsonpath='{.status.sync.status}' || echo "Unknown")
+        HEALTH_STATUS=$(kubectl get application ${APP_NAME} -n ${NAMESPACE} -o jsonpath='{.status.health.status}' || echo "Unknown")
 
-            echo "Try ${i}: sync=${SYNC_STATUS}, health=${HEALTH_STATUS}"
+        echo "Try ${i}: sync=${SYNC_STATUS}, health=${HEALTH_STATUS}"
 
-            if [ "$SYNC_STATUS" = "Synced" ] && [ "$HEALTH_STATUS" = "Healthy" ]; then
-              echo "Application is Synced and Healthy"
-              exit 0
-            fi
+        if [ "$SYNC_STATUS" = "Synced" ] && [ "$HEALTH_STATUS" = "Healthy" ]; then
+          echo "Application is Synced and Healthy"
+          exit 0
+        fi
 
-            sleep 5
-          done
+        sleep 5
+      done
 
-          echo "Application did not become Synced/Healthy in time"
-          kubectl get application ${APP_NAME} -n ${NAMESPACE} -o yaml || true
-          kubectl get pods -A || true
+      echo "Application did not become Synced/Healthy in time"
+      kubectl get application ${APP_NAME} -n ${NAMESPACE} -o yaml || true
+      kubectl get pods -A || true
 
-          exit 1
-          
-      - name: Clean up
-        if: always()
-        run: |
-          kind delete cluster --name argocd-ci-cluster
+      exit 1
+
+- name: Clean up
+  if: always()
+  run: |
+      kind delete cluster --name argocd-ci-cluster
 ```
 
-여태까지의 YAML을 `.github/workflows/ci-argocd-kind.yaml`에 저장하고 Push  해보자. 
+여태까지의 YAML을 `.github/workflows/ci-argocd-kind.yaml`에 저장하고 Push 해보자.
 (필자의 [blog-example-demo 레포지토리](https://github.com/yulmwu/blog-example-demo)에 가보면 해당 파일이 루트에 없는데, 테스트 후 `k8s-argocd-ci-example/_.git/...`으로 옮겨두었다.)
 
 # 3. Testing
@@ -364,9 +364,8 @@ ArgoCD Application CRD를 적용한다. 필자는 아래와 같이 적용했지�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ee81e8f5-3b74-4bf7-9662-be2407514fdd/image.png)
 
-잘 되는 모습을 볼 수 있다. 여기서 `Wait for ArgoCD ...`를 확인해보면 
+잘 되는 모습을 볼 수 있다. 여기서 `Wait for ArgoCD ...`를 확인해보면
 
 ![](https://velog.velcdn.com/images/yulmwu/post/93d8b16c-ffbc-4826-8908-7f22deb50012/image.png)
-
 
 이렇게 3번째 시도, 11초만에 Sync와 Healthy까지 확인이 되는 모습을 볼 수 있는데, 만약 리소스가 많아 오래 걸릴 경우 적절히 스크립트를 수정하면 된다.
