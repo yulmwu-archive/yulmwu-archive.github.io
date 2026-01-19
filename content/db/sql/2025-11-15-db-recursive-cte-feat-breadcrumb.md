@@ -4,7 +4,7 @@ description: 'Recursive CTE를 통해 Directory Breadcrumb를 구현하면서 De
 slug: '2025-11-15-db-recursive-cte-feat-breadcrumb'
 author: yulmwu
 date: 2025-11-15T11:08:28.310Z
-updated_at: 2026-01-16T19:22:03.859Z
+updated_at: 2026-01-18T16:23:44.354Z
 categories: ['DB/SQL']
 tags: ['PostgreSQL', 'db', 'sql', 'typeOrm']
 series:

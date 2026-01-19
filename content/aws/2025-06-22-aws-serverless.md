@@ -4,7 +4,7 @@ description: 'AWS Lambda를 통한 서버리스 아키텍처 배포 (with API Ga
 slug: '2025-06-22-aws-serverless'
 author: yulmwu
 date: 2025-06-22T13:29:13.135Z
-updated_at: 2026-01-16T06:38:21.303Z
+updated_at: 2026-01-17T15:27:47.894Z
 categories: ['AWS']
 tags: ['aws', 'serverless']
 series:

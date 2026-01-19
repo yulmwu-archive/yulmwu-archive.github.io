@@ -4,7 +4,7 @@ description: 'KEDA를 통한 쿠버네티스 Event Driven 파드 오토스케일
 slug: '2026-01-10-kubernetes-keda'
 author: yulmwu
 date: 2026-01-10T02:35:23.258Z
-updated_at: 2026-01-15T16:12:53.282Z
+updated_at: 2026-01-19T05:04:19.940Z
 categories: ['Kubernetes']
 tags: ['kubernetes']
 series:

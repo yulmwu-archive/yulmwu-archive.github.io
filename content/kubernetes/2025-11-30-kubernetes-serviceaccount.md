@@ -4,7 +4,7 @@ description: 'Kubernetes API에 접근하기 위한 RBAC(Role Based Access Contr
 slug: '2025-11-30-kubernetes-serviceaccount'
 author: yulmwu
 date: 2025-11-30T11:18:59.974Z
-updated_at: 2026-01-15T13:19:50.822Z
+updated_at: 2026-01-18T01:32:44.192Z
 categories: ['Kubernetes']
 tags: ['aws', 'kubernetes']
 series:

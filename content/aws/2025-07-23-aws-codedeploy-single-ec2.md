@@ -4,7 +4,7 @@ description: 'AWS CodeDeploy + Github Actions를 통한 EC2 배포 실습 (Singl
 slug: '2025-07-23-aws-codedeploy-single-ec2'
 author: yulmwu
 date: 2025-07-23T05:21:34.383Z
-updated_at: 2026-01-10T03:03:54.023Z
+updated_at: 2026-01-18T01:20:41.029Z
 categories: ['AWS']
 tags: ['CI/CD', 'aws']
 series:

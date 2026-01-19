@@ -4,7 +4,7 @@ description: 'AWS ECS 및 Fargate를 통한 컨테이너 컴퓨팅'
 slug: '2025-07-04-ecs-deploy'
 author: yulmwu
 date: 2025-07-04T12:51:41.224Z
-updated_at: 2025-12-24T05:51:31.371Z
+updated_at: 2026-01-19T11:15:43.310Z
 categories: ['AWS']
 tags: ['Computing', 'aws']
 series:

@@ -4,7 +4,7 @@ description: 'CA를 통한 쿠버네티스(EKS) Cluster Autoscaling 구성하기
 slug: '2025-11-23-kubernetes-ca'
 author: yulmwu
 date: 2025-11-23T23:30:46.163Z
-updated_at: 2026-01-17T12:57:03.050Z
+updated_at: 2026-01-17T18:28:41.005Z
 categories: ['Kubernetes']
 tags: ['eks', 'kubernetes']
 series:

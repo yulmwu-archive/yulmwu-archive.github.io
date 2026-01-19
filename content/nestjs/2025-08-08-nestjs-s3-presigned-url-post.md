@@ -4,7 +4,7 @@ description: 'NestJS에서 AWS S3 Presigned URL 사용하기 (POST 방식)'
 slug: '2025-08-08-nestjs-s3-presigned-url-post'
 author: yulmwu
 date: 2025-08-08T11:43:35.057Z
-updated_at: 2026-01-15T18:54:32.111Z
+updated_at: 2026-01-18T18:33:03.769Z
 categories: ['NestJS']
 tags: ['NestJS', 'aws']
 series:
