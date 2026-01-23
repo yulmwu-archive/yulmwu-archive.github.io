@@ -4,7 +4,7 @@ description: 'ArgoCD를 통한 쿠버네티스 GitOps 구성 및 Kustomize 배�
 slug: '2025-10-03-kubernetes-gitops-argocd'
 author: yulmwu
 date: 2025-10-03T12:07:32.658Z
-updated_at: 2026-01-14T19:37:48.649Z
+updated_at: 2026-01-22T09:07:31.827Z
 categories: ['Kubernetes']
 tags: ['CI/CD', 'argocd', 'kubernetes']
 series:

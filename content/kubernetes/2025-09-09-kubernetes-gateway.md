@@ -4,7 +4,7 @@ description: 'Ingress의 차세대, Gateway API 실습 및 AWS Lattice 개념'
 slug: '2025-09-09-kubernetes-gateway'
 author: yulmwu
 date: 2025-09-09T02:34:00.236Z
-updated_at: 2026-01-18T04:27:42.363Z
+updated_at: 2026-01-21T05:33:39.186Z
 categories: ['Kubernetes']
 tags: ['aws', 'eks', 'kubernetes', 'networking']
 series:

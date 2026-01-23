@@ -4,7 +4,7 @@ description: 'NestJS에서 AWS S3 Presigned URL 사용하기'
 slug: '2025-08-03-nestjs-s3-presigned-url'
 author: yulmwu
 date: 2025-08-03T05:36:07.088Z
-updated_at: 2026-01-13T04:05:06.996Z
+updated_at: 2026-01-21T03:07:31.886Z
 categories: ['NestJS']
 tags: ['NestJS', 'aws']
 series:

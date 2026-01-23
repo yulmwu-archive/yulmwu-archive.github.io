@@ -4,7 +4,7 @@ description: '다이어그램 도구, draw.io 사용법 (AWS 다이어그램 만
 slug: '2025-07-19-how-to-use-draw-io'
 author: yulmwu
 date: 2025-07-19T06:05:51.558Z
-updated_at: 2026-01-19T07:56:18.577Z
+updated_at: 2026-01-22T05:51:05.039Z
 categories: ['Misc']
 tags: ['aws']
 series:

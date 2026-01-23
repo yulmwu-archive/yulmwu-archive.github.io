@@ -4,7 +4,7 @@ description: 'AWS ALB - EC2 - RDS로 3 Tier 아키텍처 구현하기'
 slug: '2025-11-21-aws-deploying-3-tier-architecture'
 author: yulmwu
 date: 2025-11-21T12:27:07.839Z
-updated_at: 2026-01-16T08:35:39.094Z
+updated_at: 2026-01-22T06:42:50.961Z
 categories: ['AWS']
 tags: ['aws']
 series:

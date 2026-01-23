@@ -4,7 +4,7 @@ description: 'AWS CodePipeline CI/CD를 통한 ECS, S3(정적 웹 호스팅) 배
 slug: '2025-07-04-aws-codepipeline'
 author: yulmwu
 date: 2025-07-04T12:53:29.547Z
-updated_at: 2026-01-18T01:20:25.813Z
+updated_at: 2026-01-20T14:08:41.015Z
 categories: ['AWS']
 tags: ['CI/CD', 'aws']
 series:

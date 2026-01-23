@@ -4,7 +4,7 @@ description: 'Go 언어에서 Operator SDK를 통한 쿠버네티스 Operator �
 slug: '2025-10-01-kubernetes-operator-go'
 author: yulmwu
 date: 2025-10-01T08:16:26.908Z
-updated_at: 2026-01-08T08:18:03.446Z
+updated_at: 2026-01-22T11:45:58.722Z
 categories: ['Kubernetes']
 tags: ['kubernetes']
 series:

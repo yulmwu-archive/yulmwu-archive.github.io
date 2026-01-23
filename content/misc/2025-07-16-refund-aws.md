@@ -4,7 +4,7 @@ description: 'Feat. 공중분해 될 뻔한 20달러 돌려받기'
 slug: '2025-07-16-refund-aws'
 author: yulmwu
 date: 2025-07-16T01:06:24.694Z
-updated_at: 2026-01-19T08:04:24.310Z
+updated_at: 2026-01-21T14:12:26.284Z
 categories: ['Misc']
 tags: ['aws', '일상']
 series:

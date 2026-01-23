@@ -4,7 +4,7 @@ description: 'AWS Kinesis Data Streams, Flink, Glue 및 Athena를 통한 UI/UX �
 slug: '2025-12-28-aws-click-heatmap-with-kds-msf-glue-athena'
 author: yulmwu
 date: 2025-12-28T10:51:06.968Z
-updated_at: 2026-01-18T10:14:51.555Z
+updated_at: 2026-01-23T01:31:41.243Z
 categories: ['AWS']
 tags: ['aws']
 series:

@@ -4,16 +4,16 @@ description: 'Kafka 프로듀서의 send(ProducerRecord) 호출 부터 브로커
 slug: '2025-12-01-kafka-producer-message-delivery-time'
 author: yulmwu
 date: 2025-12-01T01:34:12.283Z
-updated_at: 2026-01-19T11:02:53.571Z
-categories: ['Kafka']
+updated_at: 2026-01-22T02:38:56.774Z
+categories: ['Data Streaming']
 tags: ['kafka']
 series:
-    name: Kafka
-    slug: kafka
-thumbnail: ../../thumbnails/kafka/kafka-producer-message-delivery-time.png
+    name: Data Streaming
+    slug: data-streaming
+thumbnail: ../../thumbnails/data-streaming/kafka-producer-message-delivery-time.png
 linked_posts:
     previous:
-    next:
+    next: 2025-12-01-flink-late-event-handling
 is_private: false
 ---
 

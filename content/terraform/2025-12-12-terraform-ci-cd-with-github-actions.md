@@ -4,7 +4,7 @@ description: 'Github Actions를 통한 Terraform CI/CD 파이프라인 구축'
 slug: '2025-12-12-terraform-ci-cd-with-github-actions'
 author: yulmwu
 date: 2025-12-12T08:59:59.463Z
-updated_at: 2026-01-15T19:55:36.465Z
+updated_at: 2026-01-21T06:23:10.715Z
 categories: ['Terraform']
 tags: ['CI/CD', 'aws', 'terraform']
 series:

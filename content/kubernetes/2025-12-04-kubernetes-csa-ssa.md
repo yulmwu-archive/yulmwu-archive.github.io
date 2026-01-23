@@ -4,7 +4,7 @@ description: '쿠버네티스의 CSA(Client Side Apply)와 SSA(Server Side Apply
 slug: '2025-12-04-kubernetes-csa-ssa'
 author: yulmwu
 date: 2025-12-04T07:28:55.187Z
-updated_at: 2026-01-13T04:51:29.573Z
+updated_at: 2026-01-21T15:21:04.217Z
 categories: ['Kubernetes']
 tags: ['helm', 'kubernetes']
 series:

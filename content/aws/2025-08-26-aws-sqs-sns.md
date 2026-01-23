@@ -4,7 +4,7 @@ description: 'AWS SQS and SNS를 통한 MSA 애플리케이션 간 메시징 솔
 slug: '2025-08-26-aws-sqs-sns'
 author: yulmwu
 date: 2025-08-26T04:24:51.006Z
-updated_at: 2026-01-12T08:25:13.127Z
+updated_at: 2026-01-23T04:23:44.253Z
 categories: ['AWS']
 tags: ['Integration', 'aws']
 series:

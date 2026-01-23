@@ -4,7 +4,7 @@ description: 'AWS EC2 노드 프로비저닝 없이 EKS 클러스터 구성하�
 slug: '2025-09-23-kubernetes-eks-fargate'
 author: yulmwu
 date: 2025-09-23T03:09:18.966Z
-updated_at: 2025-12-20T17:54:28.428Z
+updated_at: 2026-01-21T00:48:02.371Z
 categories: ['Kubernetes']
 tags: ['aws', 'eks', 'kubernetes']
 series:

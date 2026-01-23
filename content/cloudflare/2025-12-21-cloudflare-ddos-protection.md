@@ -4,7 +4,7 @@ description: 'Cloudflare를 사용한 DDoS 방어 (Feat. AWS Shield)'
 slug: '2025-12-21-cloudflare-ddos-protection'
 author: yulmwu
 date: 2025-12-21T12:04:19.600Z
-updated_at: 2026-01-19T07:12:32.508Z
+updated_at: 2026-01-22T18:41:23.866Z
 categories: ['Cloudflare']
 tags: ['Cloudflare', 'aws', 'security']
 series:

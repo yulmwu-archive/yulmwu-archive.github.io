@@ -4,7 +4,7 @@ description: 'AWS Lambda를 사용한 Secrets Manager 키 로테이션 '
 slug: '2025-08-12-aws-secrets-manager-key-rotation-lambda'
 author: yulmwu
 date: 2025-08-12T13:35:35.857Z
-updated_at: 2026-01-19T08:38:56.856Z
+updated_at: 2026-01-22T12:35:44.434Z
 categories: ['AWS']
 tags: ['Misc', 'aws']
 series:

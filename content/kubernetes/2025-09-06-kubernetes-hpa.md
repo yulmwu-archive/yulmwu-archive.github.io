@@ -4,7 +4,7 @@ description: '쿠버네티스 파드 수평적 오토스케일링(HPA) 실습'
 slug: '2025-09-06-kubernetes-hpa'
 author: yulmwu
 date: 2025-09-06T01:59:45.085Z
-updated_at: 2026-01-12T00:43:20.545Z
+updated_at: 2026-01-21T01:27:12.681Z
 categories: ['Kubernetes']
 tags: ['eks', 'kubernetes']
 series:

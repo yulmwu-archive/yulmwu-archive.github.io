@@ -4,7 +4,7 @@ description: '쿠버네티스 Service(ClusterIP, NodePort, LoadBalancer) 및 Ing
 slug: '2025-08-31-kubernetes-service-ingress'
 author: yulmwu
 date: 2025-08-31T04:04:42.869Z
-updated_at: 2026-01-14T03:17:10.537Z
+updated_at: 2026-01-21T01:37:31.488Z
 categories: ['Kubernetes']
 tags: ['eks', 'kubernetes']
 series:

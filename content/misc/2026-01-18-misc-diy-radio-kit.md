@@ -4,7 +4,7 @@ description: '다만 낭만은 있음.'
 slug: '2026-01-18-misc-diy-radio-kit'
 author: yulmwu
 date: 2026-01-18T13:51:16.486Z
-updated_at: 2026-01-19T11:02:28.368Z
+updated_at: 2026-01-22T09:02:28.479Z
 categories: ['Misc']
 tags: ['일상']
 series:

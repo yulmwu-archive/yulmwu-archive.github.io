@@ -4,7 +4,7 @@ description: 'OPA Gatekeeper와 Kyverno를 통한 Kubernetes PaC(Policy as Code)
 slug: '2026-01-13-kubernetes-pac-with-gatekeeper-and-kyverno'
 author: yulmwu
 date: 2026-01-13T12:30:29.037Z
-updated_at: 2026-01-19T07:00:52.176Z
+updated_at: 2026-01-20T08:51:40.347Z
 categories: ['Kubernetes']
 tags: ['kubernetes']
 series:

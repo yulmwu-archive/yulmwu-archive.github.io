@@ -4,7 +4,7 @@ description: "cert-manager를 통한 쿠버네티스 TLS/SSL 인증서 관리 (F
 slug: '2026-01-09-kubernetes-cert-manager'
 author: yulmwu
 date: 2026-01-09T06:37:47.568Z
-updated_at: 2026-01-18T14:10:56.458Z
+updated_at: 2026-01-22T08:23:12.759Z
 categories: ['Kubernetes']
 tags: ['kubernetes']
 series:

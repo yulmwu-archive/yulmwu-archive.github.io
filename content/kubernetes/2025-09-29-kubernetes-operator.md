@@ -4,7 +4,7 @@ description: '쿠버네티스 Operator 패턴을 통한 Day 2 Operation 자동�
 slug: '2025-09-29-kubernetes-operator'
 author: yulmwu
 date: 2025-09-29T23:24:51.261Z
-updated_at: 2026-01-13T04:04:54.115Z
+updated_at: 2026-01-22T01:16:36.105Z
 categories: ['Kubernetes']
 tags: ['kubernetes']
 series:
