@@ -1,23 +1,23 @@
 ---
-title: '[Kubernetes] Observability with Prometheus + Grafana '
-description: 'Prometheus와 Grafana를 통한 쿠버네티스 Observability 확보하기'
-slug: '2025-11-06-kubernetes-prometheus-grafana'
+title: "[Kubernetes] Observability with Prometheus + Grafana "
+description: "Prometheus와 Grafana를 통한 쿠버네티스 Observability 확보하기"
+slug: "2025-11-06-kubernetes-prometheus-grafana"
 author: yulmwu
 date: 2025-11-06T12:42:55.584Z
-updated_at: 2025-12-09T15:19:51.260Z
-categories: ['Kubernetes']
-tags: ['kubernetes']
+updated_at: 2026-02-14T21:44:57.326Z
+categories: ["Kubernetes"]
+tags: ["kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-prometheus-grafana.png
 linked_posts:
-    previous: 2025-11-06-kubernetes-serviceaccount
-    next: 2025-11-06-kubernetes-csa-ssa
+  previous: 2025-11-06-kubernetes-serviceaccount
+  next: 2025-11-06-kubernetes-csa-ssa
 is_private: false
 ---
 
-# 0. Overview
+# 0. Overview 
 
 인프라를 운영하면서 주기적으로 성능을 관찰하거나 다양한 문제에 직면하여 대응하기 위해 **모니터링(Monitoring)** 한다.
 
@@ -83,7 +83,7 @@ Prometheus는 메트릭을 수집할, 디스커버리 될 대상을 아래와 �
 
 ## 1-2. Prometheus Server
 
-Prometheus의 HTTP 서버로, 주요 기능은 구성된 스크랩 대상으로 부터 메트릭을 Pull 하고, 수집된 메트릭을 TSDB(Time Series Database)에 저장한다.
+Prometheus의 HTTP 서버로, 주요 기능은 구성된 스크랩 대상으로 부터 메트릭을 Pull 하고, 수집된 메트릭을 TSDB(Time Series Database)에 저장한다. 
 
 또한 조건에 따라 알림을 만들어 이메일이나 메신저, 웹훅 등을 호출할 수 있고(Alertmanager), HTTP API나 자체적인 웹 UI를 제공, 후술할 PromQL을 제공하여 Grafana와 같은 시각화 서비스와 연동할 수 있다.
 
@@ -96,9 +96,9 @@ Prometheus의 HTTP 서버로, 주요 기능은 구성된 스크랩 대상으로 
 `/metrics` 엔드포인트는 Prometheus에서 제공하는 언어 별 라이브러리/패키지 등으로 구현할 수 있고, Pushgateway와 함께 다음 차례에서 다뤄보겠다.
 
 > ### 1-3-1. OpenMetrics
->
+> 
 > Prometheus는 메트릭 엔드포인트(`/metrics` 등, 커스텀 가능)를 통해 Pull하여 메트릭을 수집하도록 하는데, 이때 메트릭들을 아래와 같은 텍스트 기반의 포맷으로 구성한다.
->
+> 
 > ```shell
 > # HELP http_requests_total The total number of HTTP requests.
 > # TYPE http_requests_total counter
@@ -108,7 +108,7 @@ Prometheus의 HTTP 서버로, 주요 기능은 구성된 스크랩 대상으로 
 > # TYPE cpu_usage gauge
 > cpu_usage 72.5
 > ```
->
+> 
 > Prometheus는 처음엔 이러한 독자적인 포맷인 **Prometheus Exposition Format**을 사용하도록 하였는데, 여기에 네이밍 규칙 표준화, 추가적인 기능과 `application/openmetrics-text` MIME 타입 추가 등의 표준화된 포맷인 **OpenMetrics**를 만들고 표준으로 사용하게 되었다.
 
 **Exporter**는 애플리케이션이나 시스템이 직접 Prometheus Exposition Format(이하 PEF)이나 OpenMetrics 포맷의 metrics 엔드포인트(`/metrics` 등)를 노출하지 못하는 경우, Exporter를 중간에 두어 Exporter가 메트릭을 수집, 그리고 OpenMetrics(이하 PEF 포함) 포맷의 엔드포인트를 노출하여 Prometheus가 Pull 할 수 있도록 한다.
@@ -121,7 +121,7 @@ Prometheus의 HTTP 서버로, 주요 기능은 구성된 스크랩 대상으로 
 
 ## 1-4. Targets — Pushgateway
 
-Prometheus는 기본적으로 수집할 대상에 Pull을 통해 메트릭을 수집하도록 하는데 (Pull 모델), 짧게 실행되는 배치 작업이나 지속되지 않는 CronJob 등의 경우 Pull 모델을 사용하기가 어려울 수 있다.
+Prometheus는 기본적으로 수집할 대상에 Pull을 통해 메트릭을 수집하도록 하는데 (Pull 모델), 짧게 실행되는 배치 작업이나 지속되지 않는 CronJob 등의 경우 Pull 모델을 사용하기가 어려울 수 있다. 
 
 예를 들어 어떠한 CronJob이 30초 동안만 실행되고 종료되는데, 만약 `scrape_interval=30s`로 설정한다면 스크랩 시 파드가 이미 종료되기 때문에 Pull을 하기가 어려울 수 있다.
 
@@ -152,7 +152,7 @@ Prometheus에선 Alertmanager를 통해 사용자가 지정한 조건, Alerting 
 중복된 알림을 제거하도록 하는 Deduplication, 같은 유형의 알림을 묶는 Grouping, 알림을 특정 대상(리시버)으로 전달하는 Routing 등의 기능이 있다.
 
 > 이때 구성한 조건(Alerting Rule)은 일정 시간마다 평가하여 알림을 보내는데, 이를 Rule Evaluation이라고 한다.
->
+> 
 > 추가적으로 자주 사용하는 PromQL을 미리 계산해서 별도의 Time Series 데이터로 저장하는 Recording Rule 또한 이때 평가된다.
 
 ## 1-7. PromQL
@@ -230,7 +230,7 @@ PromQL에 대한 문법은 본 포스팅에서 자세히 다루지 않을 예정
 - `max_over_time()` — 해당 구간의 최대값을 구함.
 - `min_over_time()` — 해당 구간의 최소값을 구함.
 
-예를 들어 아래와 같은 PromQL이 있다면
+예를 들어 아래와 같은 PromQL이 있다면 
 
 ```sql
 increase(http_requests_total{job="backend"}[1h])
@@ -437,20 +437,20 @@ const register = new client.Registry()
 client.collectDefaultMetrics({ register })
 
 const httpRequestCounter = new client.Counter({
-	name: 'http_requests_total',
-	help: 'Total number of HTTP requests',
-	labelNames: ['method', 'route', 'status_code'],
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+    labelNames: ['method', 'route', 'status_code'],
 })
 register.registerMetric(httpRequestCounter)
 
 app.get('/', (req, res) => {
-	httpRequestCounter.inc({ method: 'GET', route: '/', status_code: 200 })
-	res.send('Hello Metrics!')
+    httpRequestCounter.inc({ method: 'GET', route: '/', status_code: 200 })
+    res.send('Hello Metrics!')
 })
 
 app.get('/metrics', async (req, res) => {
-	res.set('Content-Type', register.contentType)
-	res.end(await register.metrics())
+    res.set('Content-Type', register.contentType)
+    res.end(await register.metrics())
 })
 
 app.listen(8080, () => console.log(`Server running on port 8080`))
@@ -486,38 +486,38 @@ docker buildx build --platform linux/amd64,linux/arm64 \
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: express-app
-    labels:
-        app: express-app
+  name: express-app
+  labels:
+    app: express-app
 spec:
-    replicas: 1
-    selector:
-        matchLabels:
-            app: express-app
-    template:
-        metadata:
-            labels:
-                app: express-app
-        spec:
-            containers:
-                - name: express-app
-                  image: <USERNAME>/prometheus-test:latest
-                  ports:
-                      - containerPort: 8080
+  replicas: 1
+  selector:
+    matchLabels:
+      app: express-app
+  template:
+    metadata:
+      labels:
+        app: express-app
+    spec:
+      containers:
+      - name: express-app
+        image: <USERNAME>/prometheus-test:latest
+        ports:
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    name: express-app
-    labels:
-        app: express-app
+  name: express-app
+  labels:
+    app: express-app
 spec:
-    selector:
-        app: express-app
-    ports:
-        - name: http
-          port: 8080
-          targetPort: 8080
+  selector:
+    app: express-app
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
 ```
 
 ```yaml
@@ -526,17 +526,17 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-    name: express-app
-    labels:
-        release: kube-prometheus-stack
+  name: express-app
+  labels:
+    release: kube-prometheus-stack
 spec:
-    selector:
-        matchLabels:
-            app: express-app
-    endpoints:
-        - port: http
-          path: /metrics
-          interval: 10s
+  selector:
+    matchLabels:
+      app: express-app
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 10s
 ```
 
 ```shell
@@ -561,3 +561,4 @@ http_requests_total{method="GET",route="/",status_code="200"} 4
 그럼 사진과 같이 커스텀한 `http_requests_total`가 잘 표시되는 것을 확인할 수 있다. 마찬가지로 Grafana 대시보드에서도 패널을 추가하여 확인해볼 수 있다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b5e0240b-7546-4962-9b6c-b628b484b41f/image.png)
+

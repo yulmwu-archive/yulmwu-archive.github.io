@@ -1,31 +1,31 @@
 ---
-title: '[AWS Streaming] UI/UX Click Heatmap with AWS KDS, MSF, Glue, and Athena Pipeline'
-description: 'AWS Kinesis Data Streams, Flink, Glue 및 Athena를 통한 UI/UX 클릭 히트맵 파이프라인 구축하기 (PoC/MVP)'
-slug: '2025-12-28-aws-click-heatmap-with-kds-msf-glue-athena'
+title: "[AWS Streaming] UI/UX Click Heatmap with AWS KDS, MSF, Glue, and Athena Pipeline"
+description: "AWS Kinesis Data Streams, Flink, Glue 및 Athena를 통한 UI/UX 클릭 히트맵 파이프라인 구축하기 (PoC/MVP)"
+slug: "2025-12-28-aws-click-heatmap-with-kds-msf-glue-athena"
 author: yulmwu
 date: 2025-12-28T10:51:06.968Z
-updated_at: 2026-01-23T01:31:41.243Z
-categories: ['AWS']
-tags: ['aws']
+updated_at: 2026-02-25T06:40:51.056Z
+categories: ["AWS"]
+tags: ["aws"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-click-heatmap-with-kds-msf-glue-athena.png
 linked_posts:
-    previous: 2025-12-28-aws-appsync-graphql-serverless
-    next: 2025-12-28-aws-cloudfront-lambda-image-resizing
+  previous: 2025-12-28-aws-appsync-graphql-serverless
+  next: 2025-12-28-aws-cloudfront-lambda-image-resizing
 is_private: false
 ---
 
 > 본 포스팅에선 실습을 위한 애플리케이션 및 (필요 시) Terraform 코드를 아래의 깃허브 레포지토리에서 제공한다. (단, 이 포스팅에선 Terraform을 사용하지 않고 AWS 콘솔을 통해 리소스를 생성해볼 것이다.)
->
+> 
 > https://github.com/yulmwu/aws-click-heatmap-demo
 
 # 0. Overview
 
 필자는 프론트엔드 개발자도 아니고 그쪽 분야로 관심이 있는 것 또한 아니다. 하지만 작은 팀이나 1인 개발 시 어쩔 수 없이 접해야 하고, 또한 최종적으로 실 사용자들에게 보여지는 분야 중 하나이기 때문에 최소한의 학습을 해야 하는 분야가 아닌가 싶다.
 
-팀에서 최근 얼떨결에 프론트엔드와 UI/UX를 담당할 새로운 팀원과 함께하게 되었는데, 여러 이야기를 나눠보던 중 *"UX 개선을 위해 히트맵을 구현해보자."*라는 의견을 나누게 되었다.
+팀에서 최근 얼떨결에 프론트엔드와 UI/UX를 담당할 새로운 팀원과 함께하게 되었는데, 여러 이야기를 나눠보던 중 _"UX 개선을 위해 히트맵을 구현해보자."_라는 의견을 나누게 되었다.
 
 ---
 
@@ -33,12 +33,12 @@ is_private: false
 
 ---
 
-그리고 이 포스팅에서는 Kafka 대신 AWS의 데이터 스트리밍 플랫폼인 **KDS*(Kinesis Data Streams)***와 AWS에서 매니지드로 관리하는 Flink인 **MSF*(AWS Managed Service for Apache Flink)***, S3 쿼리를 위한 **Glue** 및 **Athena**를 사용하여 PoC/MVP 정도의 페이지 클릭 히트맵을 구현해볼 것이다. 최종적으로 확인해볼 수 있는 히트맵은 아래와 같다.
+그리고 이 포스팅에서는 Kafka 대신 AWS의 데이터 스트리밍 플랫폼인 **KDS_(Kinesis Data Streams)_**와 AWS에서 매니지드로 관리하는 Flink인 **MSF_(AWS Managed Service for Apache Flink)_**, S3 쿼리를 위한 **Glue** 및 **Athena**를 사용하여 PoC/MVP 정도의 페이지 클릭 히트맵을 구현해볼 것이다. 최종적으로 확인해볼 수 있는 히트맵은 아래와 같다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/a3da04bd-7e9c-4969-8595-b67a6a3b6014/image.png)
 
-> 이 포스팅에선 AWS 인프라를 다루며, 클릭 시 데이터가 Kinesis Data Streams에 쌓이도록 하는 애플리케이션(이하 **Click Producer**)과 Athena 쿼리 결과를 응답 받아 히트맵을 렌더링하는 애플리케이션(이하 **Heatmap Viewer**)에 대한 소스코드 설명은 하지 않는다.
->
+> 이 포스팅에선 AWS 인프라를 다루며, 클릭 시 데이터가 Kinesis Data Streams에 쌓이도록 하는 애플리케이션(이하 **Click Producer**)과 Athena 쿼리 결과를 응답 받아 히트맵을 렌더링하는 애플리케이션(이하 **Heatmap Viewer**)에 대한 소스코드 설명은 하지 않는다. 
+> 
 > 다만 환경 변수 설정 및 빌드/실행 방법만 기술하고, 자세한 소스코드는 제공된 깃허브 레포지토리를 참고하자. PoC 수준이기 때문에 프로덕션 환경에서는 사용하지 않는 것을 극히 권장한다.
 
 # 1. AWS Architecture
@@ -81,9 +81,9 @@ MSF(Flink)를 거친 큐레이션된 데이터는 Raw 데이터와 마찬가지�
 마지막으로 MSF(Flink) 애플리케이션은 S3 버킷에 데이터를 저장하고(FileSink), Athena 분석에서 최적화를 위해 Parquet 포맷으로 저장한다. (ParquetWriters)
 
 > **Parquet 포맷**은 주로 빅데이터, 하둡 생태계에서 많이 사용하는 컬럼 기반의 파일 포맷이다.
->
+> 
 > 행(Row)이 아닌 열(컬럼) 단위로 저장하기 때문에 압축 효율이 높고, 쿼리를 통한 분석 시 데이터 처리 성능에 대해 최적화 할 수 있다.
->
+> 
 > 대부분의 다양한 처리 엔진 및 분석 서비스에서 호환되는데, AWS Athena 및 Glue에서도 호환되는 포맷이기 때문에 사용하였다.
 
 이렇게 큐레이션된 데이터가 Curated S3 버킷에 저장이 되었다면, **AWS Glue Crawler**를 통해 Athena를 위한 테이블 스키마와 파티션 정보를 Glue Data Catalog로 만든다. (Curated S3엔 `dt='yyyy-MM-dd'/hour='HH"` 형태로 저장됨)
@@ -105,7 +105,6 @@ Glue Crawler를 통해 자동으로 테이블의 스키마를 알 수 있고, �
 ## (1) S3 Bucket
 
 버킷의 이름은 다음과 같다. 중복이 되면 안되니 겹친다면 변경하도록 하자.
-
 - Raw S3 Bucket: `heatmap-demo-raw-1230`
 - Curated S3 Bucket: `heatmap-demo-curated-1230`
 - Athena Results S3 Bucket: `heatmap-demo-athena-results-1230`
@@ -152,9 +151,16 @@ Kinesis Data Streams는 앞서 말했 듯 EFO를 구성하지는 않겠다. 다�
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement':
-        [{ 'Effect': 'Allow', 'Principal': { 'Service': 'firehose.amazonaws.com' }, 'Action': 'sts:AssumeRole' }],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "firehose.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
 }
 ```
 
@@ -164,37 +170,37 @@ Kinesis Data Streams는 앞서 말했 듯 EFO를 구성하지는 않겠다. 다�
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement':
-        [
-            {
-                'Sid': 'S3Write',
-                'Effect': 'Allow',
-                'Action':
-                    [
-                        's3:AbortMultipartUpload',
-                        's3:GetBucketLocation',
-                        's3:GetObject',
-                        's3:ListBucket',
-                        's3:ListBucketMultipartUploads',
-                        's3:PutObject',
-                    ],
-                'Resource': ['arn:aws:s3:::heatmap-demo-raw-1230', 'arn:aws:s3:::heatmap-demo-raw-1230/*'],
-            },
-            {
-                'Sid': 'KinesisRead',
-                'Effect': 'Allow',
-                'Action':
-                    [
-                        'kinesis:DescribeStream',
-                        'kinesis:DescribeStreamSummary',
-                        'kinesis:GetShardIterator',
-                        'kinesis:GetRecords',
-                        'kinesis:ListShards',
-                    ],
-                'Resource': 'arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds',
-            },
-        ],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3Write",
+      "Effect": "Allow",
+      "Action": [
+        "s3:AbortMultipartUpload",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:ListBucketMultipartUploads",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::heatmap-demo-raw-1230",
+        "arn:aws:s3:::heatmap-demo-raw-1230/*"
+      ]
+    },
+    {
+      "Sid": "KinesisRead",
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:GetShardIterator",
+        "kinesis:GetRecords",
+        "kinesis:ListShards"
+      ],
+      "Resource": "arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds"
+    }
+  ]
 }
 ```
 
@@ -212,11 +218,11 @@ Firehose의 소스는 KDS(`heatmap-demo-kds`)이며, 대상은 S3를 선택한�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/298341d3-cbb2-4ba6-875c-07a0e27267f3/image.png)
 
-옵션 중 Lambda를 사용하여 데이터를 가공하고 조작, 변경할 수 있는 기능 등이 있으나 생략한다.
+옵션 중 Lambda를 사용하여 데이터를 가공하고 조작, 변경할 수 있는 기능 등이 있으나 생략한다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/0760081e-8a46-4525-8b56-b01af38b263f/image.png)
 
-대상 설정은 위와 같이 Raw S3 Bucket를 선택하고, S3 버킷 접두사는 `raw/`로 설정해두었다.
+대상 설정은 위와 같이 Raw S3 Bucket를 선택하고, S3 버킷 접두사는 `raw/`로 설정해두었다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/708a4121-c6c5-426e-80e6-fbe3aa514d61/image.png)
 
@@ -234,7 +240,7 @@ IAM 역할은 위와 같이 만들어둔 `heatmap-demo-firehose-role`을 선택�
 
 ### Building Flink Artifacts (Jar)
 
-MSF를 구성하기 전, MSF(Kafka)에 올릴 애플리케이션을 빌드하고 Jar 아키팩트를 S3(`heatmap-demo-curated-1230`) 버킷에 업로드하자. 애플리케이션은 아래의 깃허브 레포지토리의 `applications/flink-heatmap-job` 디렉토리에 위치한다.
+MSF를 구성하기 전, MSF(Kafka)에 올릴 애플리케이션을 빌드하고 Jar 아키팩트를 S3(`heatmap-demo-curated-1230`) 버킷에 업로드하자. 애플리케이션은 아래의 깃허브 레포지토리의 `applications/flink-heatmap-job` 디렉토리에 위치한다. 
 
 ```shell
 git clone https://github.com/yulmwu/aws-click-heatmap-demo.git
@@ -259,15 +265,16 @@ Firehose와 마찬가지로 IAM 역할과 역할에 Attach할 정책을 만들�
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement':
-        [
-            {
-                'Effect': 'Allow',
-                'Principal': { 'Service': 'kinesisanalytics.amazonaws.com' },
-                'Action': 'sts:AssumeRole',
-            },
-        ],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "kinesisanalytics.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
 }
 ```
 
@@ -279,52 +286,58 @@ Firehose와 마찬가지로 IAM 역할과 역할에 Attach할 정책을 만들�
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement':
-        [
-            {
-                'Sid': 'S3Access',
-                'Effect': 'Allow',
-                'Action':
-                    [
-                        's3:AbortMultipartUpload',
-                        's3:GetObject',
-                        's3:ListBucketMultipartUploads',
-                        's3:PutObject',
-                        's3:ListBucket',
-                        's3:DeleteObject',
-                        's3:ListMultipartUploadParts',
-                    ],
-                'Resource': ['arn:aws:s3:::heatmap-demo-curated-1230', 'arn:aws:s3:::heatmap-demo-curated-1230/*'],
-            },
-            {
-                'Sid': 'KinesisRead',
-                'Effect': 'Allow',
-                'Action':
-                    [
-                        'kinesis:DescribeStream',
-                        'kinesis:DescribeStreamSummary',
-                        'kinesis:GetRecords',
-                        'kinesis:GetShardIterator',
-                        'kinesis:ListShards',
-                        'kinesis:ListStreams',
-                        'kinesis:SubscribeToShard',
-                    ],
-                'Resource': 'arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds',
-            },
-            {
-                'Sid': 'CloudWatchLogs',
-                'Effect': 'Allow',
-                'Action': ['logs:PutLogEvents', 'logs:CreateLogStream', 'logs:DescribeLogStreams'],
-                'Resource': 'arn:aws:logs:*:*:log-group:/aws/kinesis-analytics/heatmap-demo-flink:*',
-            },
-            {
-                'Sid': 'CloudWatchLogsCreateGroup',
-                'Effect': 'Allow',
-                'Action': ['logs:CreateLogGroup'],
-                'Resource': '*',
-            },
-        ],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3Access",
+      "Effect": "Allow",
+      "Action": [
+        "s3:AbortMultipartUpload",
+        "s3:GetObject",
+        "s3:ListBucketMultipartUploads",
+        "s3:PutObject",
+        "s3:ListBucket",
+        "s3:DeleteObject",
+        "s3:ListMultipartUploadParts"
+      ],
+      "Resource": [
+        "arn:aws:s3:::heatmap-demo-curated-1230",
+        "arn:aws:s3:::heatmap-demo-curated-1230/*"
+      ]
+    },
+    {
+      "Sid": "KinesisRead",
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:GetRecords",
+        "kinesis:GetShardIterator",
+        "kinesis:ListShards",
+        "kinesis:ListStreams",
+        "kinesis:SubscribeToShard"
+      ],
+      "Resource": "arn:aws:kinesis:ap-northeast-2:<ACCOUNT_ID>:stream/heatmap-demo-kds"
+    },
+    {
+      "Sid": "CloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:PutLogEvents",
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "arn:aws:logs:*:*:log-group:/aws/kinesis-analytics/heatmap-demo-flink:*"
+    },
+    {
+      "Sid": "CloudWatchLogsCreateGroup",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup"
+      ],
+      "Resource": "*"
+    }
+  ]
 }
 ```
 
@@ -425,53 +438,68 @@ Glue Crawler를 위한 IAM 역할과 정책을 생성해주도록 하자. 이는
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement': [{ 'Effect': 'Allow', 'Principal': { 'Service': 'glue.amazonaws.com' }, 'Action': 'sts:AssumeRole' }],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "glue.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
 }
 ```
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement':
-        [
-            {
-                'Sid': 'S3ReadCurated',
-                'Effect': 'Allow',
-                'Action': ['s3:GetObject', 's3:ListBucket'],
-                'Resource': ['arn:aws:s3:::heatmap-demo-curated-1230', 'arn:aws:s3:::heatmap-demo-curated-1230/*'],
-            },
-            {
-                'Sid': 'GlueCatalogAccess',
-                'Effect': 'Allow',
-                'Action':
-                    [
-                        'glue:CreateTable',
-                        'glue:UpdateTable',
-                        'glue:GetDatabase',
-                        'glue:GetTable',
-                        'glue:GetTables',
-                        'glue:BatchGetPartition',
-                        'glue:BatchCreatePartition',
-                        'glue:CreatePartition',
-                        'glue:UpdatePartition',
-                        'glue:GetPartition',
-                        'glue:GetPartitions',
-                    ],
-                'Resource':
-                    [
-                        'arn:aws:glue:*:*:catalog',
-                        'arn:aws:glue:*:*:database/heatmap_demo',
-                        'arn:aws:glue:*:*:table/heatmap_demo/*',
-                    ],
-            },
-            {
-                'Sid': 'CloudWatchLogs',
-                'Effect': 'Allow',
-                'Action': ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-                'Resource': 'arn:aws:logs:*:*:log-group:/aws-glue/crawlers:*',
-            },
-        ],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3ReadCurated",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::heatmap-demo-curated-1230",
+        "arn:aws:s3:::heatmap-demo-curated-1230/*"
+      ]
+    },
+    {
+      "Sid": "GlueCatalogAccess",
+      "Effect": "Allow",
+      "Action": [
+        "glue:CreateTable",
+        "glue:UpdateTable",
+        "glue:GetDatabase",
+        "glue:GetTable",
+        "glue:GetTables",
+        "glue:BatchGetPartition",
+        "glue:BatchCreatePartition",
+        "glue:CreatePartition",
+        "glue:UpdatePartition",
+        "glue:GetPartition",
+        "glue:GetPartitions"
+      ],
+      "Resource": [
+        "arn:aws:glue:*:*:catalog",
+        "arn:aws:glue:*:*:database/heatmap_demo",
+        "arn:aws:glue:*:*:table/heatmap_demo/*"
+      ]
+    },
+    {
+      "Sid": "CloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:log-group:/aws-glue/crawlers:*"
+    }
+  ]
 }
 ```
 
@@ -605,7 +633,7 @@ Glue Crawler를 실행하고 나면 아래와 같이 스키마와 파티션 정�
 
 ---
 
-이렇게 Athena 쿼리를 실행해보고 Athena Results S3 버킷에 쿼리 결과가 저장되는 것을 확인하였다면, 마지막으로 히트맵을 렌더링하는 Heatmap Viewer 애플리케이션을 실행하고, 아래와 같은 Athena SQL 쿼리를 작성한 뒤 Run query 버튼을 클릭하자.
+이렇게 Athena 쿼리를 실행해보고 Athena Results S3 버킷에 쿼리 결과가 저장되는 것을 확인하였다면, 마지막으로 히트맵을 렌더링하는 Heatmap Viewer 애플리케이션을 실행하고, 아래와 같은 Athena SQL 쿼리를 작성한 뒤 Run query 버튼을 클릭하자. 
 
 ```sql
 # AWS Athena는 Presto 엔진을 기반한다.
@@ -643,10 +671,11 @@ _(Amazon Managed Service for Apache Flink ::)_
 
 ![](https://velog.velcdn.com/images/yulmwu/post/df7df327-7bbb-47bb-9825-dfabadc8cd0a/image.png)
 
-또한 MSF는 매니지드 서비스답게 콘솔에서 대시보드 접속 버튼을 클릭하여 Flink 대시보드에 접속해볼 수 있다.
+또한 MSF는 매니지드 서비스답게 콘솔에서 대시보드 접속 버튼을 클릭하여 Flink 대시보드에 접속해볼 수 있다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/0ee4d05b-6713-42fd-b48d-671e6bb97f69/image.png)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/df3ab786-bc74-499a-aadf-9d3e81913776/image.png)
 
 이상으로 포스팅을 마치겠다. 이 아키텍처를 기반으로 히트맵이 아니더라도 다양한 곳(특히 분석 쪽)에서 활용해볼 수 있으니 참고가 되었으면 좋을 것 같다.
+

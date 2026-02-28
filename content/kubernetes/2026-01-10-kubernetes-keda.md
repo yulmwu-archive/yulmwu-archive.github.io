@@ -1,25 +1,25 @@
 ---
-title: '[Kubernetes w/ EKS] Pod AutoScaling with KEDA (Event Driven), with AWS SQS'
-description: 'KEDA를 통한 쿠버네티스 Event Driven 파드 오토스케일링 (with Kafka, SQS)'
-slug: '2026-01-10-kubernetes-keda'
+title: "[Kubernetes w/ EKS] Pod AutoScaling with KEDA (Event Driven), with AWS SQS"
+description: "KEDA를 통한 쿠버네티스 Event Driven 파드 오토스케일링 (with Kafka, SQS)"
+slug: "2026-01-10-kubernetes-keda"
 author: yulmwu
 date: 2026-01-10T02:35:23.258Z
-updated_at: 2026-01-19T13:23:15.875Z
-categories: ['Kubernetes']
-tags: ['kubernetes']
+updated_at: 2026-02-10T06:12:17.431Z
+categories: ["Kubernetes"]
+tags: ["kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
+  name: Kubernetes
+  slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-keda.png
 linked_posts:
-    previous: 2026-01-10-kubernetes-hpa
-    next: 2026-01-10-kubernetes-ca
+  previous: 2026-01-10-kubernetes-hpa
+  next: 2026-01-10-kubernetes-ca
 is_private: false
 ---
 
 # 0. Overview
 
-Kubernetes에서 전통적으로 파드 오토스케일링을 위해 [**VPA** 또는 **HPA**](https://velog.io/@yulmwu/kubernetes-hpa)를 사용한다. 하지만 이는 CPU 점유율이나 메모리 사용량과 같은 Pod 내부의 리소스 메트릭을 기반으로 스케일링된다.
+Kubernetes에서 전통적으로 파드 오토스케일링을 위해 [**VPA** 또는 **HPA**](https://velog.io/@yulmwu/kubernetes-hpa)를 사용한다. 하지만 이는 CPU 점유율이나 메모리 사용량과 같은 Pod 내부의 리소스 메트릭을 기반으로 스케일링된다. 
 
 하지만 **MSA**이나 **Event Driven** 아키텍처에서는 Kafka(Lag 메트릭), RabbitMQ, Redis Stream, AWS SQS나 백로그 DB 등의 큐의 적체량과 같이 **메시지나 이벤트 큐 기반**으로 부하가 결정되는 경우가 대부분이다.
 
@@ -43,7 +43,7 @@ Kubernetes에서 전통적으로 파드 오토스케일링을 위해 [**VPA** �
 
 백문이 불여일견, 직접 실습해보도록 하자. 실습에서는 KEDA를 통해 AWS SQS 큐의 메트릭을 기준으로 오토스케일링이 되는지 확인해볼 것이다. AWS MSK(Kafka)는 구성 방법이 좀 더 복잡한데, 이는 추후 따로 포스팅해보겠다.
 
-# 2. KEDA Demo
+# 2. KEDA Demo 
 
 예제로 살표볼 아키텍처는 아래와 같다. 이렇게 메시지/이벤트 큐나 데이터 스트리밍 플랫폼의 메트릭을 기반으로 오토스케일링 한다는 것은 대부분 컨슈머 파드를 오토스케일링 한다는 의미인데, 컨슈머를 구현하는 것은 이 포스팅의 범위를 벗어나기 때문에 생략하겠다.
 
@@ -84,23 +84,23 @@ EKS(Kubernetes) 클러스터는 eksctl 및 ClusterConfig 매니페스트를 작�
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-    name: demo-cluster
-    region: ap-northeast-2
-    version: '1.33'
+  name: demo-cluster
+  region: ap-northeast-2
+  version: "1.33"
 vpc:
-    cidr: 10.1.0.0/16
-    nat:
-        gateway: Single
+  cidr: 10.1.0.0/16
+  nat:
+    gateway: Single
 iam:
-    withOIDC: true
+  withOIDC: true
 managedNodeGroups:
-    - name: ng-1
-      instanceType: t3.medium
-      desiredCapacity: 1
-      privateNetworking: false
-      iam:
-          withAddonPolicies:
-              ebs: true
+  - name: ng-1
+    instanceType: t3.medium
+    desiredCapacity: 1
+    privateNetworking: false
+    iam:
+      withAddonPolicies:
+        ebs: true
 ```
 
 ```shell
@@ -114,7 +114,7 @@ kubectl get nodes
 
 ## (3) Installing KEDA and IRSA
 
-KEDA는 아래와 같이 Helm Chart로 설치할 수 있다.
+KEDA는 아래와 같이 Helm Chart로 설치할 수 있다. 
 
 ```shell
 helm repo add kedacore https://kedacore.github.io/charts
@@ -129,17 +129,17 @@ helm install keda kedacore/keda --namespace keda --create-namespace
 
 ```yaml
 {
-    'Version': '2012-10-17',
-    'Statement':
-        [
-            {
-                'Sid': 'ReadSqsQueueAttributesForScaling',
-                'Effect': 'Allow',
-                'Action': ['sqs:GetQueueAttributes', 'sqs:GetQueueUrl'],
-                'Resource': '*',
-            },
-        ],
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ReadSqsQueueAttributesForScaling",
+            "Effect": "Allow",
+            "Action": ["sqs:GetQueueAttributes", "sqs:GetQueueUrl"],
+            "Resource": "*"
+        }
+    ]
 }
+
 ```
 
 실습의 편의를 위해 `"Resource": "*"`로 두었지만, 실제 환경에서는 SQS 큐의 ARN으로 설정해두는 것이 바람직하다.
@@ -179,20 +179,20 @@ helm upgrade --install keda kedacore/keda \
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: demo-worker
+  name: demo-worker
 spec:
-    replicas: 0
-    selector:
-        matchLabels:
-            app: demo-worker
-    template:
-        metadata:
-            labels:
-                app: demo-worker
-        spec:
-            containers:
-                - name: pause
-                  image: registry.k8s.io/pause:3.9
+  replicas: 0
+  selector:
+    matchLabels:
+      app: demo-worker
+  template:
+    metadata:
+      labels:
+        app: demo-worker
+    spec:
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.9
 ```
 
 ```shell
@@ -209,11 +209,11 @@ kubectl apply -f application.yaml
 apiVersion: keda.sh/v1alpha1
 kind: TriggerAuthentication
 metadata:
-    name: aws-irsa-keda-operator
+  name: aws-irsa-keda-operator
 spec:
-    podIdentity:
-        provider: aws
-        identityOwner: keda
+  podIdentity:
+    provider: aws
+    identityOwner: keda
 ```
 
 이렇게하면 인증 주체가 KEDA, 즉 KEDA Operator에 할당된 IAM 역할(IRSA)를 그대로 사용하겠다는 의미가 된다. 다음으로 ScaledObject CRD를 살펴보자.
@@ -224,28 +224,28 @@ spec:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-    name: sqs-scaledobject
+  name: sqs-scaledobject
 spec:
-    scaleTargetRef:
-        name: demo-worker
-    pollingInterval: 10
-    cooldownPeriod: 30
-    minReplicaCount: 0
-    maxReplicaCount: 5
-    triggers:
-        - type: aws-sqs-queue
-          authenticationRef:
-              name: aws-irsa-keda-operator
-          metadata:
-              queueURL: 'https://sqs.ap-northeast-2.amazonaws.com/<ACCOUNT_ID>/keda-demo-queue'
-              queueLength: '5'
-              activationQueueLength: '0'
-              awsRegion: 'ap-northeast-2'
+  scaleTargetRef:
+    name: demo-worker
+  pollingInterval: 10
+  cooldownPeriod: 30
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  triggers:
+    - type: aws-sqs-queue
+      authenticationRef:
+        name: aws-irsa-keda-operator
+      metadata:
+        queueURL: "https://sqs.ap-northeast-2.amazonaws.com/<ACCOUNT_ID>/keda-demo-queue"
+        queueLength: "5"
+        activationQueueLength: "0"
+        awsRegion: "ap-northeast-2"
 ```
 
 여기서 중요하게 살펴볼 것은 `queueLength`와 `activationQueueLength`인데, 각각 아래와 같은 역할을 한다. 다른 필드에 대해선 공식 문서를 참조하길 바란다.
 
-- `queueLength` — 파드 1개가 담당할 수 있다고 가정하는 메시지 수를 의미한다.
+- `queueLength` — 파드 1개가 담당할 수 있다고 가정하는 메시지 수를 의미한다. 
 - `activationQueueLength` — Scale to Zero 상태에서 언제 스케일링을 시작할지를 나타내는 필드로, 0으로 설정한다는 것은 메시지가 하나라도 발생했을 때 즉시 스케일 아웃이 된다는 의미이다. (활성화 이후의 replica 계산에는 관여하지 않는다.)
 
 ```shell

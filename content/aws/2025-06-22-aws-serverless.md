@@ -1,34 +1,34 @@
 ---
-title: '[AWS Serverless] Lambda Serverless API With Cognito Authentication'
-description: 'AWS Lambda를 통한 서버리스 아키텍처 배포 (with API Gateway, Cognito, etc)'
-slug: '2025-06-22-aws-serverless'
+title: "[AWS Serverless] Lambda Serverless API With Cognito Authentication"
+description: "AWS Lambda를 통한 서버리스 아키텍처 배포 (with API Gateway, Cognito, etc)"
+slug: "2025-06-22-aws-serverless"
 author: yulmwu
 date: 2025-06-22T13:29:13.135Z
-updated_at: 2026-01-20T10:19:12.189Z
-categories: ['AWS']
-tags: ['aws', 'serverless']
+updated_at: 2026-02-27T23:17:26.822Z
+categories: ["AWS"]
+tags: ["aws", "serverless"]
 series:
-    name: AWS
-    slug: aws
+  name: AWS
+  slug: aws
 thumbnail: ../../thumbnails/aws/aws-serverless.png
 linked_posts:
-    previous: 2025-06-22-aws-deploying-ecs-fargate-dynamodb
-    next: 2025-06-22-aws-vpc-peering-transit-privatelink
+  previous: 2025-06-22-aws-deploying-ecs-fargate-dynamodb
+  next: 2025-06-22-aws-vpc-peering-transit-privatelink
 is_private: false
 ---
 
 > 해당 게시글은 [세명컴퓨터고등학교](https://smc.sen.hs.kr/) 보안과 동아리 세미나 발표 내용을 블로그 형식으로 정리한 글로, **본 글의 저작권은 [yulmwu (김준영)](https://github.com/yulmwu)에게 있습니다.** 개인적인 용도로만 사용 가능하며, 상업적 목적의 **무단 복제, 배포, 또는 변형을 금지합니다.**
->
+> 
 > 이미지의 출처가 있는 경우 별도로 명시하며, 출처가 없는 경우 직접 제작한 이미지입니다.
->
+> 
 > 글에 오류가 댓글로 남겨주시거나 피드백해주시면 감사드리겠습니다.
 
 > 포스팅에서 사용한 소스코드는 깃허브에 올려두었습니다. 아래의 링크에 방문하여 확인하실 수 있습니다.
->
+> 
 > https://github.com/eocndp/aws-lambda-example
 >
 > 발표에 사용된 프레젠테이션(PPT)는 완성되는 대로 해당 포스팅에 첨부하겠습니다.
->
+> 
 > https://drive.google.com/file/d/1KhsmWHPzbNs-tEzAapYcLQmlH2dt0gzt/view?usp=sharing
 
 # 0. Overview
@@ -37,7 +37,7 @@ is_private: false
 
 가령 서버리스가 당장 무슨 말인지 몰라도 이 포스팅을 통해 어느정도 이해가 되었으면 하는 바람이다.
 
-이에 따라 **MSA(Micro Service Architecture)**와 **AWS 람다(Lambda)**에 대해 알아보고, 실제로 **AWS 람다**를 이용한 서버리스 API 구축을 다뤄보면서 추가적으로 **Cognito**를 사용한 **인증(Authentication)** 구현에 대해 다뤄볼까 한다.
+이에 따라  **MSA(Micro Service Architecture)**와 **AWS 람다(Lambda)**에 대해 알아보고, 실제로 **AWS 람다**를 이용한 서버리스 API 구축을 다뤄보면서 추가적으로 **Cognito**를 사용한 **인증(Authentication)** 구현에 대해 다뤄볼까 한다.
 
 (때문에 해당 포스트에서 설명하는 서버리스는 AWS 람다와의 연관성이 큼을 미리 알린다.)
 
@@ -54,9 +54,9 @@ is_private: false
 ## 1-1. Cloud
 
 > 사실 클라우드와 AWS가 뭔지 정도는 설명이 가능해도, 그 자세한 내용과 다양한 서비스를 설명하기엔 분량 상 어려움이 있다.
->
-> 애초에 이 글을 읽는 독자 여러분은 AWS에 대한 기초적인 지식이 있다고 가정하지만, 이 포스팅에선 AWS에 대한 설명을 간단히 하고 넘어가려 한다.
->
+> 
+애초에 이 글을 읽는 독자 여러분은 AWS에 대한 기초적인 지식이 있다고 가정하지만, 이 포스팅에선 AWS에 대한 설명을 간단히 하고 넘어가려 한다.
+> 
 > 람다(Lambda), API Gateway, DynamoDB 등의 서비스에 대해선 이후 따로 설명할 예정이다.
 
 **" 인터넷을 통해 접근 가능하고, 가상화된 서버나 서비스, 자원 등을 제공해주는 서비스. "**
@@ -66,10 +66,10 @@ is_private: false
 우리가 전통적으로 서버를 구축하고 서비스하려면 어떻게 해야할까?
 만약 그러한 상황에 처했다면 필자는 아마 컴퓨터(=서버), 즉 장비부터 구매하였을 것이다.
 
-문제가 벌써 발생했다. 앞으로 서비스할 서비스의 규모가 어느정도로 커질지,
+문제가 벌써 발생했다. 앞으로 서비스할 서비스의 규모가 어느정도로 커질지, 
 또는 줄어들지 예측도 어려우니, 초기 인프라 구축 비용도 크게 발생한다.
 
-또한 이미 비싼 장비를 구매해뒀기 때문에 이를 변경하려면 추가적인 비용과 시간이 들며, 상당히 어려운 작업이 되는데, 그렇다고 그러한 장비의 유지보수에 대해 쉬운것도 아니다.
+또한 이미 비싼 장비를 구매해뒀기 때문에 이를 변경하려면 추가적인 비용과 시간이 들며, 상당히 어려운 작업이 되는데, 그렇다고 그러한 장비의 유지보수에 대해 쉬운것도 아니다. 
 
 확장성도 거의 없다시피 하고, 많은 인력과 실력자들이 있지 않는 이상 이상적인 보안 솔루션도 만들기 어렵다. 애초에 펌웨어 및 운영체제 부터 시작하여 모든걸 관리해야되기 때문이다.
 
@@ -79,7 +79,7 @@ is_private: false
 
 ## 1-2. AWS
 
-**AWS(Amazon Web Service)**는 그러한 클라우드 서비스/업체 중 단연 1위를 달리고 있는 업체이다.
+**AWS(Amazon Web Service)**는 그러한 클라우드 서비스/업체 중 단연 1위를 달리고 있는 업체이다. 
 
 사실상 백엔드 서버를 구축할 때 필요한 모든 기술 및 서비스가 갖춰져있고, 비용적인 측면만 제외한다면 안쓸 이유가 없다. (물론 초기 러닝 커브 등은 생각하지 않는다.)
 
@@ -99,16 +99,17 @@ AWS에서 서버를 배포할 땐 주로 **EC2(Elastic Cloud Computer)**라는 �
 ![](https://velog.velcdn.com/images/yulmwu/post/d9002182-acaa-4cce-8ec5-c03ecf4e3f47/image.png)
 출처: https://www.redhat.com/en/topics/cloud-computing/iaas-vs-paas-vs-saas
 
+
 > **PaaS(Platform as a Service)**와 **FaaS(Function as a Service)**는 얼핏 보기엔 비슷해보일 순 있으나, **PaaS**는 플랫폼(NodeJS, Python 등)을 제공해주고, 그 위에 배포할 수 있도록 한다. (대표적으로 AWS ECS, EKS Fargate)
->
+> 
 > 이렇게 배포를 하면 EC2 등의 IaaS를 사용했을 때 처럼 지속적으로 서버 애플리케이션을 유지시킬 수 있다.
->
+> 
 > 얼핏 보면 플랫폼을 제공해준 다는 것에 대해 PaaS도 서버리스의 특징을 가져 범주에 포함될 순 있지만, 해당 포스트에선 PaaS를 서버리스라고 부르진 않겠다.
->
-> 그에 비해 **FaaS**는 더 세분화된 함수라는 단위로 코드를 작성하고, 이벤트가 발생했을 때 순간적으로 실행한다. (대표적으로 AWS Lambda)
+> 
+> 그에 비해 **FaaS**는 더 세분화된 함수라는 단위로 코드를 작성하고, 이벤트가 발생했을 때 순간적으로 실행한다. (대표적으로 AWS Lambda) 
 > 즉 사용하지 않았을 땐 실행되는 상태가 아니라는 것이다.
 
-이는 런타임 플랫폼을 클라우드 업체에서 제공하는 것인데, 정말 쉽게 말해서 코드만 올려서 작동시키는 것이다. "서버가 없는 것"이 절대 아니라, 서버를 직접 관리하지 않는다는 점을 강조하고 싶다.
+이는 런타임 플랫폼을 클라우드 업체에서 제공하는 것인데, 정말 쉽게 말해서 코드만 올려서 작동시키는 것이다. "서버가 없는 것"이 절대 아니라, 서버를 직접 관리하지 않는다는 점을 강조하고 싶다. 
 
 즉 백엔드 개발자 입장에서 서버와 OS를 따로 관리하지 않는 다는 점이 서버리스의 핵심 포인트이다.
 (물론 실제로 전혀 직접 관리하지 않는 것은 아니다. 기본적인 최대 메모리/CPU 구성, 동시성 등의 설정은 세팅할 수 있다.)
@@ -135,7 +136,7 @@ AWS에서 서버를 배포할 땐 주로 **EC2(Elastic Cloud Computer)**라는 �
 
 흔히들 EC2의 대표적인 요금제인 온디맨드, 즉 사용량 만큼 비용을 지불한다는 요금제가 존재한다.
 
-이는 EC2를 켜두는 시간만큼 요금이 지불되는데, 잘 생각해보자.
+이는 EC2를 켜두는 시간만큼 요금이 지불되는데, 잘 생각해보자. 
 
 365일 24시간 돌아가야 하는 서버인데, 즉 맨날 켜둬야하는 서비스인데 그럼 결국엔 사용한 만큼 지불한다는 온디맨드라 하기엔 좀 그렇지 않은가?
 (다만 전통적인 관점에서 볼땐 서버를 구매하는게 아닌, 특정 시간동안 임대하여 사용하는 것이니 맞는 표현이긴 하다.)
@@ -195,9 +196,10 @@ AWS에서 서버를 배포할 땐 주로 **EC2(Elastic Cloud Computer)**라는 �
 
 AWS 람다로 예를 들면 각 함수별로 서비스가 구분된다는 것(FaaS)과 MSA의 개별적인 마이크로 서비스의 궁합이 잘 맞고, 앞서 설명했던 장점들을 극대화 하여 서버리스 환경과 MSA 아키텍쳐 조합을 자주 사용한다.
 
-> 물론 착각하면 안되는게, *"서버리스 환경에선 무조건 MSA"*와 같은 오해는 금물이다.
->
+> 물론 착각하면 안되는게, _"서버리스 환경에선 무조건 MSA"_와 같은 오해는 금물이다. 
+> 
 > 서버리스 환경에서도 모놀리식 아키텍쳐를 사용하는 프로젝트도 많고, 반대로 Serverful한 환경에서 MSA 아키텍쳐를 사용하는 프로젝트도 많다.
+
 
 ## 2-4. Stateless
 
@@ -209,9 +211,9 @@ AWS 람다로 예를 들면 각 함수별로 서비스가 구분된다는 것(Fa
 하지만 람다의 경우 이벤트에 대해 트리거 되며 개별적인 함수가 실행되고, 이러한 함수는 호출될 때 마다 새로운 환경으로 부터 가상화되어 실행되기 때문에 (기본적으론) 상태를 저장할 수 가 없다.
 
 > 다만 이 문장엔 에러가 존재한다. 이후 람다의 Life Cycle에 대해 다룰 때 알아볼 내용이지만, 미리 스포하자면 람다는 효율성을 위해 특정 시간 동안 환경을 유지한다. (이를 Warm Start라 한다.)
->
+> 
 > 예를 들어 람다에 전역 변수를 선언해두고, 곧바로 똑같은 요청을 보내게 되면 해당 전역 변수가 보통은 유지된다는 것이다. (똑같은 환경이 유지되니)
->
+> 
 > 때문에 람다를 사용할 땐 비동기 처리 등에서 정확한 처리가 필요하며, 이를 주의하고 코드를 작성해야 한다.
 
 이렇게 내부적으로 저장할 수 없는 것을(않는 것을) **무상태(Stateless)**라고 한다.
@@ -251,21 +253,21 @@ REST API를 통해 적절한 CRUD를 구현하고, 인증 시스템까지 있으
 > 자세한 API 별 소개는 [이곳](https://github.com/eocndp/aws-lambda-example/blob/main/backend/README.md)에서 확인할 수 있다.
 > 여기선 단순히 추후 인프라를 구성할 때 참고할 정도의 API 구조를 설명한다.
 
-| 엔드포인트                | 설명                            | 요청 데이터            | 응답 데이터                                             | JWT 인증 여부 |
-| :------------------------ | :------------------------------ | :--------------------- | :------------------------------------------------------ | :------------ |
-| `POST /auth/login`        | 로그인                          | `username`, `password` | `accessToken`, `idToken`<br>(Set-Cookie) `refreshToken` |               |
-| `POST /auth/confirmEmail` | 이메일 인증                     | `username`, `code`     |                                                         |               |
-| `POST /auth/resendEmail`  | 이메일 인증 재전송              | `username`             |                                                         |               |
-| `POST /auth/logout`       | 로그아웃 (리프레시 토큰 무효화) |                        |                                                         | O             |
-| `POST /auth/refresh`      | 엑세스 토큰 재발급              |                        | `accessToken`, `idToken`                                |               |
-| `GET /posts`              | 모든 글 조회                    |                        | (생략)                                                  |               |
-| `GET /posts/{postId}`     | 특정 글 조회                    |                        | (생략)                                                  |               |
-| `POST /posts`             | 글 작성                         | `title`, `content`     | (생략)                                                  | O             |
-| `PUT /posts/{postId}`     | 글 수정                         | `title`, `content`     | (생략)                                                  | O             |
-| `DELETE /posts/{postId}`  | 글 삭제                         |                        |                                                         | O             |
-| `GET /myinfo`             | 로그인된 유저 정보 확인         |                        | (생략)                                                  | O             |
+| 엔드포인트 | 설명 | 요청 데이터 | 응답 데이터 | JWT 인증 여부 | 
+| :- | :- | :- | :- | :- |
+| `POST /auth/login` | 로그인 | `username`, `password` | `accessToken`, `idToken`<br>(Set-Cookie) `refreshToken` |  | 
+| `POST /auth/confirmEmail` | 이메일 인증 | `username`, `code` |  | |
+| `POST /auth/resendEmail` | 이메일 인증 재전송 | `username` | | |
+| `POST /auth/logout` | 로그아웃 (리프레시 토큰 무효화) | | | O |
+| `POST /auth/refresh` | 엑세스 토큰 재발급 | | `accessToken`, `idToken` | |
+| `GET /posts` | 모든 글 조회 | | (생략) | |
+| `GET /posts/{postId}` | 특정 글 조회 |  | (생략) | |
+| `POST /posts` | 글 작성 | `title`, `content` | (생략) | O |
+| `PUT /posts/{postId}` | 글 수정 | `title`, `content` | (생략) | O |
+| `DELETE /posts/{postId}` | 글 삭제 | | | O |
+| `GET /myinfo` | 로그인된 유저 정보 확인 | | (생략) | O |
 
-이제 프로젝트 구상이 끝났으니 실제로 AWS 아키텍쳐를 그려보고, 인프라를 구축하며 자동화까지 해보도록 하자.
+이제 프로젝트 구상이 끝났으니 실제로 AWS 아키텍쳐를 그려보고, 인프라를 구축하며 자동화까지 해보도록  하자.
 
 ---
 
@@ -305,7 +307,7 @@ REST API를 통해 적절한 CRUD를 구현하고, 인증 시스템까지 있으
 런타임을 구축하는 시간은 요금을 계산할 때 람다의 실행 시간에 포함되지 않는다. 다만 초기화 코드(부트스트랩)를 실행하는 시간은 람다의 실행 시간에 포함된다.
 
 > 2025년 8월 1일부터 람다의 라이프 사이클 중 **INIT 단계 또한 요금에 포함된다.** 람다 사용에 참고하도록 하자.
->
+> 
 > https://aws.amazon.com/ko/blogs/compute/aws-lambda-standardizes-billing-for-init-phase
 
 #### (2) Invoke
@@ -325,17 +327,17 @@ import { error, internalServerError } from '../../utils/httpError'
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 export const handler = async (): Promise<APIGatewayProxyResultV2> => {
-	try {
-		const command = new ScanCommand({ TableName: 'Posts' })
-		const result = await dynamoDB.send(command)
+    try {
+        const command = new ScanCommand({ TableName: 'Posts' })
+        const result = await dynamoDB.send(command)
 
-		return {
-			statusCode: 200,
-			body: JSON.stringify(result.Items),
-		}
-	} catch (err) {
-		return error(internalServerError((err as Error).message), 'ERR_GET_POSTS_INTERNAL_SERVER_ERROR')
-	}
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result.Items),
+        }
+    } catch (err) {
+        return error(internalServerError((err as Error).message), 'ERR_GET_POSTS_INTERNAL_SERVER_ERROR')
+    }
 }
 ```
 
@@ -353,7 +355,7 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
 
 1. Download Source Code
 2. Preparing for a new Environment
-3. Execute initialization code
+3. Execute initialization code 
 4. Execute Handler
 
 여기서 1, 2, 3번 단계에 해당되는 과정을 바로 **Cold Start**라고 한다.
@@ -374,13 +376,14 @@ const db = connectToDatabase()
 const config = loadConfig()
 
 export const handler = async (event) => {
-	return await db.query('SELECT * FROM users')
+	return await db.query("SELECT * FROM users")
 }
 ```
 
 여기서 데이터베이스 연결과 설정 관리 등의 로직은 `handler()` 함수 밖에 있는데, 바로 이게 초기화 코드(부트스트랩)이다.
 
 이 초기화 코드의 실행 시간이 `INIT_START`, 즉 `300ms`라는 것이고, 총 시간(Duration)은 약 `700ms`이므로 `handler()` 함수의 실행(Invoke) 시간은 약 `400ms`임을 알 수 있다.
+
 
 ### Warm Start
 
@@ -391,7 +394,7 @@ export const handler = async (event) => {
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b37cb8fb-a620-4567-9301-e1fe9cb49965/image.png)
 
-위 사진은 실제 Warm Start로 작동하였던 예시이다.
+위 사진은 실제 Warm Start로 작동하였던 예시이다. 
 두번째 `START`에 대해선 보고에서 Init Duration이 없는 것을 볼 수 있는데, 즉 초기화를 진행하지 않고 `handler()` 함수만 실행했다는 의미로 해석된다.
 
 그래서 이로 인해 문제가 발생할 수 도 있는데, 예를 들어 아래와 같은 코드를 예시로 볼 수 있다.
@@ -426,9 +429,9 @@ export const handler = async (event) => {
 이처럼 람다 함수에선 Warm Start로 인한 문제가 발생할 수 있으므로, Stateless한 코드 작성을 중요시한다.
 
 > 다만 이러한 Warm Start를 활용할 수 도 있는데, 후술할 프로비저닝된 동시성을 사용하거나 Cold Start를 대응할 수 있다면 작업이 오래걸리는 데이터베이스 연결 등의 코드를 초기화 코드로 빼두는 방법이다.
->
+> 
 > Warm Start로 실행된다면 빠르게 실행이 가능하니, 람다의 성능을 개선시켜보고 싶다면 이와 같은 방법도 괜찮은 방법이다.
->
+> 
 > 다만 stateful한 코드 작성은 금물이다.
 
 ### Lambda Concurrently
@@ -440,9 +443,10 @@ export const handler = async (event) => {
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b441eebc-30f8-4cad-9203-ff279bcf1007/image.png)
 
+
 하지만 이렇게 람다 하나만을 기다리며 동시성을 처리하는 것은 매우 비효율적인데, 그래서 람다는 위와 같이 직렬적인 방식(Sequential)이 아닌 병렬적인 방식(Concurrent)을 사용할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/89a3f353-c378-4c8a-a232-a7730d3fc8ab/image.png)
+![](https://velog.velcdn.com/images/yulmwu/post/89a3f353-c378-4c8a-a232-a7730d3fc8ab/image.png)	
 
 동시성(Concurrent)이 설정된 람다에선, 만약 이벤트를 처리중이라 다른 이벤트를 받을 수 없다면 새로운 환경을 새로 생성한다.
 
@@ -459,12 +463,13 @@ export const handler = async (event) => {
 이러한 동시성은 아래의 옵션인 "동시성 예약"을 통해 최대 동시성의 제한을 둘 수 있다.
 
 > 그런데 계정 별로 최대 한도를 1000으로 제한하고 있는데, 왜 예약되지 않은 계정 동시성은 10으로 뜰까?
->
+> 
 > 필자도 그 이유가 궁금하여 Service Quotas에서 확인한 결과, 기본적으로 10으로 설정되어 있음을 확인했다.
 >
 > 이 계정만 그런건지, 아니면 모든 계정이 기본적으로 10으로 설정된 것인지는 모르겠지만 이는 AWS에 요청을 통해 증가시킬 수 있다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/e50da935-1beb-4545-bf80-7ee63b303f3f/image.png)
+
 
 ### Lambda Cold Start Prevention
 
@@ -485,10 +490,11 @@ AWS엔 EventBridge라는 서비스가 있는데, 이 서비스는 어떠한 다�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/3261d244-968e-45ad-b627-71e38cd8a45a/image.png)
 
+
 물론 약간의 비용이 발생할 순 있으나 그 비용은 미미하고, 또 성능 상 크게 문제가 될만하진 않기 때문에 꽤나 자주 이용하는 편이다.
 
 > 다만 이 방식을 100% 신뢰하면 안되는게, Warm Start가 가능한 상태의 유지 시간을 AWS에서 공식적으로 말하지 않았기 때문이다.
->
+> 
 > 일부 개발자들에 의하면 보통은 5분 내외, 또는 10분 정도로 보고 있다고 하지만,
 > 이 또한 람다의 성능에 따라 달라질 수 있다고 하니 여러 테스트를 통해 몇 분의 주기로 설정할진 직접 정해야할 듯 싶다.
 
@@ -505,9 +511,9 @@ AWS엔 EventBridge라는 서비스가 있는데, 이 서비스는 어떠한 다�
 ![](https://velog.velcdn.com/images/yulmwu/post/45abe63c-f9a4-452b-bb24-af760fc5dc90/image.png)
 
 > Provisioned Concurrency의 요금이 더 비싼데, 굳이 왜 이걸 사용하려는 것일까 의문이 들 수 있다.
->
+> 
 > 이는 SLA(Service Level Agreement)에 따른 요금의 발생인데, 쉽게 말해 돈을 좀 더 주면 AWS에서 가용성, 안정성 등을 보장하고 제공한다는 의미이다.
->
+> 
 > 즉 Provisioned Concurrency은 실시간 응답이나 속도 등이 중요한 서비스에 활용할 수 있으며, EventBridge Scheduler를 사용한 방법이 별로라는 것은 아니다.
 >
 > 물론 Provisioned Concurrency은 SLA에 따라 Cold Start 현상을 방지하는 것을 보장한다.
@@ -520,6 +526,7 @@ AWS엔 EventBridge라는 서비스가 있는데, 이 서비스는 어떠한 다�
 
 즉 가장 단순하지만 금전적 여유만 된다면 가장 확실한 방법으로, 비용 계산을 효율적으로 하여 메모리를 늘리는 방법도 Cold Start를 대응하는 방법 중 하나이다.
 
+
 ### Lambda Limit
 
 람다에선 실행에 대한 제한과 배포에 대한 제한이 존재하는데, 아래와 같은 제한이 존재한다.
@@ -530,27 +537,27 @@ https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
 
 #### Execution Limit
 
-먼저 람다가 실행되는 환경에 대한 제한은 아래와 같다.
+먼저 람다가 실행되는 환경에 대한 제한은 아래와 같다. 
 
-| 항목        | 제한             | 기타                                                                   |
-| :---------- | :--------------- | :--------------------------------------------------------------------- |
-| 메모리      | 128MB ~ 10GB     | 메모리에 따라 CPU 성능이 같이 증가함, 1MB 단위로 조절 가능             |
-| 실행 시간   | 최대 15분(900초) | 기본 값은 3초                                                          |
-| `/tmp` 용량 | 512MB            | 임시 파일을 저장하는 용도로 람다에서 `/tmp` 디렉토리를 사용할 수 있음. |
-| 동시성      | 최대 1000개      | 리전 단위 당 최대 1000개 제한                                          |
+| 항목 | 제한 | 기타 |
+| :- | :- | :- |
+| 메모리 | 128MB ~ 10GB | 메모리에 따라 CPU 성능이 같이 증가함, 1MB 단위로 조절 가능 | 
+| 실행 시간 | 최대 15분(900초) | 기본 값은 3초 |
+| `/tmp` 용량 | 512MB | 임시 파일을 저장하는 용도로 람다에서 `/tmp` 디렉토리를 사용할 수 있음. |
+| 동시성 | 최대 1000개 | 리전 단위 당 최대 1000개 제한 |
 
 #### Deployment Limit
 
 또한 람다 함수를 업로드하거나 배포할 때 코드의 크기 제한이 있는데, 아래와 같이 제한된다.
 
-| 방식                       | 제한              | 기타                                             |
-| :------------------------- | :---------------- | :----------------------------------------------- |
-| ZIP 파일 직접 업로드       | 최대 50MB         |                                                  |
-| ZIP 파일 S3 업로드 및 연동 | 최대 250MB        |                                                  |
-| ZIP 압축 해제 이후 코드    | 최대 250MB        | AWS 내부에서 언팩된 코드의 사이즈                |
-| 도커 컨테이너 이미지       | 최대 10GB         | ECR 업로드 후 람다에서 컨테이너 이미지 사용 가능 |
-| 레이어 결합                | 최대 5개          |
-| 개별 레이어                | 압축 후 최대 50MB | 레이어 총합 압축 해제 후 최대 250MB 이내         |
+| 방식 | 제한 | 기타 |
+| :- | :- | :- |
+| ZIP 파일 직접 업로드 | 최대 50MB | |
+| ZIP 파일 S3 업로드 및 연동 | 최대 250MB | |
+| ZIP 압축 해제 이후 코드 | 최대 250MB | AWS 내부에서 언팩된 코드의 사이즈 | 
+| 도커 컨테이너 이미지 | 최대 10GB | ECR 업로드 후 람다에서 컨테이너 이미지 사용 가능 |
+| 레이어 결합 | 최대 5개 |
+| 개별 레이어 | 압축 후 최대 50MB | 레이어 총합 압축 해제 후 최대 250MB 이내 |
 
 그래서 이 포스팅에선 용량을 초과하지 않아 추후 Serverless Framework를 사용하여 ZIP + S3 배포를 하기 때문에 최대 250MB로 제한된다.
 
@@ -564,7 +571,7 @@ https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
 
 람다의 이야기를 끝냈으니, 다음으로 람다를 사용한 AWS 서버리스 구축에서 빠질 수 없는 **API Gateway**에 대해 이야기 하려고 한다.
 
-만약 여러 기능들을 구현하여 MSA 아키텍쳐를 유지하고, 여러 람다 함수들이 있다고 가정해보자.
+만약 여러 기능들을 구현하여 MSA 아키텍쳐를 유지하고, 여러 람다 함수들이 있다고 가정해보자. 
 각 람다 함수엔 호출가능한 HTTP 요청이 가능한 함수 URL를 제공하는데, 그럼 아래의 아키텍쳐를 보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/606bccf3-309f-46c1-99ac-c2f0b2c5b335/image.png)
@@ -598,6 +605,7 @@ SOP는 풀네임에서 알 수 있듯이, 같은 오리진에서만 리소스를
 
 ![](https://velog.velcdn.com/images/yulmwu/post/aad63521-34a1-4c0e-b63e-654c9c11fe62/image.png)
 
+
 아무래도 같은 오리진(출처) 내에서의 리소스 공유가 가장 안전하고, 외부의 리소스를 가져오는 것은 보안 상 문제가 될 수 있기 때문이다.
 
 하지만 웹 개발을 하다보면 어쩔 수 없게 외부의 리소스를 가져와야 할 때가 있는데, 이때 CORS(Cross Origin Resource Sharing) 정책을 지킨 리소스라면 이 요청을 허용하게 된다.
@@ -612,7 +620,7 @@ CORS의 기본적인 동작 과정은 아래와 같다.
 
 하지만 서버에서 보내온 응답에 웹 페이지의 오리진을 명시적으로 허용하지 않으면 브라우저는 이 요청을 파기하게 된다.
 
-아래의 두 가지 예시를 보자.
+아래의 두 가지 예시를 보자. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/8c2becc4-fd98-47a6-84eb-a1c00b7cda05/image.png)
 
@@ -643,8 +651,9 @@ CORS의 기본적인 동작 과정은 아래와 같다.
 때문에 `Access-Control-Allow-Origin` 헤더에 와일드카드 `*`를 사용할 수 없는 것이고, 오리진을 명시적으로 표기해야된다.
 
 > 이 포스팅에선 Preflight Request와 같은 좀 더 깊은 내용의 CORS에 대해선 따로 다루지 않는다.
->
+> 
 > 이에 따라 `Access-Control-Allow-Methods` 등의 Preflight Request와 관련된 내용도 다루지 않는다.
+
 
 ## 4-3. DynamoDB
 
@@ -686,7 +695,7 @@ AWS에세 제공하는 서버리스 기반의 데이터베이스엔 크게 2가�
 다만 HTTP API 통신이므로 네트워크적 오버헤드나 레이턴시 등의 문제가 발생할 순 있다.
 
 > 위와 같은 이유로 해당 포스팅에서 구현하려는 프로젝트에 DynamoDB를 채택하였다.
->
+> 
 > 서버리스 람다 사용 시 무조건 DynamoDB와 같은 오해는 하지 않기를 바라며, DynamoDB의 간단함과 유연함이 간단한 Toy 프로젝트를 구현하는데 적합하다고 생각하였기 때문이라는 것만 알고있다면 좋을 것 같다.
 
 ## 4-4. Cognito
@@ -703,7 +712,7 @@ AWS에세 제공하는 서버리스 기반의 데이터베이스엔 크게 2가�
 
 클라우드 시대가 오면서 여러 서비스의 형태가 생겨나기 시작했는데, 그 중 **IDaaS(Identity as a Service)**라는 서비스의 형태가 있다.
 
-이름 그대로 클라우드 형태로 인증과 인가를 제공하는 SaaS(Software as a Service)의 일종이다.
+이름 그대로 클라우드 형태로 인증과 인가를 제공하는 SaaS(Software as a Service)의 일종이다. 
 
 즉 인증과 인가에 관련하여 직접 구현할 필요 없이 클라우드에서 제공하는 인증과 인가를 사용할 수 있다는 것인데, 이것이 서버리스 MSA 아키텍쳐의 핵심이다.
 
@@ -748,7 +757,7 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/functions/auth/lo
 
 앞서 JWT 토큰에 대해서 언급을 했었는데, **JWT(JSON Web Token)**이 무엇인지, 그리고 기존의 세션 방식과의 차이는 무엇인지 알고 넘어가도록 하자.
 
-#### vs Session
+#### vs Session 
 
 JWT이나 세션(Session) 방식 모두 로그인 후, 그 로그인 상태를 유지하기 위해 사용된다.
 
@@ -769,6 +778,7 @@ JWT이나 세션(Session) 방식 모두 로그인 후, 그 로그인 상태를 �
 이때 서버는 요청을 받았으나, 해당 요청의 쿠키에 포함된 세션 아이디가 누구의 세션 아이디인지 모르니, 세션 아이디를 저장하는 별도의 데이터베이스에 접근하여 유저 정보를 가져오고, 그 이후 API를 처리한다.
 
 즉 인증을 위해선 세션 아이디 데이터베이스에 접근하는 오버헤드가 발생하게 되고, 서비스의 규모가 커질수록 이러한 문제는 더욱 극대화된다.
+
 
 #### What is JWT?
 
@@ -799,21 +809,21 @@ JWT은 **JSON Web Token**의 약자이다. 즉 JSON 객체에 인증에 필요�
 요청 시 JWT 토큰을 포함시키려면 `Authorization` 헤더에 JWT 토큰을 포함시킨다.
 
 > JWT 토큰은 대부분 Bearer로 시작하는데, 이건 해당 토큰이 소유자의 토큰이라고 표시하며 JWT 또는 OAuth 방식에 대한 토큰을 사용한다는 의미이다.
->
+> 
 > Basic(아이디와 비밀번호를 Base64로 인코딩 후 사용) 등의 다른 타입도 존재하나, 여기선 다루지 않는다.
 
 > JWT도 만능은 아니다. 그 예시 중 하나는 강제 로그아웃과 같은 문제인데, 세션 방식에선 세션 아이디를 저장하는 데이터베이스에서 원하는 세션 아이디를 삭제시키면 클라이언트에선 자동으로 로그아웃된다.
->
+> 
 > 하지만 JWT 방식의 경우 그렇지 못하는데, Stateful한 세션 방식과는 다르게 Stateless하게 작동하여 의도적으로 직접 만료시킬 수 가 없다.
->
+> 
 > 그래서 JWT 토큰의 페이로드엔 생성일이나 만료일을 설정하는데, 이 만료일을 짧게 설정하여 보안을 유지한다.
->
+> 
 > JWT 토큰이 만료되면 로그아웃되지 않냐 하겠지만, 곧 알아볼 리프레시 토큰(Refresh Token)을 사용하여 그러한 문제를 해결할 수 있다.
 
 > 아까 설명에서 JWT 토큰을 변수에 담는다고 하였는데, 이는 쿠키나 로컬 스토리지 등은 XSS 등의 보안 상 문제가 될만한 곳이다.
->
+> 
 > 그렇다고 후술할 HTTPOnly 쿠키에 담는 경우 아예 접근할 수 없는 경우가 되기 때문에 JWT 토큰을 변수에 담는 것이 좋은 방법이다.
->
+> 
 > 하지만 "좋은 방법이다"라고 말한 이유가, 어떻게 저장하는지에 대한 방법은 없기 때문이다. JWT 토큰을 로컬 스토리지나 세션 등에 저장하는 경우도 있고, 그러한 방식은 아키텍쳐나 구조에 따라 달라질 수 있기 때문이다.
 
 #### Refresh Token
@@ -821,7 +831,7 @@ JWT은 **JSON Web Token**의 약자이다. 즉 JSON 객체에 인증에 필요�
 여기까지 제대로 읽었다면 이러한 질문이 들 수 있을 것이다.
 **" JWT 토큰이 만료되면 다시 로그인을 해야하나? "**
 
-위 설명대로라면 그렇겠지만, 실제론 그렇지 않다. 아직 설명하지 않은 개념이 있는데, 바로 **리프레시 토큰(Refresh Token)**이다.
+위 설명대로라면 그렇겠지만, 실제론 그렇지 않다. 아직 설명하지 않은 개념이 있는데, 바로 **리프레시 토큰(Refresh Token)**이다. 
 
 JWT엔 일반적으로 2가지의 토큰이 존재하는데, 여태 설명했던 인증을 위한 토큰, **엑세스 토큰(Access Token)**과 해당 엑세스 토큰을 다시 생성할 수 있게끔 하는 **리프레시 토큰(Refresh Token)**이 존재한다.
 
@@ -836,14 +846,14 @@ JWT엔 일반적으로 2가지의 토큰이 존재하는데, 여태 설명했던
 그 리프레시 토큰은 클라이언트는 (일반적으로) HTTPOnly 쿠키에 저장한다.
 
 > 일반적으로 쿠키는 서버의 응답에 `Set-Cookie` 헤더를 통해 클라이언트(=브라우저 등)에 자동으로 저장한다.
->
+> 
 > 다른 리소스로 요청(Request) 시 해당 쿠키를 자동으로 포함하여 보내지는(물론 HTTP 클라이언트에 `withCredentials: true` 등의 옵션이 있어야 함),
 > HTTPOnly 쿠키는 자바스크립트로 접근할 수 없어 XSS 공격 등을 방어할 수 있다.
->
+> 
 > 즉 HTTP 통신 시에만 자동으로 포함하는 쿠키로, 자바스크립트로 접근 할 수 없기 때문에 리프레시 토큰을 저장할 때 대부분 HTTPOnly 쿠키에 저장한다.
->
+> 
 > HTTPOnly 쿠키를 보내기 위해선 `HttpOnly` 옵션을 붙여야 하는데, 같이 붙는 여러 옵션들을 아래에 간략히 정리해두었다.
->
+> 
 > - `HttpOnly`: HTTPOnly를 적용시키기 위해 필요한 옵션이다.
 > - `Path`: 주로 `Path=/`로 설정되며, 모든 경로에 대해 쿠키를 전송할 수 있도록 한다.
 > - `Max-Age`: 쿠키의 만료 시간으로, 쿠키가 생성된 시점으로 부터 몇 초 동안 유지할건지를 나타낸다. 이는 상대적인 시간이지만, `Expires` 옵션은 절대적인 시간으로 나타내며, 둘 다 설정하지 않는다면 그 쿠키는 브라우저가 종료될 때 없어진다.
@@ -856,6 +866,7 @@ JWT엔 일반적으로 2가지의 토큰이 존재하는데, 여태 설명했던
 그러면 결국엔 다시 로그인을 해야 리프레시 토큰이 생기는 것이니, 로그아웃 구현이 가능하다.
 
 다만 엑세스 토큰이 만료되지 않았다면 로그아웃 이후에도 해당 엑세스 토큰을 여전히 사용할 수 있는 것이고, 리프레시 토큰이 없기 때문에 이후의 엑세스 토큰 리프레시는 불가능하다.
+
 
 ## 4-4. S3 + CloudFront (Frontend)
 
@@ -871,7 +882,7 @@ S3에 저장되는 데이터는 모두 객체인데, 객체는 실제 데이터�
 
 그리고 S3엔 실제 디렉토리 구조가 없고, 객체의 이름을 `/path/file.txt` 형태로 저장하며 평면적으로 저장된다.
 
-S3에 대해선 여기까지만 알아보고, 중요한건 S3엔 정적 웹 호스팅을 지원한다는 것이다.
+S3에 대해선 여기까지만 알아보고, 중요한건 S3엔 정적 웹 호스팅을 지원한다는 것이다. 
 즉 이걸 가지고 프론트엔드를 띄울 수 있다는 얘기인데, 사실 이건 Github Pages 등으로 "무료로" 사용 가능하기도 하다.
 
 하지만 굳이 AWS S3를 선택한 이유는 그 앞에 CDN 서비스인 CloudFront를 쉽게 사용하기 위해, 그리고 S3에 호스팅한다 해도 엄청나게 큰 비용이 발생하는 것은 아니기 때문에 S3 + CloudFront를 선택하였다.
@@ -906,7 +917,7 @@ CloudFront에선 캐시 서버를 **엣지 로케이션(Edge Location)**이라 �
 ![](https://velog.velcdn.com/images/yulmwu/post/f39d3f20-d44a-48e3-8c89-6c4b74e58784/image.png)
 
 > 추가적으로, 람다와 연계하여 CloudFront에 람다 함수를 배포하여 CDN 처럼 사용할 수 있는데, 이를 Lambda@Edge라 부른다. 쉽게 설명하자면 그냥 CloudFront의 엣지 로케이션에서 돌아가는 람다이다.
->
+> 
 > 해당 포스팅에선 Lambda@Edge에 대해선 다루지 않는다.
 
 ## 4-5. Serverless Framework
@@ -939,18 +950,18 @@ JSON, YAML, HCL(테라폼) 등의 포맷으로 인프라를 구성하고, 해당
 이렇게 구성된 IaC는 선언형 코드로 정의하고, 배포 시 자동으로 버전 관리 및 로깅 등의 기능을 지원한다.
 
 > 명령형 코드의 경우, 주로 절차를 정의하는데, 예를 들어 아래와 같다.
->
+> 
 > ```
 > 람다 HelloLambda를 생성하고 "index.js" 코드를 올린 후, API Gateway의 "/hello" 엔드포인트에 그 람다를 연결해라
 > ```
->
+> 
 > 반면 선언형 코드는 그 결과를 직접 입력하는 것인데, 위 코드를 선언형 코드로 변경하면 아래와 같아진다.
->
+> 
 > ```
 > HelloLambda: SourceCode="index.js"
 > API Gateway: "/hello"="HelloLambda"
 > ```
->
+> 
 > 대부분의 경우 IaC는 선언형으로 작성된다.
 
 또한 이 포스팅에서 잠깐 다룰 Github Actions 등의 CI/CD(지속적 통합, 지속적 배포) 자동화와 조합하여 더욱 더 강력하게 만들 수 있다.
@@ -980,14 +991,14 @@ YAML이나 JSON 형태로 코드를 작성할 수 있는데, 이 포스팅에선
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09' # 템플릿 버전 (현재까진 2010-09-09가 유일함)
 Description: 'Example Cloudformation Template' # 설명
-Resources: # 리소스 목록
-    TestBucket: # 논리적인 리소스 이름: TestBucket
-        Type: AWS::S3::Bucket # 서비스 이름: S3
-        Properties: # 속성
-            BucketName: test1234 # 버킷 이름 지정: test1234
-            AccessControl: Private # 프라이빗으로
-            VersioningConfiguration:
-                Status: Enabled # 버전 관리 사용
+Resources:                     # 리소스 목록
+  TestBucket:                  # 논리적인 리소스 이름: TestBucket
+    Type: AWS::S3::Bucket      # 서비스 이름: S3
+    Properties:                # 속성
+      BucketName: test1234     # 버킷 이름 지정: test1234
+      AccessControl: Private   # 프라이빗으로
+      VersioningConfiguration:
+        Status: Enabled        # 버전 관리 사용
 ```
 
 이런식으로 작성하면 되며, 실제로 테스트해보자. AWS > CloudFormation으로 들어가 "스택 생성"을 클릭한다.
@@ -1033,17 +1044,17 @@ Resources: # 리소스 목록
 
 ```yaml
 Resources:
-    HelloWorldFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            Handler: index.handler
-            Runtime: nodejs20.x
-            Events:
-                HelloWorld:
-                    Type: Api
-                    Properties:
-                        Path: /hello
-                        Method: get
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
 ```
 
 SAM을 통해 배포하면 람다 함수 생성은 물론, 자동으로 `index.js` 등의 코드를 압축 후 S3 등에 업로드한 후, 람다를 생성하고 해당 코드를 적용시킨다.
@@ -1065,15 +1076,15 @@ AWS에 최적화되어 있으며, 특히 플러그인 등이 활발하게 지원
 ```yaml
 service: HelloWorld
 provider:
-    name: aws
-    runtime: nodejs20.x
+  name: aws
+  runtime: nodejs20.x
 functions:
-    hello:
-        handler: handler.hello
-        events:
-            - http:
-                  path: hello
-                  method: get
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
 ```
 
 `provider`를 사용하여 기본값을 정해주고, 서버리스에 특화된 프레임워크이기 때문에 람다 함수에 대한 `functions`라는 요소를 따로 지원한다.
@@ -1083,20 +1094,19 @@ functions:
 ```sh
 > npm install -g serverless-esbuild
 ```
-
 ```yaml
 plugins:
-    - serverless-esbuild # 플러그인 추가
+    - serverless-esbuild  # 플러그인 추가
 
 custom:
     esbuild:
-        bundle: true # 번들링
-        minify: true # 코드 간소화
-        target: 'node20' # NodeJS 20버전 사용 (람다에서 지원하는 최신 버전)
+        bundle: true	  # 번들링
+        minify: true	  # 코드 간소화
+        target: 'node20'  # NodeJS 20버전 사용 (람다에서 지원하는 최신 버전)
         platform: 'node'
         treeShaking: true # 사용하지 않는 코드 삭제
-        packager: npm # npm 패키지 메니저 사용
-        format: 'cjs' # CommonJS 사용
+        packager: npm 	  # npm 패키지 메니저 사용
+        format: 'cjs' 	  # CommonJS 사용
 ```
 
 단점이라 하면 요즘 들어와서 어느정도 유료화가 됐다는 점, AWS 외의 리소스를 다루기엔 어렵다는 점 등이 있으나 AWS만 쓴다면 큰 단점이 되진 못한다.
@@ -1129,7 +1139,7 @@ resource "aws_s3_bucket" "my_bucket" {
 
 ## 4-6. CI/CD
 
-**CI/CD**는 **Continuous Integration/Continuous Deployment**의 약자로, 직역하면 지속적 통합과 지속적 배포가 된다.
+**CI/CD**는 **Continuous Integration/Continuous Deployment**의 약자로, 직역하면 지속적 통합과 지속적 배포가 된다. 
 
 이게 무슨말이냐면, 예를 들어 아래와 같은 시나리오를 생각해보자.
 
@@ -1153,7 +1163,7 @@ CI/CD 플랫폼엔 대표적으로 오픈소스인 Jenkins나 Travis CI 등이 �
 
 이 포스팅을 읽는 독자 중에서 **깃(Git)**과 **깃허브(Github)**에 대해 모르는 독자는 거의 없을 것이라 생각하지만, 간단히 설명하자면 깃(Git)은 소스코드 등의 변경 사항을 추적하고 관리하는 버전 관리 시스템이다.
 
-특히 협업을 위해선 깃이 필수인데, 그러한 깃들을 저장하는 서비스엔 크게 깃허브(Github)나 깃랩(Gitlab)이 존재한다.
+특히 협업을 위해선 깃이 필수인데, 그러한 깃들을 저장하는 서비스엔 크게 깃허브(Github)나 깃랩(Gitlab)이 존재한다. 
 
 그 중 깃허브가 가장 대중적으로 많이 사용되는데, 그 깃허브에선 **Github Actions**라는 CI/CD 도구를 지원한다.
 
@@ -1225,17 +1235,17 @@ jobs:
 name: Test Workflow
 on: push
 jobs:
-    checkout:
-        runs-on: ubuntu-latest
-        steps:
-            - name: First Check
-              run: |
-                  ls -al
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Second Check
-              run: |
-                  ls -al
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: First Check
+        run: |
+          ls -al
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Second Check 
+        run: |
+          ls -al
 ```
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b0e2785e-5b3c-4359-bafa-b9545259da78/image.png)
@@ -1342,17 +1352,14 @@ v2와 v3의 가장 큰 차이점이라 하면 기존엔 `aws-sdk` 라이브러�
 import AWS from 'aws-sdk'
 const dynamoDB = new AWS.DynamoDB()
 
-dynamoDB.getItem(
-	{
-		TableName: 'Users',
-		Key: {
-			userId: { S: '123' },
-		},
-	},
-	(err, data) => {
-		// Do Someting
-	},
-)
+dynamoDB.getItem({
+	TableName: 'Users',
+    Key: {
+        userId: { S: '123' },
+    },
+}, (err, data) => { 
+	// Do Someting
+})
 ```
 
 하지만 v3의 경우 서비스별로 따로 모듈화되어 있는데, 때문에 필요한 기능만 임포트하여 사용할 수 있다. 위 v2 SDK를 v3로 변경하면 아래와 같다.
@@ -1382,10 +1389,10 @@ SDK의 서비스별 사용 방법은 아래에서 차근차근 설명하도록 �
 ## 5-2. `login.ts`
 
 > 포스팅의 가독성을 위하여 실제 배포에 사용되었던 코드를 변형하여 주요 로직만 포함되어있다.
->
+> 
 > 때문에 예외 처리 및 유틸리티 함수 등이 존재하지 않으며, 자세한 코드는 [깃허브 소스코드](https://github.com/eocndp/aws-lambda-example/tree/main/backend/functions)를 참고하길 바란다.
 
-`login.ts`는 로그인 기능을 담당하는 람다 함수로, Body로 `username`과 `password`를 받는다.
+`login.ts`는 로그인 기능을 담당하는 람다 함수로, Body로 `username`과 `password`를 받는다. 
 
 그 응답으로 엑세스 토큰과 ID 토큰, 그리고 `Set-Cookie`를 통해 HTTPOnly 쿠키로 리프레시 토큰을 응답한다.
 
@@ -1396,53 +1403,53 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 const cognitoClient = new CognitoIdentityProviderClient({})
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
-	try {
-		const { username, password } = JSON.parse(event.body ?? '{}')
-		if (!username || !password)
-			return {
-				statusCode: 400,
-				body: JSON.stringify({
-					error: 'Bad Request',
-					message: 'Username and password are required',
-				}),
-			}
+    try {
+        const { username, password } = JSON.parse(event.body ?? '{}')
+        if (!username || !password)
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    error: 'Bad Request',
+                    message: 'Username and password are required',
+                }),
+            }
 
-		const command = new InitiateAuthCommand({
-			AuthFlow: 'USER_PASSWORD_AUTH',
-			ClientId: process.env.COGNITO_CLIENT_ID!,
-			AuthParameters: {
-				USERNAME: username,
-				PASSWORD: password,
-			},
-		})
+        const command = new InitiateAuthCommand({
+            AuthFlow: 'USER_PASSWORD_AUTH',
+            ClientId: process.env.COGNITO_CLIENT_ID!,
+            AuthParameters: {
+                USERNAME: username,
+                PASSWORD: password,
+            },
+        })
 
-		const result = await cognitoClient.send(command)
+        const result = await cognitoClient.send(command)
 
-		const accessToken = result.AuthenticationResult?.AccessToken
-		const idToken = result.AuthenticationResult?.IdToken
-		const refreshToken = result.AuthenticationResult?.RefreshToken
+        const accessToken = result.AuthenticationResult?.AccessToken
+        const idToken = result.AuthenticationResult?.IdToken
+        const refreshToken = result.AuthenticationResult?.RefreshToken
 
-		const maxAge = 30 * 24 * 60 * 60 // 30 days
+        const maxAge = 30 * 24 * 60 * 60 // 30 days
 
-		return {
-			statusCode: 200,
-			headers: {
-				'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
-			},
-			body: JSON.stringify({
-				accessToken,
-				idToken,
-			}),
-		}
-	} catch (err) {
-		return {
-			statusCode: 500,
-			body: JSON.stringify({
-				error: 'Internal Server Error',
-				message: (err as Error).message,
-			}),
-		}
-	}
+        return {
+            statusCode: 200,
+            headers: {
+                'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
+            },
+            body: JSON.stringify({
+                accessToken,
+                idToken,
+            }),
+        }
+    } catch (err) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Internal Server Error',
+                message: (err as Error).message,
+            }),
+        }
+    }
 }
 ```
 
@@ -1476,7 +1483,7 @@ const cognitoClient = new CognitoIdentityProviderClient({})
 
 ```ts
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
-	// ...
+ 	// ... 
 }
 ```
 
@@ -1491,13 +1498,13 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 ```ts
 const { username, password } = JSON.parse(event.body ?? '{}')
 if (!username || !password)
-	return {
-		statusCode: 400,
-		body: JSON.stringify({
-			error: 'Bad Request',
-			message: 'Username and password are required',
-		}),
-	}
+    return {
+        statusCode: 400,
+        body: JSON.stringify({
+            error: 'Bad Request',
+            message: 'Username and password are required',
+        }),
+    }
 ```
 
 만약 둘 중 하나라도 제공되지 않을 경우 400 Bad Request를 반환한다.
@@ -1506,12 +1513,12 @@ if (!username || !password)
 
 ```ts
 const command = new InitiateAuthCommand({
-	AuthFlow: 'USER_PASSWORD_AUTH',
-	ClientId: process.env.COGNITO_CLIENT_ID!,
-	AuthParameters: {
-		USERNAME: username,
-		PASSWORD: password,
-	},
+    AuthFlow: 'USER_PASSWORD_AUTH',
+    ClientId: process.env.COGNITO_CLIENT_ID!,
+    AuthParameters: {
+        USERNAME: username,
+        PASSWORD: password,
+    },
 })
 
 const result = await cognitoClient.send(command)
@@ -1533,14 +1540,14 @@ const refreshToken = result.AuthenticationResult?.RefreshToken
 const maxAge = 30 * 24 * 60 * 60 // 30 days
 
 return {
-	statusCode: 200,
-	headers: {
-		'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
-	},
-	body: JSON.stringify({
-		accessToken,
-		idToken,
-	}),
+    statusCode: 200,
+    headers: {
+        'Set-Cookie': `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=None; Secure`,
+    },
+    body: JSON.stringify({
+        accessToken,
+        idToken,
+    }),
 }
 ```
 
@@ -1550,22 +1557,22 @@ return {
 그리고 나머지 엑세스 토큰과 ID 토큰은 Body에 넣어서 반환하고, 로그인 함수는 이로써 끝이 난다.
 
 > **2025-08-30 업데이트**
->
+> 
 > 무슨 이유인지는 모르겠으나, Cognito에서 "기존 웹 애플리케이션" 선택 시 자동으로 Client Secret 옵션이 켜지면서 Client Secret Hash 값을 요구하는 것 같다.
->
+> 
 > 아래와 같이 코드 추가하고 수정해주자.
->
+> 
 > ```ts
 > import { createHmac } from 'crypto'
->
+> 
 > const clientSecretHashGenerator = (username, clientId, clientSecretKey) => {
-> 	// Base64 ( HMAC_SHA256 ( "Client Secret Key", "Username" + "Client Id" ) )
-> 	const hmac = createHmac('sha256', clientSecretKey)
-> 	hmac.update(username + clientId)
-> 	return hmac.digest('base64')
+>     // Base64 ( HMAC_SHA256 ( "Client Secret Key", "Username" + "Client Id" ) )
+>     const hmac = createHmac('sha256', clientSecretKey)
+>     hmac.update(username + clientId)
+>     return hmac.digest('base64')
 > }
 > ```
->
+> 
 > ```ts
 >     AuthParameters: {
 >         USERNAME: '...',
@@ -1585,39 +1592,39 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 const cognitoClient = new CognitoIdentityProviderClient({})
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
-	try {
-		const { username, password, email } = JSON.parse(event.body ?? '{}')
-		if (!username || !password || !email)
-			return {
-				statusCode: 400,
-				body: JSON.stringify({
-					error: 'Bad Request',
-					message: 'Username, password, and email are required',
-				}),
-			}
+    try {
+        const { username, password, email } = JSON.parse(event.body ?? '{}')
+        if (!username || !password || !email)
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    error: 'Bad Request',
+                    message: 'Username, password, and email are required',
+                }),
+            }
 
-		const command = new SignUpCommand({
-			ClientId: process.env.COGNITO_CLIENT_ID!,
-			Username: username,
-			Password: password,
-			UserAttributes: [{ Name: 'email', Value: email }],
-		})
+        const command = new SignUpCommand({
+            ClientId: process.env.COGNITO_CLIENT_ID!,
+            Username: username,
+            Password: password,
+            UserAttributes: [{ Name: 'email', Value: email }],
+        })
 
-		await cognitoClient.send(command)
+        await cognitoClient.send(command)
 
-		return {
-			statusCode: 200,
-			body: JSON.stringify({ message: 'Signup successful, please check your email for confirmation.' }),
-		}
-	} catch (err) {
-		return {
-			statusCode: 500,
-			body: JSON.stringify({
-				error: 'Internal Server Error',
-				message: (err as Error).message,
-			}),
-		}
-	}
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Signup successful, please check your email for confirmation.' }),
+        }
+    } catch (err) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Internal Server Error',
+                message: (err as Error).message,
+            }),
+        }
+    }
 }
 ```
 
@@ -1627,10 +1634,10 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
 ```ts
 const command = new SignUpCommand({
-	ClientId: process.env.COGNITO_CLIENT_ID!,
-	Username: username,
-	Password: password,
-	UserAttributes: [{ Name: 'email', Value: email }],
+    ClientId: process.env.COGNITO_CLIENT_ID!,
+    Username: username,
+    Password: password,
+    UserAttributes: [{ Name: 'email', Value: email }],
 })
 
 await cognitoClient.send(command)
@@ -1640,7 +1647,7 @@ await cognitoClient.send(command)
 
 그래서 이메일의 경우 속성으로 값을 넘기는데, 그 사용은 위 코드와 같다.
 
-위와 같은 명령어를 통해 Cognito 클라이언트에 전달하면 회원가입이 완료되고, 인증 코드가 포함된 이메일이 회원가입 시 기입되었던 이메일로 전송된다.
+위와 같은 명령어를 통해 Cognito 클라이언트에 전달하면 회원가입이 완료되고, 인증 코드가 포함된 이메일이 회원가입 시 기입되었던 이메일로 전송된다. 
 
 회원가입 API의 반환은 특별한 값을 반환하지 않으므로 반환에 대한 코드 설명은 생략한다.
 
@@ -1654,77 +1661,77 @@ import { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyResultV2 } from
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 const getNextId = async (): Promise<number> => {
-	const command = new UpdateCommand({
-		TableName: 'Counter',
-		Key: { name: 'post' },
-		UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
-		ExpressionAttributeNames: { '#v': 'value' },
-		ExpressionAttributeValues: {
-			':inc': 1,
-			':init': 0,
-		},
-		ReturnValues: 'UPDATED_NEW',
-	})
+    const command = new UpdateCommand({
+        TableName: 'Counter',
+        Key: { name: 'post' },
+        UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
+        ExpressionAttributeNames: { '#v': 'value' },
+        ExpressionAttributeValues: {
+            ':inc': 1,
+            ':init': 0,
+        },
+        ReturnValues: 'UPDATED_NEW',
+    })
 
-	const result = await dynamoDB.send(command)
-	return result.Attributes?.value
+    const result = await dynamoDB.send(command)
+    return result.Attributes?.value
 }
 
 export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer): Promise<APIGatewayProxyResultV2> => {
-	try {
-		const { title, content } = JSON.parse(event.body ?? '{}')
-		if (!title || !content)
-			return {
-				statusCode: 400,
-				body: JSON.stringify({
-					error: 'Bad Request',
-					message: 'Title and content are required',
-				}),
-			}
+    try {
+        const { title, content } = JSON.parse(event.body ?? '{}')
+        if (!title || !content)
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    error: 'Bad Request',
+                    message: 'Title and content are required',
+                }),
+            }
 
-		const user = event.requestContext.authorizer?.jwt?.claims
-		if (!user || !user.sub || !user.username)
-			return {
-				statusCode: 401,
-				body: JSON.stringify({
-					error: 'Unauthorized',
-					message: 'User is not authenticated',
-				}),
-			}
+        const user = event.requestContext.authorizer?.jwt?.claims
+        if (!user || !user.sub || !user.username)
+            return {
+                statusCode: 401,
+                body: JSON.stringify({
+                    error: 'Unauthorized',
+                    message: 'User is not authenticated',
+                }),
+            }
 
-		const item = {
-			id: String(await getNextId()),
-			title,
-			content,
-			userId: user.sub,
-			userName: user.username,
-			createdAt: new Date().toISOString(),
-		}
+        const item = {
+            id: String(await getNextId()),
+            title,
+            content,
+            userId: user.sub,
+            userName: user.username,
+            createdAt: new Date().toISOString(),
+        }
 
-		const command = new PutCommand({
-			TableName: 'Posts',
-			Item: item,
-		})
+        const command = new PutCommand({
+            TableName: 'Posts',
+            Item: item,
+        })
 
-		await dynamoDB.send(command)
+        await dynamoDB.send(command)
 
-		return {
-			statusCode: 201,
-			body: JSON.stringify(item),
-		}
-	} catch (err) {
-		return {
-			statusCode: 500,
-			body: JSON.stringify({
-				error: 'Internal Server Error',
-				message: (err as Error).message,
-			}),
-		}
-	}
+        return {
+            statusCode: 201,
+            body: JSON.stringify(item),
+        }
+    } catch (err) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Internal Server Error',
+                message: (err as Error).message,
+            }),
+        }
+    }
 }
 ```
 
-> `event` 파라미터의 타입이 `APIGatewayProxyEventV2`이 아닌 `APIGatewayProxyEventV2WithJWTAuthorizer`인 이유는 JWT 토큰의 값을 가져오기 위해서다.
+> `event` 파라미터의 타입이 `APIGatewayProxyEventV2`이 아닌 `APIGatewayProxyEventV2WithJWTAuthorizer`인 이유는 JWT 토큰의 값을 가져오기 위해서다. 
 > 기본적으로 `APIGatewayProxyEventV2`엔 JWT 클레임 등의 정보가 포함되지 않는데, 확장된 `APIGatewayProxyEventV2WithJWTAuthorizer`엔 JWT를 사용할 수 있다.
 
 본격적으로 DynamoDB를 사용하는 코드이다. DynamoDB 또한 Cognito 클라이언트와 마찬가지로 클라이언트로 선언해주고, 그 클라이언트에 명령어를 보내는 형식이다.
@@ -1741,20 +1748,20 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 ```ts
 const getNextId = async (): Promise<number> => {
-	const command = new UpdateCommand({
-		TableName: 'Counter',
-		Key: { name: 'post' },
-		UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
-		ExpressionAttributeNames: { '#v': 'value' },
-		ExpressionAttributeValues: {
-			':inc': 1,
-			':init': 0,
-		},
-		ReturnValues: 'UPDATED_NEW',
-	})
+    const command = new UpdateCommand({
+        TableName: 'Counter',
+        Key: { name: 'post' },
+        UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
+        ExpressionAttributeNames: { '#v': 'value' },
+        ExpressionAttributeValues: {
+            ':inc': 1,
+            ':init': 0,
+        },
+        ReturnValues: 'UPDATED_NEW',
+    })
 
-	const result = await dynamoDB.send(command)
-	return result.Attributes?.value
+    const result = await dynamoDB.send(command)
+    return result.Attributes?.value
 }
 ```
 
@@ -1783,17 +1790,17 @@ SET #v = if_not_exists(#v, :init) + :inc
 
 ```ts
 const item = {
-	id: String(await getNextId()),
-	title,
-	content,
-	userId: user.sub,
-	userName: user.username,
-	createdAt: new Date().toISOString(),
+    id: String(await getNextId()),
+    title,
+    content,
+    userId: user.sub,
+    userName: user.username,
+    createdAt: new Date().toISOString(),
 }
 
 const command = new PutCommand({
-	TableName: 'Posts',
-	Item: item,
+    TableName: 'Posts',
+    Item: item,
 })
 ```
 
@@ -1813,36 +1820,36 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
-	try {
-		const id = event.pathParameters?.id
-		if (!id)
-			return {
-				statusCode: 400,
-				body: JSON.stringify({ message: 'Missing id parameter' }),
-			}
+    try {
+        const id = event.pathParameters?.id
+        if (!id)
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Missing id parameter' }),
+            }
 
-		const command = new GetCommand({
-			TableName: 'Posts',
-			Key: { id },
-		})
+        const command = new GetCommand({
+            TableName: 'Posts',
+            Key: { id },
+        })
 
-		const result = await dynamoDB.send(command)
-		if (!result.Item)
-			return {
-				statusCode: 404,
-				body: JSON.stringify({ message: 'Not found post' }),
-			}
+        const result = await dynamoDB.send(command)
+        if (!result.Item)
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ message: 'Not found post' }),
+            }
 
-		return {
-			statusCode: 200,
-			body: JSON.stringify(result.Item),
-		}
-	} catch (err) {
-		return {
-			statusCode: 500,
-			body: JSON.stringify({ message: (err as Error).message }),
-		}
-	}
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result.Item),
+        }
+    } catch (err) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: (err as Error).message }),
+        }
+    }
 }
 ```
 
@@ -1853,16 +1860,16 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 
 ```ts
 const command = new GetCommand({
-	TableName: 'Posts',
-	Key: { id },
+    TableName: 'Posts',
+    Key: { id },
 })
 
 const result = await dynamoDB.send(command)
 if (!result.Item)
-	return {
-		statusCode: 404,
-		body: JSON.stringify({ message: 'Not found post' }),
-	}
+    return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Not found post' }),
+    }
 ```
 
 그리고 `GetCommand` 명령어를 통해 특정 키(게시글의 ID)를 바탕으로 그 아이템을 가져올 수 있다.
@@ -1870,9 +1877,9 @@ if (!result.Item)
 이 아이템을 API를 호출한 클라이언트에게 반환하면 게시글을 불러오는 함수도 끝이 난다.
 
 > `GetCommand`가 아닌 `QueryCommand`를 사용할 수 도 있는데, `GetCommand`는 파티션 키와 정렬 키를 바탕으로 하나의 요소만 가져온다면 `QueryCommand`는 SQL문 처럼 여러개의 요소를 가져올 수 있다.
->
-> 또는 `getPosts` 코드에선 `ScanCommand`를 사용하였는데, DynamoDB에서 모든 테이블을 가져오는 `Scan`은 상당한 리소스를 잡아먹는 명령어인데, 실전에는 `Scan` 명령어 사용을 지양한다.
->
+> 
+> 또는 `getPosts` 코드에선 `ScanCommand`를 사용하였는데, DynamoDB에서 모든 테이블을 가져오는 `Scan`은 상당한 리소스를 잡아먹는 명령어인데, 실전에는 `Scan` 명령어 사용을 지양한다. 
+> 
 > 그 대신 `Query`를 사용하여 조건 형태로 가져오거나, 파티션 키를 "POST" 등으로 고정해두고 `Query`를 사용하여 페이지네이션, 또는 GSI(Global Secondary Index)를 사용한 뒤 페이지네이션하는 등의 솔루션이 필요하다.
 >
 > 하지만 자세한건 여기서 다루지 않고, 테스트로 확인만을 위해 `Scan`을 사용한다는 점 참고 바란다.
@@ -1888,41 +1895,43 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 const cognitoClient = new CognitoIdentityProviderClient({})
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
-	try {
-		const authHeader = event.headers?.Authorization ?? event.headers?.authorization
+    try {
+        const authHeader = event.headers?.Authorization ?? event.headers?.authorization
 
-		if (!authHeader || !authHeader.startsWith('Bearer '))
-			return {
-				statusCode: 401,
-				body: JSON.stringify({
-					error: 'Unauthorized',
-					message: 'No valid authorization header provided',
-				}),
-			}
+        if (!authHeader || !authHeader.startsWith('Bearer '))
+            return {
+                statusCode: 401,
+                body: JSON.stringify({
+                    error: 'Unauthorized',
+                    message: 'No valid authorization header provided',
+                }),
+            }
 
-		const accessToken = authHeader.substring('Bearer '.length)
+        const accessToken = authHeader.substring('Bearer '.length)
 
-		const getUserCommand = new GetUserCommand({ AccessToken: accessToken })
-		const result = await cognitoClient.send(getUserCommand)
+        const getUserCommand = new GetUserCommand({ AccessToken: accessToken })
+        const result = await cognitoClient.send(getUserCommand)
 
-		const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((attr) => [attr.Name, attr.Value]))
+        const userAttributes = Object.fromEntries(
+            (result.UserAttributes ?? []).map((attr) => [attr.Name, attr.Value])
+        )
 
-		return {
-			statusCode: 200,
-			body: JSON.stringify({
-				username: result.Username,
-				...userAttributes,
-			}),
-		}
-	} catch (err) {
-		return {
-			statusCode: 500,
-			body: JSON.stringify({
-				error: 'Internal Server Error',
-				message: (err as Error).message,
-			}),
-		}
-	}
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                username: result.Username,
+                ...userAttributes,
+            }),
+        }
+    } catch (err) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Internal Server Error',
+                message: (err as Error).message,
+            }),
+        }
+    }
 }
 ```
 
@@ -1932,13 +1941,13 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
 const authHeader = event.headers?.Authorization ?? event.headers?.authorization
 
 if (!authHeader || !authHeader.startsWith('Bearer '))
-	return {
-		statusCode: 401,
-		body: JSON.stringify({
-			error: 'Unauthorized',
-			message: 'No valid authorization header provided',
-		}),
-	}
+    return {
+        statusCode: 401,
+        body: JSON.stringify({
+            error: 'Unauthorized',
+            message: 'No valid authorization header provided',
+        }),
+    }
 
 const accessToken = authHeader.substring('Bearer '.length)
 ```
@@ -1949,16 +1958,19 @@ const accessToken = authHeader.substring('Bearer '.length)
 const getUserCommand = new GetUserCommand({ AccessToken: accessToken })
 const result = await cognitoClient.send(getUserCommand)
 
-const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((attr) => [attr.Name, attr.Value]))
+const userAttributes = Object.fromEntries(
+    (result.UserAttributes ?? []).map((attr) => [attr.Name, attr.Value])
+)
 ```
 
 > 해당 명령어를 실행하려면 JWT 엑세스 토큰이 `aws.cognito.signin.user.admin`의 범위 안에 있어야 하는데, 이는 자기 자신의 계정을 관리할 수 있는 권한이다.
->
+> 
 > Cognito에서 발급해주는 엑세스 토큰을 base64로 디코딩해보면 알 수 있다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/60fa7b4c-3eac-4607-aa0b-82729aa09f47/image.png)
 
 그리고 이 속성을 API를 호출한 클라이언트에게 반환하면 함수가 마무리된다.
+
 
 # 6. Let's build the Infra
 
@@ -2009,31 +2021,31 @@ const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((att
 ```js
 // index.mjs
 export const handler = async (event) => {
-	try {
-		const body = JSON.parse(event.body ?? '{}')
+    try {
+        const body = JSON.parse(event.body ?? '{}')
 
-		const num1 = Number(body.num1)
-		const num2 = Number(body.num2)
+        const num1 = Number(body.num1)
+        const num2 = Number(body.num2)
 
-		if (isNaN(num1) || isNaN(num2))
-			return {
-				statusCode: 400,
-				body: JSON.stringify({ error: 'Both num1 and num2 must be numbers' }),
-			}
+        if (isNaN(num1) || isNaN(num2))
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Both num1 and num2 must be numbers' }),
+            }
 
-		const sum = num1 + num2
-		console.log(`${num1} + ${num2} = ${sum}`)
+        const sum = num1 + num2
+        console.log(`${num1} + ${num2} = ${sum}`)
 
-		return {
-			statusCode: 200,
-			body: JSON.stringify({ result: sum }),
-		}
-	} catch (error) {
-		return {
-			statusCode: 500,
-			body: JSON.stringify({ error: 'Internal server error', details: error.message }),
-		}
-	}
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ result: sum }),
+        }
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error', details: error.message }),
+        }
+    }
 }
 ```
 
@@ -2059,7 +2071,7 @@ Test 버튼 클릭 > Create New Test Event 클릭 후 Event JSON에 아래의 �
 
 ![](https://velog.velcdn.com/images/yulmwu/post/aee2ead0-138a-4b9f-b078-8950ebe67503/image.png)
 
-위와 같이 두 값을 더한 결과가 상태 코드 200과 함께 반환되며, `console.log`를 통한 로깅도 INFO로 날 나타난다.
+위와 같이 두 값을 더한 결과가 상태 코드 200과 함께 반환되며, `console.log`를 통한 로깅도 INFO로 날 나타난다. 
 
 이러한 로그는 CloudWatch에서도 확인할 수 있다. CloudWatch > 로그 그룹 > `/aws/lambda/람다함수이름`을 클릭하고, 최신 로그 스트림을 클릭하면 아래와 같이 로그를 확인할 수 있다.
 
@@ -2090,6 +2102,7 @@ default 스테이지는 기본 루트(`/`) 경로에 배포하는 것으로, 아
 ![](https://velog.velcdn.com/images/yulmwu/post/e393103c-472b-4d7d-9498-1d3b9119da1b/image.png)
 
 다음 버튼 클릭 후, 생성 버튼을 클릭하면 API Gateway가 생성된다.
+
 
 ![](https://velog.velcdn.com/images/yulmwu/post/1a3daf22-a4b4-40b1-a304-5cc305c24264/image.png)
 
@@ -2202,13 +2215,13 @@ AWS Cognito에 들어가보자.
 하지만 이렇게만 생성하면 엑세스 토큰과 리프레시 토큰이 나타나지 않는데, 이는 아까 설명했던 코드처럼 AWS SDK를 사용하여 가져올 수 있다.
 
 > ![](https://velog.velcdn.com/images/yulmwu/post/2fd7825a-bc5f-4cae-956f-94f2226ad74c/image.png)
->
+> 
 > 그리고 Cognito엔 플랜이 있는데, 기본적으로 에센셜(Essentials) 플랜으로 제공된다.
->
+> 
 > Cognito 플랜엔 크게 Lite, Essentials, Plus가 존재하는데 이 포스팅에서 사용하는 Cognito 기능은 Lite에서도 모두 사용할 수 있다.
->
+> 
 > 하지만 요금은 Lite와 Essentials 사이에 거의 3배 가까이 차이가 나는데, 때문에 Lite로 전환하는걸 추천한다. (설정에서 가능)
->
+> 
 > Serverless Framework(CloudFormation)에서도 `UserPoolTier: LITE` 속성으로 설정할 수 있다.
 
 ### Cognito + API Gateway
@@ -2246,12 +2259,12 @@ https://cognito-idp.[Region].amazonaws.com/[User_Pool_ID]
 그럼 Cognito 권한 부여자가 생겼고, 나중에 이를 돌려쓸 수 있게 된다.
 이 작업은 이후 Serverless Framework에서 다시 IaC로 작성해볼 예정이다.
 
-## 6-4. CRUD with DynamoDB
+## 6-4. CRUD with DynamoDB 
 
 다음으로 포스팅을 저장하기 위한 Posts 테이블과 Counter 테이블을 만들어보자.
 
 > 다만 추후에 Serverless Framework 사용 시 기존의 인프라에 같은 이름의 리소스가 존재하면 안되는데, 이렇게 되면 `Posts`와 `Counter` 리소스가 이미 존재하게 된다.
->
+> 
 > 필자는 이 파트에서 만들고 삭제할 예정이지만, 다른 리소스 이름(`Posts_Test` 등)을 사용해도 괜찮다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ac84548d-69ef-4e4a-ab08-3bb6eea89a54/image.png)
@@ -2266,20 +2279,20 @@ AWS Console에서 DynamoDB에 접속한 후 Posts 테이블을 만들자. Posts 
 
 ```ts
 const getNextId = async (): Promise<number> => {
-	const command = new UpdateCommand({
-		TableName: 'Counter',
-		Key: { name: 'post' },
-		UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
-		ExpressionAttributeNames: { '#v': 'value' },
-		ExpressionAttributeValues: {
-			':inc': 1,
-			':init': 0,
-		},
-		ReturnValues: 'UPDATED_NEW',
-	})
+    const command = new UpdateCommand({
+        TableName: 'Counter',
+        Key: { name: 'post' },
+        UpdateExpression: 'SET #v = if_not_exists(#v, :init) + :inc',
+        ExpressionAttributeNames: { '#v': 'value' },
+        ExpressionAttributeValues: {
+            ':inc': 1,
+            ':init': 0,
+        },
+        ReturnValues: 'UPDATED_NEW',
+    })
 
-	const result = await dynamoDB.send(command)
-	return result.Attributes?.value
+    const result = await dynamoDB.send(command)
+    return result.Attributes?.value
 }
 ```
 
@@ -2328,16 +2341,19 @@ IAM 역할로 들어가 설정을 해보자. 권한 정책에 있는 정책을 �
 
 ```json
 {
-	"Action": [
-		"dynamodb:PutItem",
-		"dynamodb:GetItem",
-		"dynamodb:Scan",
-		"dynamodb:Query",
-		"dynamodb:UpdateItem",
-		"dynamodb:DeleteItem"
-	],
-	"Resource": ["[Posts_Tabble_ARN]", "[Counter_Table_ARN]"],
-	"Effect": "Allow"
+    "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem"
+    ],
+    "Resource": [
+        "[Posts_Tabble_ARN]",
+        "[Counter_Table_ARN]"
+    ],
+    "Effect": "Allow"
 }
 ```
 
@@ -2364,38 +2380,38 @@ import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dyn
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient())
 
 export const handler = async () => {
-	const item = {
-		id: '1',
-		title: 'Hello World',
-		content: 'This is a test post.',
-		createdAt: new Date().toISOString(),
-		userId: 'TestUserID',
-		userName: 'Foo',
-	}
+    const item = {
+        id: '1',
+        title: 'Hello World',
+        content: 'This is a test post.',
+        createdAt: new Date().toISOString(),
+        userId: 'TestUserID',
+        userName: 'Foo',
+    }
 
-	await dynamoDB.send(
-		new PutCommand({
-			TableName: 'Posts',
-			Item: item,
-		}),
-	)
+    await dynamoDB.send(
+        new PutCommand({
+            TableName: 'Posts',
+            Item: item,
+        })
+    )
 
-	const result = await dynamoDB.send(
-		new GetCommand({
-			TableName: 'Posts',
-			Key: {
-				id: item.id,
-			},
-		}),
-	)
+    const result = await dynamoDB.send(
+        new GetCommand({
+            TableName: 'Posts',
+            Key: {
+                id: item.id,
+            },
+        })
+    )
 
-	return {
-		statusCode: 200,
-		body: JSON.stringify({
-			message: 'Post created successfully',
-			post: result.Item,
-		}),
-	}
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: 'Post created successfully',
+            post: result.Item,
+        }),
+    }
 }
 ```
 
@@ -2414,7 +2430,7 @@ export const handler = async () => {
 이러한 권한 설정도 아래에서 설명할 Serverless Framework를 사용하여 쉽게 설정할 수 있다.
 
 > 어차피 개발자만 람다 함수를 다루고 작성한 코드대로 작성하는데 굳이 왜 IAM 정책을 부여하며 권한을 사용하는지 의문이 들 수 있다.
->
+> 
 > 하지만 이렇게 해두지 않으면 혹시 모를 개발자의 실수로 발생하는 보안 사고 등을 방지함으로 없는 것 보단 훨씬 좋다.
 
 ## 6-5. Serverless Framework
@@ -2430,9 +2446,9 @@ AWS 아키텍쳐를 소개할 때 사용했었던 자료인데, 위 자료에서
 즉 Lambda 코드 배포, API Gateway 설정, DynamoDB 설정, Cognito 설정까지 모두 Serverless Framework 안에서 처리할 것이다.
 
 > 그러기 위해선 우선 람다 소스코드가 필요한데, 포스팅의 예제는 아래의 깃허브 레포지토리에서 확인할 수 있다.
->
+> 
 > https://github.com/eocndp/aws-lambda-example/tree/main/backend
->
+> 
 > `serverless.yaml`이 이미 존재하는데, 직접 실습을 통해 따라해도 좋고 어떠한 기능을 하는지만 확인해도 좋다.
 
 우선 Serverless Framework는 일반적으로 `serverless.yaml` 이라는 파일 명을 사용하며, `serverless deploy` 등의 명령어 사용 시 자동으로 해당 파일을 사용한다.
@@ -2474,7 +2490,7 @@ provider:
 - `memorySize`: 람다의 최대 메모리 사이즈를 설정한다.
 - `timeout`: 람다 함수가 실행 될 때, 특정 시간이 지나면 자동으로 종료되는데 그 시간을 설정한다. 기본값은 3초이지만, 람다 특성 상 데이터베이스의 작업 등으로 인해 오래 걸릴 수 있으므로 10초로 설정해주었다.
 - `stage`: Serverless Framework의 스테이지를 의미하는데, 기본값은 `dev`이다. 왜인지는 모르겠으나 API Gateway의 스테이지 이름이 아니며, Serverless Framework에서 구분하기 위해 사용된다.
-- `environment`: 람다 함수 등에서 사용할 환경 변수를 설정한다.
+- `environment`: 람다 함수 등에서 사용할 환경 변수를 설정한다. 
 
 `environment` 속서에서 보면 `!Ref CognitoClient` 라는 구문이 있는데, `Ref`는 CloudFormation에서 지원하는 내장 함수이다. `!`는 Serverless Framework에서 사용 가능한 단축형이고, CloudFormation에선 `Fn::Ref` 등으로 사용한다.
 
@@ -2489,34 +2505,34 @@ provider:
 ```yaml
 # provider:
 # (생략)
-httpApi:
-    name: acinside-sl-api
-    cors:
-        allowedOrigins:
-            - https://XXX.cloudfront.net
-        allowedHeaders:
-            - Content-Type
-            - Authorization
-            - X-Requested-With
-            - X-Csrf-Token
-            - Set-Cookie
-        allowedMethods:
-            - GET
-            - POST
-            - PUT
-            - DELETE
-            - PATCH
-            - HEAD
-            - OPTIONS
-        maxAge: 86400 # 1 day
-        allowCredentials: true
+    httpApi:
+        name: acinside-sl-api
+        cors:
+            allowedOrigins:
+                - https://XXX.cloudfront.net
+            allowedHeaders:
+                - Content-Type
+                - Authorization
+                - X-Requested-With
+                - X-Csrf-Token
+                - Set-Cookie
+            allowedMethods:	
+                - GET
+                - POST
+                - PUT
+                - DELETE
+                - PATCH
+                - HEAD
+                - OPTIONS
+            maxAge: 86400 # 1 day
+            allowCredentials: true
 ```
 
 다음으로 `provider` 내에서 선언한 httpApi, 즉 API Gateway를 설정한다.
 
-API Gateway 이름(`name`)의 경우 `acinside-sl-api`라고 지정했으며, CORS의 기본값을 설정해주었다.
+API Gateway 이름(`name`)의 경우 `acinside-sl-api`라고 지정했으며, CORS의 기본값을 설정해주었다. 
 
-`allowedOrigins` 속성은 `Access-Control-Allow-Origin` 헤더를 의미하고, 나중에 S3 + CloudFront로 프론트엔드를 배포하였을 때 해당 오리진을 허용하기 위해 작성되어있다.
+`allowedOrigins` 속성은 `Access-Control-Allow-Origin` 헤더를 의미하고, 나중에 S3 + CloudFront로 프론트엔드를 배포하였을 때 해당 오리진을 허용하기 위해 작성되어있다. 
 
 `allowedHeaders`와 `allowedMethods`도 마찬가지로 각각 `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`를 의미하고, `maxAge`는 프리플라이트 요칭 시 캐싱할 기간을 나타낸다. (`Access-Control-Max-Age`)
 
@@ -2529,12 +2545,12 @@ CORS에 대한 내용은 위에서 설명하였으며, API Gateway의 라우팅 
 # (생략)
 #	httpApi:
 # 	(생략)
-authorizers:
-    cognitoAuthorizer:
-        type: jwt
-        identitySource: '$request.header.Authorization'
-        issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
-        audience: !Ref CognitoClient
+        authorizers:
+            cognitoAuthorizer:
+                type: jwt
+                identitySource: '$request.header.Authorization'
+                issuerUrl: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
+                audience: !Ref CognitoClient
 ```
 
 또 API Gateway에서 권한 부여자, 즉 Cognito를 연결하는 코드를 작성할 수 있다.
@@ -2544,7 +2560,7 @@ authorizers:
 권한 부여자의 이름은 `cognitoAuthorizer`이며, 타입은 `JWT`, 인증 방법은 `Authorization` 헤더, 발급자(issuer) URL은 Cognito IDP(JWT 제공자) URL, 대상은 Cognito Client ID를 설정한다.
 
 ```yaml
-issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
+issuerUrl: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
 ```
 
 위 코드에서 `Sub` 함수는 문자열을 치환하는 함수이다.
@@ -2553,9 +2569,9 @@ issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserP
 프로그래밍에서 포맷 스트링과 같은 기능을 수행한다고 보면 된다.
 
 > 그리고 `Sub` 함수는 Serverless Framework 레벨에서 처리하지 않고 CloudFormation 레벨에서 처리한다.
->
-> 하지만 `provider`에 설정된 리전은 Serverless Framework에서 배포 시 어느 리전에 배포할지를 식별하는 것이라 `Sub` 함수에서 사용할 수 없다.
->
+> 
+> 하지만 `provider`에 설정된 리전은 Serverless Framework에서 배포 시 어느 리전에 배포할지를 식별하는 것이라 `Sub` 함수에서 사용할 수 없다. 
+> 
 > 그래서 CloudFormation에서 제공하는 내장 파라미터 `AWS::Region`을 사용한다.
 
 그러면 API Gateway 권한 부여자 설정은 끝났다.
@@ -2567,20 +2583,20 @@ issuerUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserP
 ```yaml
 # provider:
 # (생략)
-iam:
-    role:
-        statements:
-            - Effect: Allow
-              Action:
-                  - dynamodb:PutItem # Create
-                  - dynamodb:GetItem # Read
-                  - dynamodb:Scan # Read(all)
-                  - dynamodb:Query # Read
-                  - dynamodb:UpdateItem # Update
-                  - dynamodb:DeleteItem # Delete
-              Resource:
-                  - !GetAtt PostsTable.Arn
-                  - !GetAtt CounterTable.Arn
+	iam:
+        role:
+            statements:
+                - Effect: Allow
+                  Action:
+                      - dynamodb:PutItem # Create
+                      - dynamodb:GetItem # Read
+                      - dynamodb:Scan # Read(all)
+                      - dynamodb:Query # Read
+                      - dynamodb:UpdateItem # Update
+                      - dynamodb:DeleteItem # Delete
+                  Resource:
+                      - !GetAtt PostsTable.Arn
+                      - !GetAtt CounterTable.Arn
 ```
 
 위 처럼 IAM 권한 정책을 설정했을때와 비슷하게 작성할 수 있다.
@@ -2672,13 +2688,13 @@ Cognito와 DynamoDB는 자료를 유지시키는 것이 좋으므로 해당 옵�
 # resources:
 # 	Resources:
 #		(생략)
-CognitoClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-        ClientName: acinside-cognito-client
-        UserPoolId: !Ref CognitoUserPool
-        ExplicitAuthFlows:
-            - USER_PASSWORD_AUTH
+        CognitoClient:
+            Type: AWS::Cognito::UserPoolClient
+            Properties:
+                ClientName: acinside-cognito-client
+                UserPoolId: !Ref CognitoUserPool
+                ExplicitAuthFlows:
+                    - USER_PASSWORD_AUTH
 ```
 
 그리고 Cognito 유저 풀 클라이언트(`AWS::Cognito::UserPoolClient`)에 대한 설정도 해주었다. 클라이언트의 이름은 `acinside-cognito-client`, 유저 풀 ID는 이전에 만들어둔 유저 풀을 참조한다.
@@ -2693,19 +2709,19 @@ CognitoClient:
 # resources:
 # 	Resources:
 #		(생략)
-PostsTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-    Properties:
-        TableName: Posts
-        AttributeDefinitions:
-            - AttributeName: id
-              AttributeType: S
-        KeySchema:
-            - AttributeName: id
-              KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
+        PostsTable:
+            Type: AWS::DynamoDB::Table
+            DeletionPolicy: Retain
+            UpdateReplacePolicy: Retain
+            Properties:
+                TableName: Posts
+                AttributeDefinitions:
+                    - AttributeName: id
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: id
+                      KeyType: HASH
+                BillingMode: PAY_PER_REQUEST
 ```
 
 타입은 `Type: AWS::DynamoDB::Table`, 스택 삭제 및 교체 시 유지 기능을 활성화 해뒀으며, 테이블은 이름은 `Posts`, 기본 속성은 `id: String(S)`이며 키는 `id`로 해시화하여 저장한다.
@@ -2790,6 +2806,7 @@ package:
 코드 사이즈가 1769349바이트(약 1.8MB) -> 152586바이트(약 153KB)로 10배 이상 줄어든걸 확인할 수 있다.
 (람다 함수의 파일 개수에 비례함)
 
+
 #### serverless-prune-plugin
 
 Serverless Framework를 사용하면 람다 함수 생성 또는 코드 수정 시 람다 함수의 버전이 생긴다.
@@ -2803,9 +2820,9 @@ Serverless Framework를 사용하면 람다 함수 생성 또는 코드 수정 �
 ```yaml
 # custom:
 # (생략)
-prune:
-    automatic: true
-    number: 1
+    prune:
+        automatic: true
+        number: 1
 ```
 
 위와 같이 작성해두면 마지막 버전 1개만 냅두고 나머지는 전부 지워준다.
@@ -2871,7 +2888,7 @@ Environment secrets와 Repository secrets이 있는데, 전자는 특정한 환�
 
 그에 반해 Repository secrets는 레포지토리 단위로 모든 Actions에서 접근할 수 있는데, 이 포스팅에선 Repository secrets를 사용하였다.
 
-New repository secrets 버튼을 클릭하여 환경 변수를 만들 수 있는데, 위 코드에선 IAM 퍼블릭 엑세스 키인 `AWS_ACCESS_KEY_ID`와 IAM 프라이빗 엑세스 키인 `AWS_SECRET_ACCESS_KEY`를 필요로 한다.
+New repository secrets 버튼을 클릭하여 환경 변수를 만들 수 있는데, 위 코드에선 IAM 퍼블릭 엑세스 키인 `AWS_ACCESS_KEY_ID`와 IAM 프라이빗 엑세스 키인 `AWS_SECRET_ACCESS_KEY`를 필요로 한다. 
 
 IAM 엑세스 키 생성에 대해선 다루지 않는다.
 
@@ -2937,22 +2954,22 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/serverless.yaml
 마지막으로 프론트엔드 코드를 S3에 업로드 하고 CloudFront CDN 서비스를 구성해볼 것이다.
 
 > 이 파트에선 간단하게 **CSR(Client Side Rendering)**을 사용한 프론트엔드를 배포해볼 것인데, 실제 서비스 시 **SSR(Server Side Rendering)**를 사용하는 것이 검색 엔진 최적화(SEO), (클라이언트 입장에서) 빠른 로딩 속도 등의 면에서 더욱 좋다.
->
+> 
 > 하지만 CSR과 비교적 서버리스에서 SSR을 구현하기엔 다소 복잡하다.
 > 특히 JWT 토큰을 사용하여 더욱 더 복잡해지는데, 다음과 같은 기본적인 아키텍쳐를 사용해볼 수 있다.
->
+> 
 > ![](https://velog.velcdn.com/images/yulmwu/post/8aa4b27f-a93c-4b22-a5f1-c8a142a6839c/image.png)
->
+> 
 > 일단 React를 사용한다고 가정하였을 때, NextJS 프레임워크를 사용하여 라우팅 및 SSR을 구현하고 이를 SST로 인프라를 구축하고 배포한다.
->
-> 원래 Serverless Framework에 NextJS를 올릴 수 있는 `serverless-next.js` 플러그인이 있었으나, 현재는 지원 중단으로 NextJS 13 이후 지원하지 않는다.
->
+> 
+> 원래 Serverless Framework에 NextJS를 올릴 수 있는 `serverless-next.js` 플러그인이 있었으나, 현재는 지원 중단으로 NextJS 13 이후 지원하지 않는다. 
+> 
 > 그래서 [SST](https://github.com/sst/sst)라는 툴을 사용하여 NextJS를 배포할 수 있다.
->
+> 
 > 이 이상의 SSR 구조에 대해선 다루지 않으며, 이 포스팅에선 간단하게 CSR 구조의 프론트엔드만 호스팅해보는 형태로 진행해볼 것이다.
 
 > 또한 이 파트에선 포스팅에서 직접 소스코드를 설명하지 않는다. 프론트엔드에 대한 코드는 아래에서 확인할 수 있으며, 직접 소스코드를 다운받아 `/frontend` 디렉토리에서 프론트엔드를 확인할 수 있다.
->
+> 
 > https://github.com/eocndp/aws-lambda-example/tree/main/frontend
 
 ### Tech Stacks
@@ -3069,19 +3086,24 @@ OAC를 만드는데 기본 설정을 유지하자.
 
 ```yaml
 {
-    'Version': '2008-10-17',
-    'Id': 'PolicyForCloudFrontPrivateContent',
-    'Statement':
-        [
-            {
-                'Sid': 'AllowCloudFrontServicePrincipal',
-                'Effect': 'Allow',
-                'Principal': { 'Service': 'cloudfront.amazonaws.com' },
-                'Action': 's3:GetObject',
-                'Resource': 'arn:aws:s3:::actions-frontend-bucket/*',
-                'Condition': { 'StringEquals': { 'AWS:SourceArn': '[CloudFront_Distribution_ARN]' } },
-            },
-        ],
+  "Version": "2008-10-17",
+  "Id": "PolicyForCloudFrontPrivateContent",
+  "Statement": [
+      {
+          "Sid": "AllowCloudFrontServicePrincipal",
+          "Effect": "Allow",
+          "Principal": {
+              "Service": "cloudfront.amazonaws.com"
+          },
+          "Action": "s3:GetObject",
+          "Resource": "arn:aws:s3:::actions-frontend-bucket/*",
+          "Condition": {
+              "StringEquals": {
+                "AWS:SourceArn": "[CloudFront_Distribution_ARN]"
+              }
+          }
+      }
+  ]
 }
 ```
 
@@ -3111,7 +3133,7 @@ OAC를 만드는데 기본 설정을 유지하자.
 가 있다. 첫번째의 경우는 프론트엔드 코드를 아래와 같이 자신의 API Gateway Base URL을 수정하여 다시 배포하면 해결된다.
 
 수정은 새로 업로드하거나 CLI 등을 사용하여 수정하자.
-S3에 다시 배포하였다면 CloudFront에서 캐시 무효화를 해줘야할 수 있다.
+S3에 다시 배포하였다면 CloudFront에서 캐시 무효화를 해줘야할 수 있다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4cb44e3e-fdb8-446f-87dc-bfe4f974cfc7/image.png)
 
@@ -3119,7 +3141,7 @@ S3에 다시 배포하였다면 CloudFront에서 캐시 무효화를 해줘야�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f3c43854-d99e-42e2-9cec-5aed1b005610/image.png)
 
-그리고 push하고 배포가 완료되기 까지 기다리면 된다.
+그리고 push하고 배포가 완료되기 까지 기다리면 된다. 
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f782911b-a017-4165-b66d-dbdbdc59da8f/image.png)
 
@@ -3134,7 +3156,7 @@ S3에 다시 배포하였다면 CloudFront에서 캐시 무효화를 해줘야�
 다음으로 S3와 CloudFront를 설정해뒀으니 Github Actions를 사용하여 자동으로 배포해주는 워크플로우를 작성해보겠다.
 
 > 여기에선 Serverless Framework를 사용하지 않았는데, CloudFront 설정의 복잡함(OAC 설정 등)과 간단히 인프라 2개만 사용하기 때문에 오히려 Serverless Framework를 사용하면 복잡도만 증가할 것이라 판단하였다.
->
+> 
 > 그래서 간단하 AWS CLI를 사용한 S3 배포만 다룰 예정이다.
 
 먼저 `.github/workflows/aws-deploy-fe.yaml` 파일을 만들어주고 아래와 같이 이벤트 트리거 조건을 작성해주자.
@@ -3191,7 +3213,7 @@ jobs:
       npm run build
 ```
 
-다음으로 AWS CLI를 사용하여 S3에 빌드된 소스코드(`/dist`)를 배포한다.
+다음으로 AWS CLI를 사용하여 S3에 빌드된 소스코드(`/dist`)를 배포한다. 
 AWS CLI는 Github Actions Runner에 자동으로 설치되어 있다.
 
 ```yaml
@@ -3259,11 +3281,13 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/README.md
 
 ![](https://velog.velcdn.com/images/yulmwu/post/f4e0bfdc-9c82-4dfb-a6b7-840a85658f85/image.png)
 
+
 ### `POST /auth/confirmEmail`
 
 ![](https://velog.velcdn.com/images/yulmwu/post/04364615-67c5-4f3a-8f76-f1fe1f9fe0c8/image.png)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/6026718b-07fc-43cc-9b3d-091d3f390fb1/image.png)
+
 
 ### `POST /auth/resendEmail`
 
@@ -3296,6 +3320,7 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/README.md
 ### `GET /posts/{id}` (Get Specific Post)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/8f6f7358-8c7b-4256-8275-e531d72548b7/image.png)
+
 
 ### `POST /posts` (Create Post)
 
@@ -3396,9 +3421,9 @@ DynamoDB는 크게 읽기/쓰기 작업과 스토리지 용량에 따라 요금�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/38244053-5b0e-42f1-a05c-078cef091692/image.png)
 
-여기서 Eventually consistent reads와 Strongly consistent reads 개념이 등장하는데, 전자는 데이터베이스에 데이터가 쓰여질 시 바로 그 결과값이 보여지지 않을 수 있다.
+여기서 Eventually consistent reads와 Strongly consistent reads 개념이 등장하는데, 전자는 데이터베이스에 데이터가 쓰여질 시 바로 그 결과값이 보여지지 않을 수 있다. 
 
-DynamoDB는 내부적으로 여러 곳에 분산하고 복제하기 때문이다. 반면 후자는 바로 그 값이 적용되어 읽을 수 있는 것으로, 게시글 작성 후 바로 작성된 글 보기 등에서 사용될 수 있다.
+DynamoDB는 내부적으로 여러 곳에 분산하고 복제하기 때문이다. 반면 후자는 바로 그 값이 적용되어 읽을 수 있는 것으로, 게시글 작성 후 바로 작성된 글 보기 등에서 사용될 수 있다. 
 
 하지만 대부분은 전자를 사용하니 그 비중을 95%로 설정하였다. Transactional read는 복수의 데이터를 하나의 트랜잭션(작업)으로 읽을 때 사용하는데 여기선 사용하지 않는다고 가정하였다. (가장 비싸다.)
 
@@ -3414,11 +3439,12 @@ DynamoDB는 내부적으로 여러 곳에 분산하고 복제하기 때문이다
 
 ![](https://velog.velcdn.com/images/yulmwu/post/9a73fc71-185f-4715-bd6f-3c2a73799255/image.png)
 
-테이블 클래스는 전부 스탠다드로 하였는데, 자주 접근하지 않는 아이템은 스탠다드 IA에 저장하는 것이 스토리지 면에서 효율적이다.
+테이블 클래스는 전부 스탠다드로 하였는데, 자주  접근하지 않는 아이템은 스탠다드 IA에 저장하는 것이 스토리지 면에서 효율적이다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/53e9180c-58f0-4783-ac6c-c0404132b37c/image.png)
 
 그럼 DynamoDB에 대해선 0.79달러, 한화 약 1100원 정도로 매우 저렴한 것을 볼 수 있다.
+
 
 ## S3
 
@@ -3458,9 +3484,9 @@ CloudFront는 데이터 전송 용량과 HTTPS 요청 수를 기준으로 비용
 ![](https://velog.velcdn.com/images/yulmwu/post/0582ba3b-8637-4f5c-8af6-d090363a1d60/image.png)
 
 - 서울(대한민국)
-  => Data transfer out to internet: 90% = 1.8TB, Number of requests = 18,000,000
+	=> Data transfer out to internet: 90% = 1.8TB, Number of requests = 18,000,000
 - 일본
-  => Data transfer out to internet: 10% = 0.2TB, Number of requests = 2,000,000
+	=> Data transfer out to internet: 10% = 0.2TB, Number of requests = 2,000,000
 
 ![](https://velog.velcdn.com/images/yulmwu/post/d876a1e8-ace1-476a-aec1-63395febf11e/image.png)
 
@@ -3475,6 +3501,8 @@ CloudFront는 데이터 전송 용량과 HTTPS 요청 수를 기준으로 비용
 아래는 S3만 사용했을 때 인터넷으로 나가는 데이터 전송 요금이다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/edbc3f7d-0a03-4a11-9ba3-d473ba43b0fa/image.png)
+
+
 
 ## Total Cost of Ownership
 
