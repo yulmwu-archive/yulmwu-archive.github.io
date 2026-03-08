@@ -1,34 +1,34 @@
 ---
-title: "[Kubernetes w/ EKS] Gateway API (Feat. AWS VPC Lattice)"
-description: "Ingress의 차세대, Gateway API 실습 및 AWS Lattice 개념"
-slug: "2025-09-09-kubernetes-gateway"
+title: '[Kubernetes w/ EKS] Gateway API (Feat. AWS VPC Lattice)'
+description: 'Ingress의 차세대, Gateway API 실습 및 AWS Lattice 개념'
+slug: '2025-09-09-kubernetes-gateway'
 author: yulmwu
 date: 2025-09-09T02:34:00.236Z
-updated_at: 2026-02-26T23:28:28.974Z
-categories: ["Kubernetes"]
-tags: ["aws", "eks", "kubernetes", "networking"]
+updated_at: 2026-03-07T06:38:14.520Z
+categories: ['Kubernetes']
+tags: ['aws', 'eks', 'kubernetes', 'networking']
 series:
-  name: Kubernetes
-  slug: kubernetes
+    name: Kubernetes
+    slug: kubernetes
 thumbnail: ../../thumbnails/kubernetes/kubernetes-gateway.png
 linked_posts:
-  previous: 2025-09-09-kubernetes-service-ingress
-  next: 2025-09-09-kubernetes-hpa
+    previous: 2025-09-09-kubernetes-service-ingress
+    next: 2025-09-09-kubernetes-hpa
 is_private: false
 ---
 
 > 해당 게시글은 [세명컴퓨터고등학교](https://smc.sen.hs.kr/) 보안과 동아리 세미나 발표 내용을 블로그 형식으로 정리한 글로, **본 글의 저작권은 [yulmwu (김준영)](https://github.com/yulmwu)에게 있습니다.** 개인적인 용도로만 사용 가능하며, 상업적 목적의 **무단 복제, 배포, 또는 변형을 금지합니다.**
-> 
+>
 > 글에 오류가 댓글로 남겨주시거나 피드백해주시면 감사드리겠습니다.
 
 > AWS VPC Lattice에 대한 설명은 아래의 포스팅에서 따로 다루며, 해당 포스팅에선 VPC Lattice 실습을 하지 않고 이 포스팅에서 EKS(Kubernetes) Gateway API를 통해 실습합니다.
-> 
+>
 > 이 포스팅에서 사용된 매니페스트 파일은 아래의 깃허브 링크에서 확인해보실 수 있습니다.
-> 
+>
 > https://github.com/eocndp/k8s-gateway-aws-vpc-lattice-example
-> 
+>
 > 아래의 사전 지식(쿠버네티스 서비스/Ingress, VPC Peering/TGW/PrivateLink)에 대한 포스팅을 미리 보고 오시면 더욱 빠른 이해가 가능합니다.
-> 
+>
 > - https://velog.io/@yulmwu/kubernetes-service-ingress
 > - https://velog.io/@yulmwu/aws-vpc-peering-transit-privatelink
 
@@ -66,7 +66,7 @@ Gateway API는 Gateway, GatewayClass, Route 리소스(오브젝트)를 통해 �
 # 2. What is VPC Lattice ?
 
 > EKS Gateway API 실습을 위해 AWS VPC Lattice에 대한 개념을 설명하고 넘어가겠다.
-> 
+>
 > K8s Gateway API에 대한 개념은 잠시 치워두고, VPC Lattice에 대해 잠깐만 알고 넘어가자.
 
 두개 이상의 VPC를 연결할 때 VPC Peering/Transit Gateway, 또는 다른 VPC 간의 애플리케이션 또는 서비스를 연결하기 위해 VPC PrivateLink라는 서비스를 사용하였다.
@@ -88,7 +88,7 @@ Gateway API는 Gateway, GatewayClass, Route 리소스(오브젝트)를 통해 �
 그래서 **VPC Lattice**는 분산된 여러 VPC/계정 간 서비스(애플리케이션) 네트워킹 및 라우팅을 위해 설계된 서비스로, L4/L7 계층에 HTTP/HTTPS, gRPC, TLS, TCP 등의 프로토콜을 사용할 수 있다.
 
 > Lattice Service Network를 통해 중앙에서 관리하는 Hub and Spoke 형태로 보일 순 있으나, Service Mesh 특성과 Hub and Spoke의 특성을 둘 다 가지고 있다.
-> 
+>
 > 다만 Envoy 사이드카 프록시 등을 가지고 있지 않고(AWS 완전 관리형 서비스), 네트워크 단위가 아닌 서비스 엔드포인트 단위로 동작하기 때문에 둘 모두 속하지 않는다. (내부적인 동작 자체는 Service Mesh와 비슷하긴 하다.)
 
 또한 서비스(애플리케이션) 단위의 접근 제어가 가능하고, IAM 기반으로 설정할 수 있다. (Auth Policy)
@@ -101,7 +101,7 @@ Gateway API는 Gateway, GatewayClass, Route 리소스(오브젝트)를 통해 �
 
 ### Lattice: Service
 
-실제 서비스(애플리케이션)을 대표하는 서비스 단위의 리소스로, 타겟 그룹(대상 그룹)으로 연결된다. 
+실제 서비스(애플리케이션)을 대표하는 서비스 단위의 리소스로, 타겟 그룹(대상 그룹)으로 연결된다.
 
 즉 로드밸런서의 라우팅 규칙과 비슷하며, Listener는 프로토콜과 포트를 정의, Routing Rule는 경로/헤더/가중치 등을 기반으로 트래픽을 분배하는 라우팅 규칙을 정의한다.
 
@@ -113,7 +113,7 @@ ELB 타겟 그룹과 마찬가지로 Health Check로 상태를 체크한다.
 
 ### Lattice: Service Network
 
-여러 서비스와 VPC를 논리적으로 묶고, 엑세스 제어 / 리전, 계정 간 연결 / 모니터링 등의 기능을 중앙에서 제공한다. 
+여러 서비스와 VPC를 논리적으로 묶고, 엑세스 제어 / 리전, 계정 간 연결 / 모니터링 등의 기능을 중앙에서 제공한다.
 
 Lattice 아키텍처 다이어그램에서 중앙에 있는 VPC Lattice Service Network가 바로 이것으로, Hub and Spoke 처럼 트래픽이 거쳐가는 것은 아니다.
 
@@ -130,7 +130,7 @@ Lattice 아키텍처 다이어그램에서 중앙에 있는 VPC Lattice Service 
 `AWS_IAM`은 VPC, 계정별 접근 권한을 제어하거나 특정 Principal이 해당 서비스에 접근할 수 있는지 IAM으로 설정한다.
 
 > 이 포스팅에선 빠른 실습을 위해 Auth Type = `NONE`으로 설정하여 실습한다.
-> 
+>
 > 실제 프로덕션 환경에선 `AWS_IAM`을 통해 세분화된 권한 설정이 필요하다.
 
 ### Lattice: Observability
@@ -152,7 +152,7 @@ CloudWatch Metrics나 Access Logs 등을 사용할 수 있고 이 또한 서비�
 
 하지만 다수의 VPC와 클러스터, 계정 등을 가지거나 더 세부적인 기능이 필요하다면 Lattice를 고려해보는 것이 좋다.
 
-또한 Gateway API의 추상화 구조와 VPC Lattice 추상화 구조가 비슷하기 때문에 매핑하기도 쉽다. 
+또한 Gateway API의 추상화 구조와 VPC Lattice 추상화 구조가 비슷하기 때문에 매핑하기도 쉽다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/75c22078-9736-42ac-bb92-22c1614a9d5b/image.png)
 
@@ -164,7 +164,7 @@ CloudWatch Metrics나 Access Logs 등을 사용할 수 있고 이 또한 서비�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/ac4e6adb-5073-4b6f-9cb9-162474458dc9/image.png)
 
-여기서 DNS의 경우 Route53 Private Hosted Zone(이하 PHZ)에 커스텀 도메인 `example.com`을 만들고, 수동으로 CNAME에 서비스 DNS을 추가한다. 물론 [External DNS](https://github.com/kubernetes-sigs/external-dns) 등을 사용하면 자동으로 설정되지만, 간단한 실습이기 때문에 수동으로 추가해보겠다. 
+여기서 DNS의 경우 Route53 Private Hosted Zone(이하 PHZ)에 커스텀 도메인 `example.com`을 만들고, 수동으로 CNAME에 서비스 DNS을 추가한다. 물론 [External DNS](https://github.com/kubernetes-sigs/external-dns) 등을 사용하면 자동으로 설정되지만, 간단한 실습이기 때문에 수동으로 추가해보겠다.
 
 (클라이언트 VPC 생성 및 클라이언트 EC2 생성 과정은 생략한다.)
 
@@ -178,25 +178,25 @@ CloudWatch Metrics나 Access Logs 등을 사용할 수 있고 이 또한 서비�
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: eks-demo
-  region: ap-northeast-2
-  version: "1.33"
+    name: eks-demo
+    region: ap-northeast-2
+    version: '1.33'
 vpc:
-  cidr: 10.1.0.0/16
-  nat:
-    gateway: Single # NAT Gateway
+    cidr: 10.1.0.0/16
+    nat:
+        gateway: Single # NAT Gateway
 managedNodeGroups:
-  - name: ng-1
-    instanceType: t3.medium
-    desiredCapacity: 2
-    privateNetworking: true
-    iam:
-      withAddonPolicies:
-        ebs: true
+    - name: ng-1
+      instanceType: t3.medium
+      desiredCapacity: 2
+      privateNetworking: true
+      iam:
+          withAddonPolicies:
+              ebs: true
 addons:
-  - name: vpc-cni
-  - name: kube-proxy
-  - name: coredns
+    - name: vpc-cni
+    - name: kube-proxy
+    - name: coredns
 ```
 
 VPC CIDR은 `10.1.0.0/16`, 2개의 노드는 모두 프라이빗 서브넷에 올려둔다. (NAT Gateway 1개)
@@ -232,120 +232,120 @@ export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output tex
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-app-a
+    name: demo-app-a
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: demo-app-a
-  template:
-    metadata:
-      labels:
-        app: demo-app-a
-    spec:
-      containers:
-        - name: demo-app-a
-          image: rlawnsdud/demo:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
-          env:
-            - name: HOST
-              value: "0.0.0.0"
-            - name: PORT
-              value: "3000"
-            - name: POD
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: ROUTE
-              value: "v1"
-            - name: GLOBAL_PREFIX
-              value: "/v1"
-          readinessProbe:
-            httpGet:
-              path: /v1/health
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /v1/health
-              port: 3000
-            initialDelaySeconds: 10
-            periodSeconds: 20
+    replicas: 2
+    selector:
+        matchLabels:
+            app: demo-app-a
+    template:
+        metadata:
+            labels:
+                app: demo-app-a
+        spec:
+            containers:
+                - name: demo-app-a
+                  image: rlawnsdud/demo:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 3000
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '3000'
+                      - name: POD
+                        valueFrom:
+                            fieldRef:
+                                fieldPath: metadata.name
+                      - name: ROUTE
+                        value: 'v1'
+                      - name: GLOBAL_PREFIX
+                        value: '/v1'
+                  readinessProbe:
+                      httpGet:
+                          path: /v1/health
+                          port: 3000
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                  livenessProbe:
+                      httpGet:
+                          path: /v1/health
+                          port: 3000
+                      initialDelaySeconds: 10
+                      periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-app-a
+    name: demo-app-a
 spec:
-  selector:
-    app: demo-app-a
-  ports:
-    - name: http
-      port: 80
-      targetPort: 3000
-  type: ClusterIP
+    selector:
+        app: demo-app-a
+    ports:
+        - name: http
+          port: 80
+          targetPort: 3000
+    type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-app-b
+    name: demo-app-b
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: demo-app-b
-  template:
-    metadata:
-      labels:
-        app: demo-app-b
-    spec:
-      containers:
-        - name: demo-app-b
-          image: rlawnsdud/demo:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
-          env:
-            - name: HOST
-              value: "0.0.0.0"
-            - name: PORT
-              value: "3000"
-            - name: POD
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: ROUTE
-              value: "v2"
-            - name: GLOBAL_PREFIX
-              value: "/v2"
-          readinessProbe:
-            httpGet:
-              path: /v2/health
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /v2/health
-              port: 3000
-            initialDelaySeconds: 10
-            periodSeconds: 20
+    replicas: 2
+    selector:
+        matchLabels:
+            app: demo-app-b
+    template:
+        metadata:
+            labels:
+                app: demo-app-b
+        spec:
+            containers:
+                - name: demo-app-b
+                  image: rlawnsdud/demo:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 3000
+                  env:
+                      - name: HOST
+                        value: '0.0.0.0'
+                      - name: PORT
+                        value: '3000'
+                      - name: POD
+                        valueFrom:
+                            fieldRef:
+                                fieldPath: metadata.name
+                      - name: ROUTE
+                        value: 'v2'
+                      - name: GLOBAL_PREFIX
+                        value: '/v2'
+                  readinessProbe:
+                      httpGet:
+                          path: /v2/health
+                          port: 3000
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                  livenessProbe:
+                      httpGet:
+                          path: /v2/health
+                          port: 3000
+                      initialDelaySeconds: 10
+                      periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-app-b
+    name: demo-app-b
 spec:
-  selector:
-    app: demo-app-b
-  ports:
-    - name: http
-      port: 80
-      targetPort: 3000
-  type: ClusterIP
+    selector:
+        app: demo-app-b
+    ports:
+        - name: http
+          port: 80
+          targetPort: 3000
+    type: ClusterIP
 ```
 
 그리고 Health Check를 위해 Lattice TargetGroupPolicy 오브젝트를 만들어줘야 한다.
@@ -354,46 +354,46 @@ spec:
 apiVersion: application-networking.k8s.aws/v1alpha1
 kind: TargetGroupPolicy
 metadata:
-  name: tg-policy-demo-app-a
+    name: tg-policy-demo-app-a
 spec:
-  targetRef:
-    group: ""
-    kind: Service
-    name: demo-app-a
-  protocol: HTTP
-  protocolVersion: HTTP1
-  healthCheck:
-    enabled: true
-    path: "/v1/health"
-    port: 3000
+    targetRef:
+        group: ''
+        kind: Service
+        name: demo-app-a
     protocol: HTTP
     protocolVersion: HTTP1
-    intervalSeconds: 10
-    timeoutSeconds: 5
-    healthyThresholdCount: 3
-    unhealthyThresholdCount: 3
+    healthCheck:
+        enabled: true
+        path: '/v1/health'
+        port: 3000
+        protocol: HTTP
+        protocolVersion: HTTP1
+        intervalSeconds: 10
+        timeoutSeconds: 5
+        healthyThresholdCount: 3
+        unhealthyThresholdCount: 3
 ---
 apiVersion: application-networking.k8s.aws/v1alpha1
 kind: TargetGroupPolicy
 metadata:
-  name: tg-policy-demo-app-b
+    name: tg-policy-demo-app-b
 spec:
-  targetRef:
-    group: ""
-    kind: Service
-    name: demo-app-b
-  protocol: HTTP
-  protocolVersion: HTTP1
-  healthCheck:
-    enabled: true
-    path: "/v2/health"
-    port: 3000
+    targetRef:
+        group: ''
+        kind: Service
+        name: demo-app-b
     protocol: HTTP
     protocolVersion: HTTP1
-    intervalSeconds: 10
-    timeoutSeconds: 5
-    healthyThresholdCount: 3
-    unhealthyThresholdCount: 3
+    healthCheck:
+        enabled: true
+        path: '/v2/health'
+        port: 3000
+        protocol: HTTP
+        protocolVersion: HTTP1
+        intervalSeconds: 10
+        timeoutSeconds: 5
+        healthyThresholdCount: 3
+        unhealthyThresholdCount: 3
 ```
 
 컨테이너 이미지는 필자가 만들어둔 [rlawnsdud/demo](https://github.com/yulmwu/example-app) 이미지를 사용하는데, `/env?select=POD,ROUTE` 엔드포인트를 통해 설정한 환경변수를 확인해볼 수 있다.
@@ -410,14 +410,13 @@ k9s에서 아무 파드나 잡고 S 키를 눌러 아래와 같이 테스트해�
 
 쿠버네티스(EKS)와 AWS 리소스는 기본적으로 권한이 없어 Gateway API Controller가 Lattice를 컨트롤할 수 없으므로 권한을 줘야한다.
 
-> 쿠버네티스 리소스와 AWS 리소스 간 IAM 권한을 부여하는 방법엔 크게 2가지가 있다. 
-> 
-> 바로 IRSA(IAM Role for Service Accounts)와 Pod Identity가 있는데, IRSA는 Service Account에 IAM OIDC를 부여한다. 
-> 
+> 쿠버네티스 리소스와 AWS 리소스 간 IAM 권한을 부여하는 방법엔 크게 2가지가 있다.
+>
+> 바로 IRSA(IAM Role for Service Accounts)와 Pod Identity가 있는데, IRSA는 Service Account에 IAM OIDC를 부여한다.
+>
 > 반면 Pod Identity는 Identity Agent 파드가 붙어 AWS 리소스에 접근할 권한을 관리한다.
-> 
+>
 > ![](https://velog.velcdn.com/images/yulmwu/post/024d08ce-f256-4dec-ba25-6d11422bbd34/image.png)
-
 
 ```shell
 # 컨트롤러 IAM 정책 설정
@@ -484,7 +483,7 @@ aws eks create-pod-identity-association \
 
 ## (4) SG Lattice Prefix List
 
-Lattice를 사용하였을 때 네트워크 흐름을 살펴보면 크게 `Client -> Lattice Service Network -> Target Group -> Target(Pod)` 순서이다. 
+Lattice를 사용하였을 때 네트워크 흐름을 살펴보면 크게 `Client -> Lattice Service Network -> Target Group -> Target(Pod)` 순서이다.
 
 이때 파드 입장에서 보면 Lattice Service Network에서 오는 트래픽을 보게 되는데, 여기서 원본 IP가 Lattice의 IP 대역을 가진 IP로 변경된다. (그래서 원본 IP를 유지하려면 HTTP/HTTPS 등에선 `X-Forwarded-For` 등의 헤더를 사용한다.)
 
@@ -584,9 +583,9 @@ helm upgrade gateway-api-controller \
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: amazon-vpc-lattice
+    name: amazon-vpc-lattice
 spec:
-  controllerName: application-networking.k8s.aws/gateway-api-controller
+    controllerName: application-networking.k8s.aws/gateway-api-controller
 ```
 
 ```yaml
@@ -595,19 +594,19 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: demo-sn
+    name: demo-sn
 spec:
-  gatewayClassName: amazon-vpc-lattice
-  listeners:
-    - name: http
-      protocol: HTTP
-      port: 80
-      allowedRoutes:
-        namespaces:
-          from: All
-        kinds:
-          - kind: HTTPRoute
-            group: gateway.networking.k8s.io
+    gatewayClassName: amazon-vpc-lattice
+    listeners:
+        - name: http
+          protocol: HTTP
+          port: 80
+          allowedRoutes:
+              namespaces:
+                  from: All
+              kinds:
+                  - kind: HTTPRoute
+                    group: gateway.networking.k8s.io
 ```
 
 ```yaml
@@ -616,28 +615,28 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: demo-http-route
+    name: demo-http-route
 spec:
-  parentRefs:
-    - name: demo-sn
-      sectionName: http
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /v1
-      backendRefs:
-        - kind: Service
-          name: demo-app-a
-          port: 80
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /v2
-      backendRefs:
-        - kind: Service
-          name: demo-app-b
-          port: 80
+    parentRefs:
+        - name: demo-sn
+          sectionName: http
+    rules:
+        - matches:
+              - path:
+                    type: PathPrefix
+                    value: /v1
+          backendRefs:
+              - kind: Service
+                name: demo-app-a
+                port: 80
+        - matches:
+              - path:
+                    type: PathPrefix
+                    value: /v2
+          backendRefs:
+              - kind: Service
+                name: demo-app-b
+                port: 80
 ```
 
 그리고 아래의 명령어를 작성해보자.
@@ -650,7 +649,7 @@ kubectl get httproute demo-http-route -o jsonpath='{.metadata.annotations.applic
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c98747ee-14bb-46eb-93aa-210774f9f470/image.png)
 
-이걸 클라이언트 EC2에서 테스트해보자. 
+이걸 클라이언트 EC2에서 테스트해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/845eda26-30cc-447f-93d0-8ae469e04414/image.png)
 
@@ -670,17 +669,17 @@ kubectl get httproute demo-http-route -o jsonpath='{.metadata.annotations.applic
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: demo-http-route
+    name: demo-http-route
 spec:
-  parentRefs:
-    - name: demo-sn
-      sectionName: http
-  hostnames:
-    - api.example.com
+    parentRefs:
+        - name: demo-sn
+          sectionName: http
+    hostnames:
+        - api.example.com
 # ...
 ```
 
-그리고 HTTPRoute를 삭제하고 다시 만들자.  그러면 아래와 같이 "커스텀 도메인" 항목이 보여진다.
+그리고 HTTPRoute를 삭제하고 다시 만들자. 그러면 아래와 같이 "커스텀 도메인" 항목이 보여진다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/07913ee1-8c35-4018-8f24-2d2a24de12fe/image.png)
 
@@ -754,4 +753,3 @@ $0.13\$ \times 2.7M = 0.351\$$
 이상으로 Gateway + VPC Lattice 실습을 마무리하겠다. 혹시라도 블로그에서 잘못된 코드가 있을 수 있으니 아래의 깃허브 레포지토리에서 사용된 매니페스트 파일들을 확인해볼 수 있다.
 
 https://github.com/eocndp/k8s-gateway-aws-vpc-lattice-example
-

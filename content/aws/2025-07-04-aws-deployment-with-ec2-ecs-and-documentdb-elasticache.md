@@ -1,34 +1,34 @@
 ---
-title: "[AWS Computing] Deployment with EC2 + ECS Fargate + DocumentDB, ElastiCache Redis OSS"
-description: "AWS EC2, ECS Fargate를 통한 MSA 애플리케이션 배포 및 DocumentDB 및 ElastiCache(Redis OSS) 구성 실습"
-slug: "2025-07-04-aws-deployment-with-ec2-ecs-and-documentdb-elasticache"
+title: '[AWS Computing] Deployment with EC2 + ECS Fargate + DocumentDB, ElastiCache Redis OSS'
+description: 'AWS EC2, ECS Fargate를 통한 MSA 애플리케이션 배포 및 DocumentDB 및 ElastiCache(Redis OSS) 구성 실습'
+slug: '2025-07-04-aws-deployment-with-ec2-ecs-and-documentdb-elasticache'
 author: yulmwu
 date: 2025-07-04T12:53:19.543Z
 updated_at: 2026-02-19T11:54:50.077Z
-categories: ["AWS"]
-tags: ["Computing", "aws"]
+categories: ['AWS']
+tags: ['Computing', 'aws']
 series:
-  name: AWS
-  slug: aws
+    name: AWS
+    slug: aws
 thumbnail: ../../thumbnails/aws/aws-deployment-with-ec2-ecs-and-documentdb-elasticache.png
 linked_posts:
-  previous: 2025-07-04-ec2-bastion-host
-  next: 2025-07-04-aws-deploying-3-tier-architecture
+    previous: 2025-07-04-ec2-bastion-host
+    next: 2025-07-04-aws-deploying-3-tier-architecture
 is_private: false
 ---
 
->  다른 포스팅과 달리 공부 일지 기록에 가까운 포스팅입니다. 
-> 
+> 다른 포스팅과 달리 공부 일지 기록에 가까운 포스팅입니다.
+>
 > 디테일한 내용을 찾으신다면 다른 포스팅을 참고하시길 바랍니다.
 
 > 이 포스팅에서 사용된 아키텍처는 마이스터넷 지방기능경기대회 클라우드 부분 2024 1과제를 참고하였으며, 저작권은 마이스터넷(한국산업인력공단)에 있음을 미리 알립니다.
-> 
+>
 > ![](https://velog.velcdn.com/images/yulmwu/post/a1f5c97c-c203-4f5b-bcaf-476d1c9e1573/image.png)
-> 
+>
 > 사용된 자료는 [마이스터넷 "시행자료 및 공개 과제"](https://meister.hrdkorea.or.kr/sub/3/6/4/informationSquare/enforceData.do)를 참고하였습니다.
-> 
-> 배포 파일은 따로 제공하지 않아 직접 배포할 코드를 작성하였고, 아래의 깃허브 레포지토리에서 확인할 수 있습니다. 
-> 
+>
+> 배포 파일은 따로 제공하지 않아 직접 배포할 코드를 작성하였고, 아래의 깃허브 레포지토리에서 확인할 수 있습니다.
+>
 > https://github.com/eocndp/msa-example-1
 
 # 0. AWS Architecture
@@ -77,18 +77,18 @@ npm i @aws-sdk/client-secrets-manager
 
 ```ts
 async function getSecret(): Promise<Record<string, string>> {
-    const client = new SecretsManagerClient({
-        region: process.env.AWS_REGION,
-    })
+	const client = new SecretsManagerClient({
+		region: process.env.AWS_REGION,
+	})
 
-    const command = new GetSecretValueCommand({ SecretId: process.env.SESSION_SECRET_NAME })
-    const response = await client.send(command)
+	const command = new GetSecretValueCommand({ SecretId: process.env.SESSION_SECRET_NAME })
+	const response = await client.send(command)
 
-    if (!response.SecretString) {
-        throw new Error('SecretString not found')
-    }
+	if (!response.SecretString) {
+		throw new Error('SecretString not found')
+	}
 
-    return JSON.parse(response.SecretString)
+	return JSON.parse(response.SecretString)
 }
 ```
 
@@ -98,17 +98,17 @@ async function getSecret(): Promise<Record<string, string>> {
 const secret = await getSecret()
 
 app.use(
-    session({
-        store: new RedisStore({ client: redisClient }),
-        secret: secret['session_secret_key'],
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: false,
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24, // 1 day
-        },
-    })
+	session({
+		store: new RedisStore({ client: redisClient }),
+		secret: secret['session_secret_key'],
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			secure: false,
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+		},
+	}),
 )
 ```
 
@@ -129,9 +129,9 @@ import { AuthController } from './auth.controller'
 import { User, UserSchema } from './user.entity'
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
-    providers: [AuthService],
-    controllers: [AuthController],
+	imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
+	providers: [AuthService],
+	controllers: [AuthController],
 })
 export class AuthModule {}
 ```
@@ -144,11 +144,11 @@ import { Document } from 'mongoose'
 
 @Schema()
 export class User extends Document {
-    @Prop({ required: true, unique: true })
-    username: string
+	@Prop({ required: true, unique: true })
+	username: string
 
-    @Prop({ required: true })
-    password: string
+	@Prop({ required: true })
+	password: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
@@ -161,15 +161,15 @@ Redis는 이 프로젝트에선 단순히 세션 저장용으로 사용하기 �
 
 ```ts
 const redisClient = redis.createClient({
-    url: process.env.REDIS_URL!,
+	url: process.env.REDIS_URL!,
 })
 
 redisClient.on('error', (err) => {
-    console.error('Redis error:', err)
+	console.error('Redis error:', err)
 })
 
 redisClient.on('connect', () => {
-    console.log('Connected to Redis')
+	console.log('Connected to Redis')
 })
 
 await redisClient.connect()
@@ -177,17 +177,17 @@ await redisClient.connect()
 const secret = await getSecret()
 
 app.use(
-    session({
-        store: new RedisStore({ client: redisClient }), // 세션 저장에 Redis 사용
-        secret: secret['session_secret_key'],
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: false,
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24, // 1 day
-        },
-    })
+	session({
+		store: new RedisStore({ client: redisClient }), // 세션 저장에 Redis 사용
+		secret: secret['session_secret_key'],
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			secure: false,
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+		},
+	}),
 )
 ```
 
@@ -214,7 +214,7 @@ SESSION_SECRET_NAME=TestSecret
 
 ![](https://velog.velcdn.com/images/yulmwu/post/51b57f3d-80fd-4ab7-828b-ab40cc670c9b/image.png)
 
-접속해보면 새 보안 암호 저장 버튼이 있다. 
+접속해보면 새 보안 암호 저장 버튼이 있다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/6ace9433-04b2-4a5c-a153-6d0130b3f094/image.png)
 
@@ -290,7 +290,7 @@ https://velog.io/@yulmwu/ec2-bastion-host
 
 ![](https://velog.velcdn.com/images/yulmwu/post/68b46f77-302b-4d84-8027-0e6cee2b2349/image.png)
 
-그런 다음 클러스터를 만들자. 
+그런 다음 클러스터를 만들자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/9bb47b47-831b-43e0-b1d2-2b251e008841/image.png)
 
@@ -356,7 +356,7 @@ ElastiCache도 서브넷 그룹을 만들어야 하는데, 기존 서브넷 그�
 
 Bastion Host에서도 잘 접속되는 것을 볼 수 있다. (DocumentDB, Redis 각각 보안 그룹에서 27017, 6379 포트를 열어줘야 한다)
 
-이제 DB 설정은 마쳤다. 자격 증명을 Secrets Manager로 관리할 수 있으나, 귀찮으니 스킵하였다. 
+이제 DB 설정은 마쳤다. 자격 증명을 Secrets Manager로 관리할 수 있으나, 귀찮으니 스킵하였다.
 
 ## (6) ECR
 
@@ -439,7 +439,6 @@ pm2 startup systemd -u $USER --hp $HOME
 ![](https://velog.velcdn.com/images/yulmwu/post/2df0406d-a549-4783-967b-d9a69d035a08/image.png)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/8964b581-23f8-4e11-86c6-0690b82d88dc/image.png)
-
 
 ## Launch Template
 
@@ -541,7 +540,7 @@ ECS Fargate를 만들기 전 태스크 정의부터 만들어야한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/c24d4e15-5f44-4022-b3e4-1a11d55da56c/image.png)
 
-잘 작동한다. 
+잘 작동한다.
 
 ---
 
@@ -550,6 +549,3 @@ ECS Fargate를 만들기 전 태스크 정의부터 만들어야한다.
 언젠간 더욱 디테일하고 퀄리티있게, 그리고 EKS 까지 사용하는 포스팅으로 다시 작성해보도록 하겠디.
 
 끝.
-
-
-

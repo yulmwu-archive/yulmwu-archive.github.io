@@ -206,7 +206,6 @@ const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 				</p>
 			</header>
 
-
 			<LatestPostsSection posts={latestPosts} cfg={cfg} />
 
 			<h2 class="all-posts-title">시리즈별 게시글</h2>

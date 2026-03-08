@@ -1,24 +1,24 @@
 ---
-title: "[AWS Integration] MSA with SQS & Pub/Sub Pattern with SNS"
-description: "AWS SQS and SNS를 통한 MSA 애플리케이션 간 메시징 솔루션 (+ DLQ)"
-slug: "2025-08-26-aws-sqs-sns"
+title: '[AWS Integration] MSA with SQS & Pub/Sub Pattern with SNS'
+description: 'AWS SQS and SNS를 통한 MSA 애플리케이션 간 메시징 솔루션 (+ DLQ)'
+slug: '2025-08-26-aws-sqs-sns'
 author: yulmwu
 date: 2025-08-26T04:24:51.006Z
 updated_at: 2026-02-21T12:38:04.621Z
-categories: ["AWS"]
-tags: ["Integration", "aws"]
+categories: ['AWS']
+tags: ['Integration', 'aws']
 series:
-  name: AWS
-  slug: aws
+    name: AWS
+    slug: aws
 thumbnail: ../../thumbnails/aws/aws-sqs-sns.png
 linked_posts:
-  previous: 2025-08-26-aws-codepipeline
-  next: 2025-08-26-aws-appsync-graphql-serverless
+    previous: 2025-08-26-aws-codepipeline
+    next: 2025-08-26-aws-appsync-graphql-serverless
 is_private: false
 ---
 
 > 포스팅에서 사용된 SQS 프로듀서 & 컨슈머 예제는 아래의 깃허브 링크에서 확인하실 수 있습니다.
-> 
+>
 > https://github.com/eocndp/aws-sqs-sns-example
 
 # 0. Overview
@@ -43,19 +43,19 @@ https://velog.io/@yulmwu/aws-serverless
 
 SQS는 AWS에서 제공하는 완전 관리형 서비스고, RabbitMQ를 사용할 경우 Amazon MQ 서비스를 통해 설정하고 운영할 수 있다.
 
-RabbitMQ나 Kafka에 대한 내용은 나중에 따로 다뤄보도록 하고, 먼저 AWS SQS 서비스 부터 알아보도록 하겠다. 
+RabbitMQ나 Kafka에 대한 내용은 나중에 따로 다뤄보도록 하고, 먼저 AWS SQS 서비스 부터 알아보도록 하겠다.
 
 # 1. What is SQS ?
 
-먼저 메시지를 보내는 입장을 프로듀서(Producer), 받는 쪽을 컨슈머(Consumer)라고 부른다. 
+먼저 메시지를 보내는 입장을 프로듀서(Producer), 받는 쪽을 컨슈머(Consumer)라고 부른다.
 
-예를 들어 게시판 서비스에서 게시글을 작성하면 해당 게시자를 구독(팔로우)하는 유저들에게 메일을 보내는 기능을 구현한다고 해보자. 
+예를 들어 게시판 서비스에서 게시글을 작성하면 해당 게시자를 구독(팔로우)하는 유저들에게 메일을 보내는 기능을 구현한다고 해보자.
 
 만약 메시지 브로커 없이 한번에 모두 끝낸다고 가정해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/59bd64c4-0d24-413d-b427-b7cb3cf4ac79/image.png)
 
-한명의 유저에 메일을 보내는데 예시로 50ms가 걸린다고 가정해보자. 그럼 기존엔 30ms면 끝낼 처리를 메일 전송 때문에 총 230ms가 걸리게 된다. 
+한명의 유저에 메일을 보내는데 예시로 50ms가 걸린다고 가정해보자. 그럼 기존엔 30ms면 끝낼 처리를 메일 전송 때문에 총 230ms가 걸리게 된다.
 
 또한 MSA 구조에서 알림 서비스를 따로 분리시키는 경우도 있기 때문에 이렇게 한번에 로직을 처리하는건 비효율적이다. 그래서 메시지 브로커(SQS)를 사용한다면 아래와 같이 바뀔 수 있다.
 
@@ -69,19 +69,19 @@ RabbitMQ나 Kafka에 대한 내용은 나중에 따로 다뤄보도록 하고, �
 
 ![](https://velog.velcdn.com/images/yulmwu/post/0d46a5aa-7818-48a9-8fb5-448af2fa56df/image.png)
 
-사진에서 `DelaySeconds`는 메시지를 보낸 후 컨슈머가 큐에서 읽을 수 있게 노출되기 까지의 딜레이, `MaxNumberOfMessages`는 컨슈머에서 한번에 최대 몇개의 메시지를 Polling 할지 설정할 수 있다. 
+사진에서 `DelaySeconds`는 메시지를 보낸 후 컨슈머가 큐에서 읽을 수 있게 노출되기 까지의 딜레이, `MaxNumberOfMessages`는 컨슈머에서 한번에 최대 몇개의 메시지를 Polling 할지 설정할 수 있다.
 (SQS는 RabbitMQ와 다르게 브로커에서 Push해서 컨슈머가 소비하는 방식이 아닌 컨슈머가 큐에 Polling하여 메시지를 가져온다.)
 
 > ### Short Polling vs Long Polling
-> 
+>
 > 그 둘을 설명하기 전, Polling과 Pulling은 다른 개념이다. Pulling의 경우 단순히 클라이언트가 데이터를 가져오는 일반적인 상황을 말하며, 그 응답엔 데이터가 있을 수 도 있고 없을 수 도 있다.
-> 
-> 하지만 Polling은 데이터가 없다면 요청을 반복하여 데이터가 있을 때 까지 주기적으로 요청(Pulling)을 한다. 
-> 
+>
+> 하지만 Polling은 데이터가 없다면 요청을 반복하여 데이터가 있을 때 까지 주기적으로 요청(Pulling)을 한다.
+>
 > SQS에선 Short Polling과 Long Polling이 있는데, Short Polling은 Pull Polling과 흡사하고, Long Polling은 Pulling을 하는데 메시지가 없다면 특정 시간동안 대기한다. 이후 메시지가 온다면 그대로 반환, 특정 시간 이후에도 메시지가 없다면 빈 응답을 반환한다. (내부적으로 HTTP Keep Alive 사용, 최대 20초)
-> 
-> 그래서 기존의 무한 반복에 계속해서 요청을 날리는 Polling 방식보다 리소스 절약이 가능하다. 
-> 
+>
+> 그래서 기존의 무한 반복에 계속해서 요청을 날리는 Polling 방식보다 리소스 절약이 가능하다.
+>
 > 컨슈머 코드에서 Polling과 관련한 옵션을 추후 설명하겠다.
 
 SQS 큐를 만들 때 순서 보장이 없지만 성능이 빠른 Standard와 FIFO(선입선출) 방식의 순서 보장이 있는 두 유형을 선택할 수 있다.
@@ -100,7 +100,7 @@ SQS에 대해선 3번째 목차(SQS: Let's build the Infra)에서 살짝 더 다
 
 기본적으로 SQS에서 컨슈머가 메시지를 가져갔다면, 해당 메시지는 큐에서 보여지지 않는다. (Visibility)
 
-그리고 컨슈머가 그 메시지를 처리했다면 SQS 큐에서 해당 메시지를 제거한다. 
+그리고 컨슈머가 그 메시지를 처리했다면 SQS 큐에서 해당 메시지를 제거한다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b9ccf7c5-21b6-4039-9e6c-943aa989498f/image.png)
 
@@ -108,7 +108,7 @@ SQS에 대해선 3번째 목차(SQS: Let's build the Infra)에서 살짝 더 다
 
 정답은 큐에서 다시 보여지는 것이다. 그러면 컨슈머는 해당 메시지를 다시 받을 것이고, 그렇게 되면 계속 실패하였을 경우 무한 반복이 되어 리소스를 상당히 낭비하게 될 것이다. (반복될 때 ReceiveCount를 증가시킨다.)
 
-그래서 특정 반복 횟수(ReceiveCount)를 초과할 경우(maxReceiveCount) 자동으로 DLQ(Dead Letter Queue)라는 별도의 큐로 이동된다. 
+그래서 특정 반복 횟수(ReceiveCount)를 초과할 경우(maxReceiveCount) 자동으로 DLQ(Dead Letter Queue)라는 별도의 큐로 이동된다.
 
 이제 이 큐에서 실패한(죽은) 메시지를 다른 방식으로 처리한다거나, 혹은 로그를 남기는 등의 작업을 하게 만들면 된다.
 
@@ -164,7 +164,7 @@ RabbitMQ Exchange는 큐 사이에 바인딩된 라우팅 키를 보고 브로�
 
 (SNS + SQS 동작 과정)
 
-RabbitMQ와 비교하느라 말이 길어졌는데, 결론적으로 SNS는 메시지를 받으면 패턴 정책을 바탕으로 구독자들에게 메시지를 다시 전달하는 것이다. 
+RabbitMQ와 비교하느라 말이 길어졌는데, 결론적으로 SNS는 메시지를 받으면 패턴 정책을 바탕으로 구독자들에게 메시지를 다시 전달하는 것이다.
 
 다만 SNS는 일반적으로 Fanout 방식, 즉 필터 정책을 거의 사용하지 않고 같은 메시지를 주로 여러 SQS나 람다 함수 등에 복제하는 방식으로 많이 사용한다.
 
@@ -197,15 +197,15 @@ RabbitMQ와 비교하느라 말이 길어졌는데, 결론적으로 SNS는 메�
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b55be278-a719-4fea-a383-cbe6a4a7ceae/image.png)
 
-그리고 "메시지 전송 및 수신" 버튼을 클릭하면 간단하게 메시지를 보내고 Long Polling을 해볼 수 있다. 
+그리고 "메시지 전송 및 수신" 버튼을 클릭하면 간단하게 메시지를 보내고 Long Polling을 해볼 수 있다.
 
 메시지 수신에서 "메시지 폴링" 버튼을 눌러보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/4b9950ad-cbf9-4eb3-81ee-3b1cbdf95ae3/image.png)
 
-그럼 큐에 있는 최대 10개의 메시지들을 가져오게 되고, 만약 10개가 되지 않는다면 대기한다. 
+그럼 큐에 있는 최대 10개의 메시지들을 가져오게 되고, 만약 10개가 되지 않는다면 대기한다.
 
-다만 API 상 Long Polling(ReceiveMessage)은 동작이 다른데, 메시지가 없다면 Polling 기간 동안 대기하는 것은 맞으나 메시지가 하나라도 큐에 있다면 Polling하여 바로 응답한다. 
+다만 API 상 Long Polling(ReceiveMessage)은 동작이 다른데, 메시지가 없다면 Polling 기간 동안 대기하는 것은 맞으나 메시지가 하나라도 큐에 있다면 Polling하여 바로 응답한다.
 
 만약 Long Polling 실행 시점 큐에 10개 이상의 메시지가 있다면 최대 10개의 메시지를 반환하는 것이다. (MaxNumberOfMessages)
 
@@ -239,25 +239,24 @@ MaxNumberOfMessages 때문에 복잡할 수 있는데, 다시 본론으로 돌�
 ![](https://velog.velcdn.com/images/yulmwu/post/d8fff267-ab5b-4baf-93e1-256988572fb0/image.png)
 
 > **" 컨슈머 메시지 핸들러에서 비동기로 처리하면 큐엔 항상 하나의 메시지와 ReceiveMessage 시 항상 하나의 메시지만 가져오는건 아닐까? (빠르게 비동기 핸들러로 배분되니깐) "**
-> 
-> 이러한 의문이 들 수 있다. 실제로 트래픽이 많지 않은 서비스라면 그럴 가능성이 충분히 있다. 하지만 서비스 규모가 커지거나 Bulk로 메시지를 보내는 경우라면 동시에 큐에 메시지가 들어올 수 있다. 
-> 
+>
+> 이러한 의문이 들 수 있다. 실제로 트래픽이 많지 않은 서비스라면 그럴 가능성이 충분히 있다. 하지만 서비스 규모가 커지거나 Bulk로 메시지를 보내는 경우라면 동시에 큐에 메시지가 들어올 수 있다.
+>
 > 이럴 경우 Long Polling 시 여러개의 메시지를 응답받게 될 수 있는데, MaxNumberOfMessages를 통해 응답의 메시지 수를 제한하는 것이다.
-> 
+>
 > 여러개의 메시지를 한번에 받으면 네트워크적으로 API 호출이 적어지니 효율이 좋아질 수 있으나 서버에 부담이 갈 수 있으니 적절히 조절하면 될 것 같다.
-
 
 DLQ에 대해선 따로 다뤄보겠다.
 
 # 4. SQS: Let's write the Code
 
 > 코드는 아래의 깃허브에서 볼 수 있다.
-> 
+>
 > https://github.com/eocndp/aws-sqs-sns-example
 
 이제 SQS 프로듀서 코드와 컨슈머 코드를 작성하여 메시징을 테스트 해보고, SNS와 연동하여 SNS에 메시지를 보냈을 때 SQS 컨슈머가 동작하는 모습과 람다가 실행되는 모습, 그리고 이메일까지 보내보도록 하겠다.
 
-플랫폼은 NodeJS로, AWS  SDK v3를 사용하며 NestJS와 연동하여 사용해보도록 하겠다.
+플랫폼은 NodeJS로, AWS SDK v3를 사용하며 NestJS와 연동하여 사용해보도록 하겠다.
 
 먼저 NestJS 프로젝트를 만들어주고, 아래와 같은 라이브러리를 설치해주자.
 
@@ -284,52 +283,51 @@ import { ConfigService } from '@nestjs/config'
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 
 export interface SqsSendOptions {
-    type?: string
-    delaySeconds?: number
-    groupId?: string
-    deduplicationId?: string
-    messageAttributes?: Record<string, SqsMessageAttribute>
+	type?: string
+	delaySeconds?: number
+	groupId?: string
+	deduplicationId?: string
+	messageAttributes?: Record<string, SqsMessageAttribute>
 }
 
 export interface SqsMessageAttribute {
-    DataType: 'String' | 'Number' | 'Binary'
-    StringValue?: string
-    BinaryValue?: Uint8Array
+	DataType: 'String' | 'Number' | 'Binary'
+	StringValue?: string
+	BinaryValue?: Uint8Array
 }
 
 @Injectable()
 export class SqsProducerService {
-    private readonly logger = new Logger(SqsProducerService.name)
-    private readonly client: SQSClient
-    private readonly queueUrl: string
+	private readonly logger = new Logger(SqsProducerService.name)
+	private readonly client: SQSClient
+	private readonly queueUrl: string
 
-    constructor(private readonly config: ConfigService) {
-        this.client = new SQSClient({
-            region: this.config.get<string>('AWS_REGION'),
-        })
-        this.queueUrl = this.config.get<string>('SQS_QUEUE_URL', '')
-    }
+	constructor(private readonly config: ConfigService) {
+		this.client = new SQSClient({
+			region: this.config.get<string>('AWS_REGION'),
+		})
+		this.queueUrl = this.config.get<string>('SQS_QUEUE_URL', '')
+	}
 
-    async send(body: any, options?: SqsSendOptions): Promise<string | undefined> {
-        const MessageBody = typeof body === 'string' ? body : JSON.stringify(body)
+	async send(body: any, options?: SqsSendOptions): Promise<string | undefined> {
+		const MessageBody = typeof body === 'string' ? body : JSON.stringify(body)
 
-        const cmd = new SendMessageCommand({
-            QueueUrl: this.queueUrl,
-            MessageBody,
-            DelaySeconds: options?.delaySeconds ?? 0,
-            MessageGroupId: options?.groupId,
-            MessageDeduplicationId: options?.deduplicationId,
-            MessageAttributes: options?.messageAttributes,
-        })
+		const cmd = new SendMessageCommand({
+			QueueUrl: this.queueUrl,
+			MessageBody,
+			DelaySeconds: options?.delaySeconds ?? 0,
+			MessageGroupId: options?.groupId,
+			MessageDeduplicationId: options?.deduplicationId,
+			MessageAttributes: options?.messageAttributes,
+		})
 
-        const res = await this.client.send(cmd)
-        this.logger.debug(`Sent message: ${res.MessageId}`)
+		const res = await this.client.send(cmd)
+		this.logger.debug(`Sent message: ${res.MessageId}`)
 
-        return res.MessageId
-    }
+		return res.MessageId
+	}
 }
 ```
-
 
 AWS SDK SQS 클라이언트를 사용하여 간단하게 메시지를 보내는 코드이다. 위 서비스만 연결해둔 상태로 실행해보고 AWS 콘솔로 확인해보자.
 
@@ -349,91 +347,93 @@ import { Consumer } from 'sqs-consumer'
 
 @Injectable()
 export class SqsConsumerService implements OnModuleInit, OnModuleDestroy {
-    private readonly logger = new Logger(SqsConsumerService.name)
+	private readonly logger = new Logger(SqsConsumerService.name)
 
-    private consumer!: Consumer
-    private client: SQSClient
-    private queueUrl: string
+	private consumer!: Consumer
+	private client: SQSClient
+	private queueUrl: string
 
-    constructor(private readonly config: ConfigService) {
-        this.client = new SQSClient({
-            region: this.config.get<string>('AWS_REGION'),
-        })
-        this.queueUrl = this.config.get<string>('SQS_QUEUE_URL', '')
-    }
+	constructor(private readonly config: ConfigService) {
+		this.client = new SQSClient({
+			region: this.config.get<string>('AWS_REGION'),
+		})
+		this.queueUrl = this.config.get<string>('SQS_QUEUE_URL', '')
+	}
 
-    onModuleInit() {
-        this.consumer = Consumer.create({
-            queueUrl: this.queueUrl,
-            sqs: this.client,
-            batchSize: 10,
-            waitTimeSeconds: 20,
-            visibilityTimeout: 10,
-            messageAttributeNames: ['All'],
-            messageSystemAttributeNames: ['ApproximateReceiveCount'],
-            handleMessage: async (message) => {
-                const body = this.safeParse(message.Body)
+	onModuleInit() {
+		this.consumer = Consumer.create({
+			queueUrl: this.queueUrl,
+			sqs: this.client,
+			batchSize: 10,
+			waitTimeSeconds: 20,
+			visibilityTimeout: 10,
+			messageAttributeNames: ['All'],
+			messageSystemAttributeNames: ['ApproximateReceiveCount'],
+			handleMessage: async (message) => {
+				const body = this.safeParse(message.Body)
 
-                const ok = await this.dispatch(body, { sqsMessageAttributes: message.MessageAttributes })
-                if (!ok) {
-                    throw new Error(`Message handling failed (ReceiveCount: ${message.Attributes?.ApproximateReceiveCount})`)
-                }
-            },
-        })
+				const ok = await this.dispatch(body, { sqsMessageAttributes: message.MessageAttributes })
+				if (!ok) {
+					throw new Error(
+						`Message handling failed (ReceiveCount: ${message.Attributes?.ApproximateReceiveCount})`,
+					)
+				}
+			},
+		})
 
-        this.consumer.on('error', (err) => this.logger.error(`Consumer error: ${err.message}`, err.stack))
-        this.consumer.on('processing_error', (err) => this.logger.error(`Processing error: ${err.message}`, err.stack))
-        this.consumer.on('message_received', (m) => this.logger.debug(`Received: ${m.MessageId}`))
-        this.consumer.on('message_processed', (m) => this.logger.debug(`Processed: ${m.MessageId}`))
+		this.consumer.on('error', (err) => this.logger.error(`Consumer error: ${err.message}`, err.stack))
+		this.consumer.on('processing_error', (err) => this.logger.error(`Processing error: ${err.message}`, err.stack))
+		this.consumer.on('message_received', (m) => this.logger.debug(`Received: ${m.MessageId}`))
+		this.consumer.on('message_processed', (m) => this.logger.debug(`Processed: ${m.MessageId}`))
 
-        this.consumer.start()
-        this.logger.log('SQS consumer started')
-    }
+		this.consumer.start()
+		this.logger.log('SQS consumer started')
+	}
 
-    async onModuleDestroy() {
-        if (this.consumer) {
-            this.consumer.stop()
-            this.logger.log('SQS consumer stopped')
-        }
-    }
+	async onModuleDestroy() {
+		if (this.consumer) {
+			this.consumer.stop()
+			this.logger.log('SQS consumer stopped')
+		}
+	}
 
-    private safeParse(raw?: string) {
-        if (!raw) return undefined
-        try {
-            return JSON.parse(raw)
-        } catch {
-            return raw
-        }
-    }
+	private safeParse(raw?: string) {
+		if (!raw) return undefined
+		try {
+			return JSON.parse(raw)
+		} catch {
+			return raw
+		}
+	}
 
-    private async dispatch(payload: any, meta?: any): Promise<boolean> {
-        try {
-            const parsedPayloadBody = this.jsonParse(payload?.Message)
+	private async dispatch(payload: any, meta?: any): Promise<boolean> {
+		try {
+			const parsedPayloadBody = this.jsonParse(payload?.Message)
 
-            switch (parsedPayloadBody?.type || payload?.type) {
-                case 'order.created':
-                    this.logger.log('[order.created]', payload, meta)
-                    break
-                case 'throw.error':
-                    throw new Error('Test error')
-                default:
-                    this.logger.log('[message]', payload, meta)
-            }
-            return true
-        } catch (e: any) {
-            this.logger.error('dispatch error: ' + e?.message)
-            return false
-        }
-    }
+			switch (parsedPayloadBody?.type || payload?.type) {
+				case 'order.created':
+					this.logger.log('[order.created]', payload, meta)
+					break
+				case 'throw.error':
+					throw new Error('Test error')
+				default:
+					this.logger.log('[message]', payload, meta)
+			}
+			return true
+		} catch (e: any) {
+			this.logger.error('dispatch error: ' + e?.message)
+			return false
+		}
+	}
 
-    private jsonParse(raw?: string): any {
-        if (!raw) return undefined
-        try {
-            return JSON.parse(raw)
-        } catch {
-            return raw
-        }
-    }
+	private jsonParse(raw?: string): any {
+		if (!raw) return undefined
+		try {
+			return JSON.parse(raw)
+		} catch {
+			return raw
+		}
+	}
 }
 ```
 
@@ -535,7 +535,7 @@ SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 �
 
 ![](https://velog.velcdn.com/images/yulmwu/post/3db745bf-1d6e-493d-997f-5881d4a8394d/image.png)
 
-이렇게 메시지를 게시해보자. 
+이렇게 메시지를 게시해보자.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/b3b317a1-9041-44b8-9a5d-fc323d1b6aaa/image.png)
 
@@ -544,7 +544,7 @@ SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 �
 이번엔 본문에서 `type`이 `order.created`인 경우에만 이메일을 보낼 수 있도록 해보자. (필터 정책 적용)
 
 > 본 포스팅에선 단순한 예시와 코드를 위해 페이로드 기반의 필터 정책을 사용하였으나, 요금이 다소 비싸질 수 있다.
-> 
+>
 > 그래서 단순 라우팅 정도라면 메시지 속성 기반의 필터 정책을 사용하는 것을 추천한다. (이 경우엔 무료이다.)
 
 ![](https://velog.velcdn.com/images/yulmwu/post/d5ff711e-8ae2-45b5-a772-b76032f58ae1/image.png)
@@ -589,7 +589,7 @@ SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 �
 
 그럼 사진과 같이 본문 내용이 포함된 메일을 받게 된다. SNS에서 프로토콜 별로 메시지 내용을 다르게 하여 보낼 수 있으니 적절히 사용하면 좋을 것 같다.
 
-개념 위주의 기초적인 내용만 다뤘고, 더욱 더 디테일하게 사용하려면 RabbitMQ 등을 사용해보는 것도 좋은 선택일 듯 싶다. 
+개념 위주의 기초적인 내용만 다뤘고, 더욱 더 디테일하게 사용하려면 RabbitMQ 등을 사용해보는 것도 좋은 선택일 듯 싶다.
 
 # 6. Calculate Price
 
@@ -599,23 +599,23 @@ SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 �
 
 ![](https://velog.velcdn.com/images/yulmwu/post/183fa31f-3e05-4453-a4a6-20d5770adc6b/image.png)
 
-그런데 페이로드의 크기에 따라 요청 수가 달라진다. 
+그런데 페이로드의 크기에 따라 요청 수가 달라진다.
 
 ![](https://velog.velcdn.com/images/yulmwu/post/e06c4d04-23ea-4b86-925f-11e41e687fc5/image.png)
 
 > 2025년 8월 4일 부로 메시지의 최대 크기가 1MB로 변경되었으며, 요청의 페이로드 최대 크기도 1MB로 확장되었다.
-> 
+>
 > 요금에 변동이 있는건 아니지만 참고하도록 하자.
-> 
+>
 > https://aws.amazon.com/ko/about-aws/whats-new/2025/08/amazon-sqs-max-payload-size-1mib/
 > https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessageBatch.html
 
-사진과 같이 하나의 요청은 64KB 크기를 기준으로 청구된다. 즉 256KB 크기는 4개의 요청, 1MB의 크기는 16개의 요청으로 처리된다. 
+사진과 같이 하나의 요청은 64KB 크기를 기준으로 청구된다. 즉 256KB 크기는 4개의 요청, 1MB의 크기는 16개의 요청으로 처리된다.
 
 요금은 월 요청 수에 따라 달라지고, 예를 들어 월 별로 200만개의 메시지(메시지의 크기는 128KB라고 가정)가 발생하는데, 하나의 메시지를 보내고 처리하는데 아래와 같이 3번의 API가 필요하다. (SQS 단독으로 사용 시)
 
 - SendMessage: 요청의 크기를 64KB의 청크로 나눠서 요청 수를 계산하므로, 2개의 요청으로 계산된다.
-- ReceiveMessage: 한번의 요청으로 하나의 메시지를 가져온다고 가정하였을 때 하나의 요청으로 계산된다. (실제론 Long Polling 시 줄어들 수 있음) 
+- ReceiveMessage: 한번의 요청으로 하나의 메시지를 가져온다고 가정하였을 때 하나의 요청으로 계산된다. (실제론 Long Polling 시 줄어들 수 있음)
 - DeleteMessage: 하나의 메시지를 컨슈머가 처리했다면 메시지를 삭제해야 하므로 하나의 요청이 발생한다.
 
 최종적으로 4개의 요청이 발생하고, 월 별로 총 $2,000,000 × 4 = 8,000,000$개의 요청이 발생하게 된다.
@@ -647,7 +647,7 @@ SNS는 메시지를 리시브하거나 삭제하는 일은 없고, 구독을 만
 
 이메일의 경우 10만개당 2$가 청구된다.
 
-그리고 필터 정책도 요금이 발생하는데, 메시지 속성을 바탕으로 한 필터 정책은 요금이 발생하지 않는다. 
+그리고 필터 정책도 요금이 발생하는데, 메시지 속성을 바탕으로 한 필터 정책은 요금이 발생하지 않는다.
 
 다만 페이로드 기반 필터 정책은 요금이 발생하는데, 아래와 같다.
 
