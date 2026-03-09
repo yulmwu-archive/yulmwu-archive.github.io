@@ -6,6 +6,8 @@ import { QuartzPluginData } from '../../plugins/vfile'
 type PostsByDirectory = Map<string, QuartzPluginData[]>
 type DirectoryTitles = Map<string, string>
 
+const pinnedSlugs: string[] = ['misc/2025-12-31-memoir-2025']
+
 const getLatestPosts = (posts: QuartzPluginData[], limit: number = 10): QuartzPluginData[] => {
 	return posts.slice(0, limit)
 }
@@ -143,6 +145,26 @@ const LatestPostsSection = ({ posts, cfg }: { posts: QuartzPluginData[]; cfg: an
 	)
 }
 
+const PinnedPostsSection = ({ posts, cfg }: { posts: QuartzPluginData[]; cfg: any }) => {
+	if (posts.length === 0) return null
+
+	return (
+		<div class="posts-section">
+			<input type="checkbox" id="section-pinned" class="section-toggle" defaultChecked />
+			<label htmlFor="section-pinned" class="section-header">
+				<span class="expand-icon" aria-hidden="true"></span>
+				<h2 class="section-title">고정 게시글</h2>
+				<span class="post-count">{posts.length}</span>
+			</label>
+			<div class="posts-grid">
+				{posts.map((post) => (
+					<PostCard post={post} cfg={cfg} />
+				))}
+			</div>
+		</div>
+	)
+}
+
 const CollapsibleSection = ({
 	directory,
 	posts,
@@ -190,6 +212,12 @@ const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 	})
 
 	const latestPosts = getLatestPosts(sortedPosts, 10)
+	const postsBySlug = new Map<string, QuartzPluginData>()
+	posts.forEach((post) => {
+		if (post.slug) postsBySlug.set(String(post.slug), post)
+	})
+
+	const pinnedPosts = pinnedSlugs.map((slug) => postsBySlug.get(slug)).filter(Boolean) as QuartzPluginData[]
 
 	const postsByDirectory = groupPostsByDirectory(posts)
 	sortPostsByDate(postsByDirectory, cfg)
@@ -213,6 +241,7 @@ const HomePage: QuartzComponent = ({ allFiles, cfg }: QuartzComponentProps) => {
 			</header>
 
 			<LatestPostsSection posts={latestPosts} cfg={cfg} />
+			<PinnedPostsSection posts={pinnedPosts} cfg={cfg} />
 
 			<h2 class="all-posts-title">시리즈별 게시글</h2>
 
