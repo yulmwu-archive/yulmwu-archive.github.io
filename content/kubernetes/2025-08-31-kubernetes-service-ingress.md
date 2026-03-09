@@ -1,24 +1,24 @@
 ---
-title: '[Kubernetes w/ EKS] Service(ClusterIP, NodePort, LoadBalancer) and Ingress(Nginx, AWS ALB)'
-description: '쿠버네티스 Service(ClusterIP, NodePort, LoadBalancer) 및 Ingress(Nginx, AWS ALB) + AWS EKS 실습'
-slug: '2025-08-31-kubernetes-service-ingress'
+title: "[Kubernetes w/ EKS] Service(ClusterIP, NodePort, LoadBalancer) and Ingress(Nginx, AWS ALB)"
+description: "쿠버네티스 Service(ClusterIP, NodePort, LoadBalancer) 및 Ingress(Nginx, AWS ALB) + AWS EKS 실습"
+slug: "2025-08-31-kubernetes-service-ingress"
 author: yulmwu
 date: 2025-08-31T04:04:42.869Z
 updated_at: 2026-03-05T12:50:34.813Z
-categories: ['Kubernetes']
-tags: ['eks', 'kubernetes']
+categories: ["Kubernetes"]
+tags: ["eks", "kubernetes"]
 series:
-    name: Kubernetes
-    slug: kubernetes
-thumbnail: ../../thumbnails/kubernetes/kubernetes-service-ingress.png
+  name: Kubernetes
+  slug: kubernetes
+thumbnail: https://mirror-cdn.swua.kr/thumbnails/kubernetes/kubernetes-service-ingress_960x540.png
 linked_posts:
-    previous:
-    next: 2025-08-31-kubernetes-gateway
+  previous: 
+  next: 2025-08-31-kubernetes-gateway
 is_private: false
 ---
 
 > 예제로 사용한 쿠버네티스 매니페스트 파일과 테스트로 사용한 배포 애플리케이션(NodeJS Express)은 아래의 깃허브 레포지토리에서 확인해보실 수 있습니다.
->
+> 
 > https://github.com/eocndp/k8s-service-ingress-example
 
 # 1. What is Service?
@@ -33,7 +33,7 @@ is_private: false
 
 ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/58a64353-11f0-414a-a5c8-2adda18c89a9.png)
 
-클러스터 내 3개의 파드는 클러스터 CIDR(CNI에서 결정함) 10.244.0.0/16 범위에서 IP를 부여받았다. 하지만 이는 파드가 생성될 때 고정된 IP가 아닌 동적으로 IP가 바뀌며, 파드는 일종의 일회성 소모품과 같은 개념이기 때문에 특정한 파드에 파드 IP로 직접 접근하는 것은 어렵다. (1번 문제)
+클러스터 내 3개의 파드는 클러스터 CIDR(CNI에서 결정함)  10.244.0.0/16 범위에서 IP를 부여받았다. 하지만 이는 파드가 생성될 때 고정된 IP가 아닌 동적으로 IP가 바뀌며, 파드는 일종의 일회성 소모품과 같은 개념이기 때문에 특정한 파드에 파드 IP로 직접 접근하는 것은 어렵다. (1번 문제)
 
 그리고 이러한 파드들은 기본적으로 외부에서 접근할 수 없으며(2번 문제), CNI에서 할당해준 IP를 개별적으로 가지고 있기 때문에 분산 서비스를 하기도 어렵다.
 
@@ -43,9 +43,9 @@ is_private: false
 
 ## ClusterIP
 
-파드에 부여되는 IP는 고정되어 있지 않는다고 했는데, 이는 클러스터 내부에서 파드끼리 통신할때도 문제가 된다.
+파드에 부여되는 IP는 고정되어 있지 않는다고 했는데, 이는 클러스터 내부에서 파드끼리 통신할때도 문제가 된다. 
 
-서로 통신하는 것 자체는 같은 클러스터라면 문제가 되지 않지만 IP를 모르기 때문에 쉽게 통신하기가 어렵다. 그래서 클러스터 안에서 가상 IP를 하나 만들고 ClusterIP:Port <-> 파드 IP:targetPort로 매핑한다.
+서로 통신하는 것 자체는 같은 클러스터라면 문제가 되지 않지만 IP를 모르기 때문에 쉽게 통신하기가 어렵다. 그래서 클러스터 안에서 가상 IP를 하나 만들고 ClusterIP:Port <-> 파드 IP:targetPort로 매핑한다. 
 
 이때 같은 파드가 여러개로 Replica 되어있다면 내부적으로 분산해주기도 하며, 이러한 작업은 노드에 있는 기본적인 DaemonSet 중 하나인 kube-proxy(iptables/ipvs)가 도와준다.
 
@@ -55,13 +55,13 @@ is_private: false
 
 ClusterIP 서비스를 통해 내부의 파드들은 고정된 IP(또는 DNS)를 통해 서로 통신할 수 있고, 이때 kube-proxy 데몬이 이를 가능하도록 해주며, 여러 파드가 있다면 트래픽을 분산해주기도 한다.
 
-그런데 ClusterIP 서비스는 클러스터 외부로 노출하지 않는데, 때문에 클러스터 내 마이크로서비스 간의 통신 등에서 적합하며 외부로 파드를 노출하려면 NodePort나 LoadBalancer, 또는 Ingress(Ingress Controller)를 사용해야 한다.
+그런데 ClusterIP 서비스는 클러스터 외부로 노출하지 않는데, 때문에 클러스터 내 마이크로서비스 간의 통신 등에서 적합하며 외부로 파드를 노출하려면 NodePort나 LoadBalancer, 또는 Ingress(Ingress Controller)를 사용해야 한다. 
 
 ## NodePort
 
 NodePort 서비스를 적용하게 되면 클러스터에 있는 모든 노드들에 대해 특정한 포트를 개방시킨다. (노드 포트는 기본적으로 30000~32767 범위로 사용할 수 있다.)
 
-그럼 노드 IP와 랜덤한 포트(직접 지정할 수도 있긴 하다.)를 통해 노드에서 ClusterIP 거쳐 내부의 서비스(파드)에 접근할 수 있다.
+그럼 노드 IP와 랜덤한 포트(직접 지정할 수도 있긴 하다.)를 통해 노드에서 ClusterIP 거쳐 내부의 서비스(파드)에 접근할 수 있다. 
 
 NodePort가 클러스터 외부로 파드를 노출시키는데, 여기서 외부로 노출된다는게 일반적인 배포 환경에선 노드에 Public IP를 할당해서 쓰진 않는다.
 (물론 로드밸런서나 Ingress 등을 쓰지 않고 노드 포트를 직접 열어 Public IP를 할당하는 특이한 경우가 있긴 할 것이다.)
@@ -73,36 +73,36 @@ NodePort가 클러스터 외부로 파드를 노출시키는데, 여기서 외�
 즉 클러스터 외부에서도 접근할 수 있고 내부에서도 ClusterIP를 통해 접근할 수 있는 것이다.
 
 > ### externalTrafficPolicy
->
+> 
 > 기본적으로 요청을 받은 노드의 NodePort가 iptables/ipvs 규칙으로 엔드포인트(파드)를 고르는데, 이때 상황에 따라 다른 노드의 파드가 잡힐 수 있다. (kube-proxy)
->
+> 
 > 즉 아래와 같은 상황이 발생할 수 있는 것이다.
->
+> 
 > ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/e8c81133-9cc9-4eb5-9393-4b681bc32de7.png)
->
+> 
 > 외부의 클라이언트는 Worker Node 1의 IP(또는 DNS)를 사용하여 접근을 시도하였으나 Worker Node 1의 모종의 이유로 Worker Node 2로 트래픽이 다시 보내지게 되었다.
->
+> 
 > 이때 Worker Node 2로 라우팅되는 네트워크 홉이 발생하게 되고, 심지어 SNAT이 발생(노드 간 리다이렉트가 발생함)하게 되어 클라이언트의 IP도 보존되지 않는다는 단점이 있다. (Cross AZ 비용도 발생할 수 있음)
->
+> 
 > 그래서 서비스에 `externalTrafficPolicy` 옵션을 사용할 수 있는데, 기본값인 `Cluster`로 설정 시 위와 같은 문제가 발생할 수 있으며, `Local`로 설정하면 특정한 노드로 예외 없이 전달되기 때문에 설명한 문제가 발생하지 않는다.
->
-> 다만 만약 해당 노드나 파드가 정상 작동 하지 않는 경우 해당 트래픽은 폐기된다.
->
+> 
+> 다만 만약 해당 노드나 파드가 정상 작동 하지 않는 경우 해당 트래픽은 폐기된다. 
+> 
 > 그리고 해당 옵션은 AWS ALB/NLB에서 IP 대상의 로드밸런서를 사용한다면 크게 의미가 없는데, NodePort 서비스를 경유하지 않고 파드 IP를 통해 직접 파드로 로드밸런싱 하기 때문에 딱히 상관이 없다. (`target-type: ip`)
->
+> 
 > 이 주제에 대해선 추후 다시 포스팅을 작성해보겠다.
 
 NodePort는 클러스터 외부에서 클러스터 내부로 접근할 수 있다는 의미이고, 실제 배포 환경이라면 노드 포트로 서비스를 외부에 제공하는게 아닌 로드밸런서나 Ingress를 연결하는게 좋다.
 
-애초에 노드 포트를 30000번 아래로 설정하는걸 권장하지도 않고 인증서 적용이나 라우팅 등에서 적용시키기 어렵고, 오토스케일링 등으로 노드 수가 동적으로 변화된다면 로드밸런서 등을 사용하는게 좋다.
+애초에 노드 포트를 30000번 아래로 설정하는걸 권장하지도 않고 인증서 적용이나 라우팅 등에서 적용시키기 어렵고, 오토스케일링 등으로 노드 수가 동적으로 변화된다면 로드밸런서 등을 사용하는게 좋다. 
 
 ## LoadBalancer
 
 > 앞서 말했 듯 대상 그룹 타입을 IP로 설정하면 파드 IP를 직접 대상 그룹에 등록하기 때문에 더욱 많이 사용되지만, 실습에선 Instance 모드로 설정하고 실습해보겠다. (NodePort 등 테스트)
->
+> 
 > 추후 Ingress 실습에선 대상 그룹 타입을 IP로 설정해두고 테스트해볼 것이다.
 
-NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 있게 하는 서비스라고 설명하였다.
+NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 있게 하는 서비스라고 설명하였다. 
 
 그런데 오토스케일링 등으로 노드가 많아질 수 있고, NodePort의 경우 노드의 IP를 알아야 하는 등 실제 서비스에서 사용하기엔 어려움이 있다.
 
@@ -131,17 +131,17 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 여기서 Ingress Controller는 Nginx Ingress Controller, AWS ALB Ingress Controller 등이 있다. 그 외에도 GCP에서 제공하는 Ingress Controller도 있기 한데, 포스팅에선 Nginx Ingress Controller와 AWS ALB Ingress Controller로 나눠서 설명하겠다.
 
 > 왜 LoadBalancer 서비스는 클라우드에서 제공하는 로드밸런서를 사용하고, 왜 Ingress는 Ingress Controller가 클러스터 안에서 구현되었는지 궁금할 수 있다.
->
-> 쿠버네티스의 철학 등의 이유가 있겠지만 기술적인 이유 중 하나는 L4 로드밸런서를 쿠버네티스 클러스터 안에서 구현하기엔 어려움이 있기 때문이다.
->
+> 
+> 쿠버네티스의 철학 등의 이유가 있겠지만 기술적인 이유 중 하나는 L4 로드밸런서를 쿠버네티스 클러스터 안에서 구현하기엔 어려움이 있기 때문이다. 
+> 
 > 때문에 LoadBalancer 서비스는 외부의 클라우드가 제공하는 로드밸런서를 사용하도록 하고, L7 로드밸런서는 클러스터 안에서 구현할 수 있기 때문에 Ingress Controller가 파드 형태로 L7 로드밸런싱을 해주는 것이다.
 
 ## Nginx Ingress Controller
 
 > Nginx Ingress Controller에 대한 유지보수는 2026년 3월까지 진행되고, 이후 유지보수가 종료된다. [[참고 1]](https://github.com/kubernetes/ingress-nginx?tab=readme-ov-file#ingress-nginx-retirement) [[참고 2]](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/)
->
+> 
 > 기존의 Helm Chart나 Nginx Ingress Controller로 운영중이던 서비스가 종료되는건 아니지만 보안 취약점 대응이나 버그 수정 등의 작업이 진행되지 않는다.
->
+> 
 > 때문에 [Gateway API](https://velog.io/@yulmwu/kubernetes-gateway)로 마이그레이션을 권장하고 있지만, 이 포스팅에선 실습을 위해 Nginx Ingress Controller를 그대로 사용할 예정이다.
 
 클라우드 환경이라면 Nginx Ingress Controller가 아닌 AWS ALB Ingress Controller와 같이 클라우드에서 제공하는 컨트롤러를 사용하여 더욱 간결하게 구성할 수 있으나, 로컬이나 온프레미스에서 Nginx Ingress Controller를 구성한다면 그 앞에 NodePort나 LoadBalancer(L4) 서비스를 붙여야 한다. (Nginx Ingress Controller도 결국엔 파드로 실행됨)
@@ -154,7 +154,7 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 
 ## AWS ALB Ingress Controller
 
-만약 AWS EKS에 Ingress를 만든다면 AWS ALB Ingress Controller를 사용할 수 있다.
+만약 AWS EKS에 Ingress를 만든다면 AWS ALB Ingress Controller를 사용할 수 있다. 
 
 이때 대상 그룹의 타입을 IP로 설정하면 바로 파드의 IP로 포워딩한다.
 (그래서 앞서 말했 듯 이땐 `externalTrafficPolicy`가 무의미 해진다고 하였다.)
@@ -167,12 +167,12 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 
 보면 Nginx Ingress Controller에 비해 다른 모습을 보이고 있다. 가장 큰 점을 보면 바로 ALB Ingress Controller를 직접 지나지 않는다는 점이다.
 
-즉 Nginx Ingress Controller는 파드가 직접 리버스 프록시 역할을 하며 로드밸런싱을 하는 반면, ALB Ingress Controller는 Ingress 리소스를 모니터링하며 ALB를 업데이트하는 역할이고 AWS ALB가 로드밸런싱을 직접 한다는 것이다.
+즉 Nginx Ingress Controller는 파드가 직접 리버스 프록시 역할을 하며 로드밸런싱을 하는 반면, ALB Ingress Controller는 Ingress 리소스를 모니터링하며 ALB를 업데이트하는 역할이고 AWS ALB가 로드밸런싱을 직접 한다는 것이다. 
 
 이때 대상 그룹은 IP 타입이므로 NodePort, ClusterIP 등의 서비스를 경유하지 않고 IP를 통해 대상 그룹의 파드로 직접 로드밸런싱을 해준다. (즉 Nginx Ingress 로드밸런싱 주체: Pod, ALB Ingress 로드밸런싱 주체: ALB)
 
-> 사진상 설명하지 않은 부분이 있는데, 각 서비스(Deployment 등)에 대한 ClusterIP 서비스는 만들어둬야 한다.
->
+> 사진상 설명하지 않은 부분이 있는데, 각 서비스(Deployment 등)에 대한 ClusterIP 서비스는 만들어둬야 한다. 
+> 
 > ALB Ingress Controller가 ALB에 대상 그룹에 IP를 등록시키기 위해선 엔드포인트 슬라이스를 참조하여 대상 그룹을 수정한다. 이때 엔드포인트 슬라이스는 ClusterIP 등이 서비스가 있어야 생기니 ClusterIP 서비스를 만들어주는 것이다. (직접 사용하진 않음)
 
 # 3. Examples
@@ -208,29 +208,29 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-    name: eks-test
-    region: ap-northeast-2
-    version: '1.33' # 표준 지원 기간(초과 시 추가 요금), EOL 확인
+  name: eks-test
+  region: ap-northeast-2
+  version: "1.33" # 표준 지원 기간(초과 시 추가 요금), EOL 확인
 
 vpc:
-    cidr: 10.0.0.0/16
+  cidr: 10.0.0.0/16
 
 managedNodeGroups:
-    - name: ng-private
-      instanceTypes: ['t3.small']
-      desiredCapacity: 2
-      minSize: 2
-      maxSize: 3
-      privateNetworking: true
-      labels: { nodegroup: private }
+  - name: ng-private
+    instanceTypes: ["t3.small"]
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 3
+    privateNetworking: true
+    labels: { nodegroup: private }
 
-    - name: ng-public
-      instanceTypes: ['t3.small']
-      desiredCapacity: 1
-      minSize: 1
-      maxSize: 1
-      privateNetworking: false
-      labels: { nodegroup: public }
+  - name: ng-public
+    instanceTypes: ["t3.small"]
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 1
+    privateNetworking: false
+    labels: { nodegroup: public }
 ```
 
 그리고 아래의 명령어를 입력하여 EKS 클러스터를 만들고 kubeconfig를 업데이트해보자. (실습 시 요금이 발생할 수 있으니 주의하자.)
@@ -260,60 +260,60 @@ aws eks update-kubeconfig --name eks-test --region ap-northeast-2
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: app1-deploy
+  name: app1-deploy
 spec:
-    replicas: 3
-    selector:
-        matchLabels:
-            app: app1
-    template:
-        metadata:
-            labels:
-                app: app1
-        spec:
-            containers:
-                - name: app1
-                  image: rlawnsdud/testapp
-                  ports:
-                      - containerPort: 8080
-                  env:
-                      - name: HOST
-                        value: '0.0.0.0'
-                      - name: PORT
-                        value: '8080'
-                      - name: APP_NAME
-                        valueFrom:
-                            fieldRef:
-                                fieldPath: metadata.name
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+        - name: app1
+          image: rlawnsdud/testapp
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8080"
+            - name: APP_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: app2-deploy
+  name: app2-deploy
 spec:
-    replicas: 3
-    selector:
-        matchLabels:
-            app: app2
-    template:
-        metadata:
-            labels:
-                app: app2
-        spec:
-            containers:
-                - name: app2
-                  image: rlawnsdud/testapp
-                  ports:
-                      - containerPort: 8080
-                  env:
-                      - name: HOST
-                        value: '0.0.0.0'
-                      - name: PORT
-                        value: '8080'
-                      - name: APP_NAME
-                        valueFrom:
-                            fieldRef:
-                                fieldPath: metadata.name
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app2
+  template:
+    metadata:
+      labels:
+        app: app2
+    spec:
+      containers:
+        - name: app2
+          image: rlawnsdud/testapp
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8080"
+            - name: APP_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
 ```
 
 이제 kubectl을 사용하여 적용해보자.
@@ -344,15 +344,15 @@ kubectl run testbox --rm -it --image=alpine -- sh
 apiVersion: v1
 kind: Service
 metadata:
-    name: app-clusterip-svc
+  name: app-clusterip-svc
 spec:
-    type: ClusterIP
-    selector:
-        app: app1
-    ports:
-        - name: http
-          port: 3000
-          targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app1
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 8080
 ```
 
 적용하고 서비스를 조회해보자.
@@ -369,7 +369,7 @@ for i in $(seq 1 10); do curl '172.20.145.82:3000'; echo; done
 
 ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/1b9a396c-a781-4856-a527-55fdabb08913.png)
 
-이렇게 잘 분산되어 나오는 것을 볼 수 있다.
+이렇게 잘 분산되어 나오는 것을 볼 수 있다. 
 
 ## NodePort Service
 
@@ -381,16 +381,16 @@ NodePort는 아래와 같은 매니페스트 파일을 작성한다. `nodePort`�
 apiVersion: v1
 kind: Service
 metadata:
-    name: app-nodeport-svc
+  name: app-nodeport-svc
 spec:
-    type: NodePort
-    selector:
-        app: app1
-    ports:
-        - name: http
-          port: 3000
-          targetPort: 8080
-          nodePort: 30001
+  type: NodePort 
+  selector:
+    app: app1
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 8080
+      nodePort: 30001
 ```
 
 적용 후 서비스 목록을 보자.
@@ -409,7 +409,7 @@ spec:
 
 ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/0b2422f1-d2f4-4171-b2e1-cadf0e25ea54.png)
 
-접속하려는 노드에 사진과 같이 30000~32767 (또는 30001) 포트를 열어주자.
+접속하려는 노드에 사진과 같이 30000~32767 (또는 30001) 포트를 열어주자. 
 
 ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/a8f44cef-0d41-4ea9-9350-78f98da488ca.png)
 
@@ -425,19 +425,19 @@ EKS에서 LoadBalancer 서비스를 사용하면 AWS NLB(L4)를 자동으로 생
 apiVersion: v1
 kind: Service
 metadata:
-    name: app-lb-svc
-    annotations:
-        service.beta.kubernetes.io/aws-load-balancer-type: 'nlb'
-        service.beta.kubernetes.io/aws-load-balancer-scheme: 'internet-facing'
-        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: 'instance'
+  name: app-lb-svc
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
 spec:
-    type: LoadBalancer
-    selector:
-        app: app1
-    ports:
-        - name: http
-          port: 80
-          targetPort: 8080
+  type: LoadBalancer
+  selector:
+    app: app1
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
 ```
 
 테스트를 위해 대상 그룹의 타입을 Instance로 설정한다. 실제 서비스에선 IP 타입으로 설정하는 것을 권장한다.
@@ -478,7 +478,7 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
 
 ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/e1ac99c6-8c19-42a0-94fe-ba59a52f0d94.png)
 
-이제 Nginx Ingress Controller 설치는 되었고, Ingress와 연결하기 위해 Deployment 앱들에 대해 ClusterIP 서비스를 만들어주자.
+이제 Nginx Ingress Controller 설치는 되었고, Ingress와 연결하기 위해 Deployment 앱들에 대해 ClusterIP 서비스를 만들어주자. 
 
 ```yaml
 # app-clusterip.yaml
@@ -486,28 +486,28 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
 apiVersion: v1
 kind: Service
 metadata:
-    name: app1-svc
+  name: app1-svc
 spec:
-    type: ClusterIP
-    selector:
-        app: app1
-    ports:
-        - name: http
-          port: 3000
-          targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app1
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    name: app2-svc
+  name: app2-svc
 spec:
-    type: ClusterIP
-    selector:
-        app: app2
-    ports:
-        - name: http
-          port: 3000
-          targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app2
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 8080
 ```
 
 이제부터 두개의 Deployment를 모두 사용하니 서비스도 두개를 만들어주자.
@@ -520,9 +520,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
-    name: nginx
+  name: nginx
 spec:
-    controller: k8s.io/ingress-nginx
+  controller: k8s.io/ingress-nginx
 ```
 
 그리고 Ingress 오브젝트를 아래와 같이 작성하자.
@@ -533,29 +533,29 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-    name: app-ingress
-    annotations:
-        nginx.ingress.kubernetes.io/use-regex: 'true'
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
-    ingressClassName: nginx
-    rules:
-        - http:
-              paths:
-                  - path: /v1(/|$)(.*)
-                    pathType: ImplementationSpecific
-                    backend:
-                        service:
-                            name: app1-svc
-                            port:
-                                number: 3000
-                  - path: /v2(/|$)(.*)
-                    pathType: ImplementationSpecific
-                    backend:
-                        service:
-                            name: app2-svc
-                            port:
-                                number: 3000
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /v1(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: app1-svc
+                port:
+                  number: 3000
+          - path: /v2(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: app2-svc
+                port:
+                  number: 3000
 ```
 
 여기서 `rewrite-target`은 대상 서비스로 경로를 보낼 때 어떻게 할지를 정한다. 없다면 `/v1/foo`와 같이 그대로 들어가는데, Express에선 `/`에서 값을 반환하므로 해당 옵션을 사용해주었다.
@@ -589,17 +589,17 @@ ingress.networking.k8s.io/app-ingress   nginx   *       172.20.174.15   80      
 
 ## ALB Ingress
 
-> ALB Ingress Controller를 실습하기 앞서, Deployment 매니페스트를 조금 수정해야한다.
->
-> ALB Ingress Controller는 Nginx Ingress Controller 처럼 경로의 정규식/캡처 그룹 등을 인식하지 못하고 rewrite 등의 옵션이 없다.
->
+> ALB Ingress Controller를 실습하기 앞서, Deployment 매니페스트를 조금 수정해야한다. 
+> 
+> ALB Ingress Controller는 Nginx Ingress Controller 처럼 경로의 정규식/캡처 그룹 등을 인식하지 못하고 rewrite 등의 옵션이 없다. 
+> 
 > 그래서 API 서버 애플리케이션에서 엔드포인트에 `v1`, `v2`를 포함하도록 Global Prefix 등을 추가하도록 수정해야 한다.
->
+> 
 > 때문에 아래와 같은 환경 변수를 추가 후 적용시켜 실습해야 한다. (필자의 `rlawnsdud/testapp` 한정)
->
+> 
 > ```yaml
 > - name: GLOBAL_PREFIX
->   value: '/v1' # app2에 /v2로 변경 후 추가
+  value: "/v1" # app2에 /v2로 변경 후 추가
 > ```
 
 ALB Ingress Controller를 사용하기 위해선 따로 설치를 해줘야 한다.
@@ -611,7 +611,7 @@ curl -fsSL -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/
 
 aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam-policy.json
 
-# {ACCOUNT_ID}에 계정 ID를 넣어줘야 한다.
+# {ACCOUNT_ID}에 계정 ID를 넣어줘야 한다. 
 eksctl create iamserviceaccount \
   --cluster eks-test \
   --namespace kube-system \
@@ -642,32 +642,32 @@ helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-contro
 apiVersion: v1
 kind: Service
 metadata:
-    name: app1-svc
-    annotations:
-        alb.ingress.kubernetes.io/healthcheck-path: /v1/health
+  name: app1-svc
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /v1/health
 spec:
-    type: ClusterIP
-    selector:
-        app: app1
-    ports:
-        - name: http
-          port: 3000
-          targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app1
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    name: app2-svc
-    annotations:
-        alb.ingress.kubernetes.io/healthcheck-path: /v2/health
+  name: app2-svc
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /v2/health
 spec:
-    type: ClusterIP
-    selector:
-        app: app2
-    ports:
-        - name: http
-          port: 3000
-          targetPort: 8080
+  type: ClusterIP
+  selector:
+    app: app2
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 8080
 ```
 
 다른 점이 있다면 해당 ClusterIP 서비스가 곧 대상 그룹이 되므로, 각각의 서비스에 ALB Health Check 경로를 입력해줘야 한다는 점이 다르다.
@@ -678,9 +678,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
-    name: alb
+  name: alb
 spec:
-    controller: ingress.k8s.aws/alb
+  controller: ingress.k8s.aws/alb
 ```
 
 그러면 `ingressClassName: alb`를 통해 해당 ALB Ingress Controller를 사용할 수 있다.
@@ -691,30 +691,30 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-    name: app-ingress
-    annotations:
-        kubernetes.io/ingress.class: alb
-        alb.ingress.kubernetes.io/scheme: internet-facing
-        alb.ingress.kubernetes.io/target-type: ip
+  name: app-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
 spec:
-    ingressClassName: alb
-    rules:
-        - http:
-              paths:
-                  - path: /v1/*
-                    pathType: Prefix
-                    backend:
-                        service:
-                            name: app1-svc
-                            port:
-                                number: 3000
-                  - path: /v2/*
-                    pathType: Prefix
-                    backend:
-                        service:
-                            name: app2-svc
-                            port:
-                                number: 3000
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /v1/*
+            pathType: Prefix
+            backend:
+              service:
+                name: app1-svc
+                port:
+                  number: 3000
+          - path: /v2/*
+            pathType: Prefix
+            backend:
+              service:
+                name: app2-svc
+                port:
+                  number: 3000
 ```
 
 그리고 조금 기다리면 아래와 같이 ALB가 프로비저닝이 된걸 볼 수 있다. 해당 로드밸런서를 자세히 보자.
@@ -737,7 +737,7 @@ HTTP(80)만 설정해주었기 때문에 리스너엔 HTTP:80만 보여진다. �
 
 ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/3481c518-d2bf-4611-b5ad-00983dd98e25.png)
 
-이처럼 경로에 따라 서비스 분산도 되고, 로드밸런싱도 잘 되는 모습을 볼 수 있다.
+이처럼 경로에 따라 서비스 분산도 되고, 로드밸런싱도 잘 되는 모습을 볼 수 있다. 
 
 이상으로 쿠버네티스(EKS)에서 3개의 서비스(ClusterIP, NodePort, LoadBalancer)와 2개의 Ingress(Nginx, ALB) 실습을 해보았다.
 

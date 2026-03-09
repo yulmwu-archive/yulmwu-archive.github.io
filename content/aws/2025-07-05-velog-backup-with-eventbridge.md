@@ -1,19 +1,19 @@
 ---
-title: '[AWS Misc] Backup Velog periodically (Lambda, EventBridge Scheduler, S3)'
-description: 'AWS Lambda + EventBridge Scheduler를 통한 주기적인 Velog 백업 자동화'
-slug: '2025-07-05-velog-backup-with-eventbridge'
+title: "[AWS Misc] Backup Velog periodically (Lambda, EventBridge Scheduler, S3)"
+description: "AWS Lambda + EventBridge Scheduler를 통한 주기적인 Velog 백업 자동화"
+slug: "2025-07-05-velog-backup-with-eventbridge"
 author: yulmwu
 date: 2025-07-05T04:23:58.191Z
 updated_at: 2026-02-11T13:34:19.943Z
-categories: ['AWS']
-tags: ['Misc', 'aws']
+categories: ["AWS"]
+tags: ["Misc", "aws"]
 series:
-    name: AWS
-    slug: aws
-thumbnail: ../../thumbnails/aws/velog-backup-with-eventbridge.png
+  name: AWS
+  slug: aws
+thumbnail: https://mirror-cdn.swua.kr/thumbnails/aws/velog-backup-with-eventbridge_960x540.png
 linked_posts:
-    previous: 2025-07-05-aws-cloudfront-lambda-image-resizing
-    next: 2025-07-05-aws-secrets-manager-key-rotation-lambda
+  previous: 2025-07-05-aws-cloudfront-lambda-image-resizing
+  next: 2025-07-05-aws-secrets-manager-key-rotation-lambda
 is_private: false
 ---
 
@@ -32,7 +32,7 @@ is_private: false
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/0cda45f2-fba6-465f-bda7-6fb41bfc4788.png)
 
 > 해당 포스팅에서 사용한 소스코드는 아래의 깃허브 레포지토리에서 확인할 수 있다.
->
+> 
 > https://github.com/yulmwu/velog-backup
 
 ---
@@ -70,7 +70,6 @@ GraphQL을 설명하기 전에 REST API가 무엇이고 어떠한 한계가 있�
 ```
 GET /api/users/kim
 ```
-
 ```js
 {
 	"username": "Kim Jun Young",
@@ -80,7 +79,7 @@ GET /api/users/kim
   	"role": "admin",
   	"followers": [ ... ],
 	... (중략)
-
+  	
 }
 ```
 
@@ -100,7 +99,7 @@ GET /api/users/kim
 
 다른 예시로 게시글을 가져오는데, 유저에 대한 자세한 정보도 필요하여 해당 게시글에 있는 유저 ID를 바탕으로 유저의 정보를 가져오는 API를 한번 더 호출하게 된다.
 
-이 과정에서 Over Fetching도 발생할 수 있으며, 이렇게 문제가 지속되어 규모가 커지면 네트워크적 리소스 낭비도 심해지게 된다.
+이 과정에서 Over Fetching도 발생할 수 있으며, 이렇게 문제가 지속되어 규모가 커지면 네트워크적 리소스 낭비도 심해지게 된다. 
 
 이러한 문제는 REST API의 한계점으로, 이를 보완하기 위해 GraphQL 형태의 API 구조가 생겨나게 됐다.
 
@@ -108,7 +107,7 @@ GET /api/users/kim
 
 그럼 Over/Under Fetching의 확실한 해결책은 무엇일까? 바로 한번의 요청으로 필요한 요소만 가져오면 된다.
 
-그러한 방식을 사용하는 대표적이고 자주 사용하는 개념이 있는데, 바로 SQL이다. RDBMS에서 데이터를 관리하고 조작하기 위한 쿼리 언어이다.
+그러한 방식을 사용하는 대표적이고 자주 사용하는 개념이 있는데, 바로 SQL이다. RDBMS에서 데이터를 관리하고 조작하기 위한 쿼리 언어이다. 
 
 그러한 쿼리 언어를 API에 적용한 것이 GraphQL이다.
 
@@ -116,10 +115,10 @@ GraphQL은 아래와 같이 자체적인 쿼리 언어를 사용하여 요청을
 
 ```graphql
 query GetUser($username: String) {
-	user(username: $username) {
-		username
-		followers
-	}
+    user(username: $username) {
+        username
+        followers
+    }
 }
 ```
 
@@ -137,7 +136,7 @@ GraphQL API의 구현을 다루는 것이 아니기 때문에 본 포스팅에�
 
 NodeJS의 GraphQL 요청 클라이언트 구현체 중 대표적으로 프론트엔드(특히 리액트)에서 자주 사용되는 `apollo-client`, 가볍고 심플한 `graphql-request` 등이 있다.
 
-전자는 세부적인 설정을 지원하나, 본 포스팅에선 간편한 `graphql-request` 라이브러리를 사용할 것이다.
+전자는 세부적인 설정을 지원하나, 본 포스팅에선 간편한 `graphql-request` 라이브러리를 사용할 것이다. 
 
 또한 타입스크립트와 함께 `codegen` 등의 도구를 사용하여 스키마를 미리 정의하고 타입 안전성을 챙길 수 있으며, 해당 포스팅에선 `codegen`도 같이 사용할 예정이다.
 
@@ -153,7 +152,7 @@ NodeJS의 GraphQL 요청 클라이언트 구현체 중 대표적으로 프론트
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/54e2de10-ecd9-442e-88b3-fef7f4975704.png)
 
-잘 작동하는 것이 보이며, `limit`은 `cursor`(글 ID)를 기준으로 하여 최근 몇개의 글을 가져올 것인지를 나타내고 최대 값은 100이다.
+잘 작동하는 것이 보이며, `limit`은 `cursor`(글 ID)를 기준으로 하여 최근 몇개의 글을 가져올 것인지를 나타내고 최대 값은 100이다. 
 
 그런데 테스트해보니 최대 값은 로직 상 100으로 제한이 되어있으나, 실제 테스트에선 50개까지만 가져오는 것을 확인할 수 있었다.
 때문에 안전하게 기본 값인 20개로 제한하도록 하였다.
@@ -164,25 +163,26 @@ NodeJS의 GraphQL 요청 클라이언트 구현체 중 대표적으로 프론트
 
 1. `cursor` 없이 최근 20개의 글을 가져온다.
 2. 가져온 글들 중 맨 마지막 글의 ID를 `cursor`로 설정하여 다시 20개의 글들 가져온다.
-3. 모든 글을 가져올 때 까지(가져온 글이 20개 미만이라면 종료) 2번을 반복한다.
+3. 모든 글을 가져올 때 까지(가져온 글이 20개 미만이라면 종료) 2번을 반복한다. 
 
 > 더욱 더 확실하게 보자면 velog의 소스코드는 [깃허브](https://github.com/velopert/velog-server)에 공개되어 있기 때문에 해당 소스코드를 참조하면 아래와 같은 GraphQL 스키마를 확인할 수 있다.
->
+> 
 > ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/7cf542e0-843c-4069-bc4d-0bfb5aefeba8.png)
->
+> 
 > ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/8fbcb8de-47ca-4b61-ace6-3bed7a4cafdd.png)
->
+> 
 > 여담으로 한가지 특이한것은 Lambda + API Gateway를 사용한 서버리스 아키텍처라는 것이다.
+
 
 ### (2) ReadPost
 
-특정한 글에 들어갔을 때 요청되는 GraphQL이다.
+특정한 글에 들어갔을 때 요청되는 GraphQL이다. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/f7e0e98c-9083-431f-9066-e50bcf83666f.png)
 
 Postman을 사용하여 글에 들어갔을 때 호출되는 `ReadPost`에 대한 GraphQL 요청을 날려보았다.
 
-만약 JWT 엑세스 토큰이 있다면 시리즈 등에 비공개 글이 표시되며, 검증되지 않았다면 공개 글만 표시된다.
+만약 JWT 엑세스 토큰이 있다면 시리즈 등에 비공개 글이 표시되며, 검증되지 않았다면 공개 글만 표시된다. 
 
 원래라면 SSR으로 본문의 내용을 GraphQL 요청으로 날리지 않고 HTML로 보내져오는데, 전 게시글/다음 게시글을 표시하기 위해 GraphQL 요청을 통해 가져오는 것을 확인하였다.
 
@@ -197,6 +197,7 @@ Postman을 사용하여 글에 들어갔을 때 호출되는 `ReadPost`에 대�
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/aa43b03e-ec75-484e-ae56-d6a4f8ffea31.png)
 
 하지만 프론트엔드에선 URL Slug를 통해 게시글을 가져오니 필자도 URL Slug를 사용하여 가져오도록 하겠다.
+
 
 # 2. Let's write the Code
 
@@ -223,26 +224,26 @@ const client = new GraphQLClient('https://v2.velog.io/graphql')
 const sdk = getSdk(client)
 
 const variables: VelogPostsQueryVariables = {
-	cursor: '',
-	limit: 10,
-	username: 'yulmwu',
+    cursor: '',
+    limit: 10,
+    username: 'yulmwu',
 }
 
 const fetchUser = async () => {
-	return await sdk.velogPosts(variables)
+    return await sdk.velogPosts(variables)
 }
 
 fetchUser()
-	.then((data) => {
-		console.log(data)
-		console.log('Total posts fetched:', data.posts?.length)
-	})
-	.catch((error) => console.error('Error fetching user:', error))
+    .then((data) => {
+        console.log(data)
+        console.log('Total posts fetched:', data.posts?.length)
+    })
+    .catch((error) => console.error('Error fetching user:', error))
 ```
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/a883d1f3-34d6-4c14-b885-9d41e4fdf99b.png)
 
-그럼 위와 같이 성공적으로 요청이 보내지며 로그가 찍히는 것을 볼 수 있다.
+그럼 위와 같이 성공적으로 요청이 보내지며 로그가 찍히는 것을 볼 수 있다. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/cbf87aa9-689d-4ef3-a95b-29a099b5ba53.png)
 
@@ -276,9 +277,9 @@ import dotenv from 'dotenv'
 dotenv.config({ quiet: true })
 
 const client = new GraphQLClient('https://v2.velog.io/graphql', {
-	headers: {
-		Authorization: `Bearer ${process.env.VELOG_JWT_ACCESS_TOKEN}`,
-	},
+    headers: {
+        Authorization: `Bearer ${process.env.VELOG_JWT_ACCESS_TOKEN}`,
+    },
 })
 ```
 
@@ -290,22 +291,22 @@ const client = new GraphQLClient('https://v2.velog.io/graphql', {
 const LIMIT = 20
 
 const fetchPosts = async (username: string, cursor?: string, posts: Post[] = []): Promise<Post[]> => {
-	const data = await sdk.velogPosts({
-		cursor,
-		limit: LIMIT,
-		username,
-	})
+    const data = await sdk.velogPosts({
+        cursor,
+        limit: LIMIT,
+        username,
+    })
 
-	if (data.posts && data.posts.length > 0) {
-		posts.push(...data.posts.filter((post): post is Post => post !== null))
+    if (data.posts && data.posts.length > 0) {
+        posts.push(...data.posts.filter((post): post is Post => post !== null))
 
-		if (data.posts.length < LIMIT) return posts
+        if (data.posts.length < LIMIT) return posts
 
-		const nextCursor = data.posts[data.posts.length - 1]?.id
-		if (nextCursor) await fetchPosts(username, nextCursor, posts)
-	}
+        const nextCursor = data.posts[data.posts.length - 1]?.id
+        if (nextCursor) await fetchPosts(username, nextCursor, posts)
+    }
 
-	return posts
+    return posts
 }
 ```
 
@@ -453,54 +454,54 @@ cron 표현 식에서 `*`는 모두(예: 1월~12월), `?`는 따로 지정하지
 name: Deploy Lambda
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Build with esbuild
-              run: npm run esbuild
+      - name: Build with esbuild
+        run: npm run esbuild
 
-            - name: Zip the code
-              run: |
-                  rm -rf code.zip
-                  zip code.zip build/index.js
+      - name: Zip the code
+        run: |
+          rm -rf code.zip
+          zip code.zip build/index.js
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v2
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ap-northeast-2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
-            - name: Update Lambda function code
-              run: |
-                  aws lambda update-function-code \
-                    --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
-                    --zip-file fileb://code.zip \
-                    --region ap-northeast-2
+      - name: Update Lambda function code
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
+            --zip-file fileb://code.zip \
+            --region ap-northeast-2
 
-            - name: Update Lambda environment variables
-              run: |
-                  aws lambda update-function-configuration \
-                    --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
-                    --environment "Variables={AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}" \
-                    --region ap-northeast-2
+      - name: Update Lambda environment variables
+        run: |
+          aws lambda update-function-configuration \
+            --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} \
+            --environment "Variables={AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}" \
+            --region ap-northeast-2
 ```
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/9e6ef3b2-4c54-40c8-95e6-8dd4baad7f82.png)
@@ -521,4 +522,5 @@ jobs:
 
 특히 이미지가 좀 많은 경우 더욱 심해질 듯 한데, 이미지는 CDN 링크 그대로 냅두고 글만 백업한다거나 방식을 바꿔 람다가 아닌 다른 EC2나 ECS와 같은 서비스를 이용하면 어떨까 싶다. (안쓸땐 꺼두고)
 
-끝.
+끝. 
+

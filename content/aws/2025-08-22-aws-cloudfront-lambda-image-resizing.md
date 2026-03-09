@@ -1,32 +1,32 @@
 ---
-title: '[AWS Misc] Image Resizing with AWS CloudFront + Lambda@Edge'
-description: 'AWS S3 + CloudFront + Lambda@Edge을 통한 이미지 리사이징 및 LCP 최적화'
-slug: '2025-08-22-aws-cloudfront-lambda-image-resizing'
+title: "[AWS Misc] Image Resizing with AWS CloudFront + Lambda@Edge"
+description: "AWS S3 + CloudFront + Lambda@Edge을 통한 이미지 리사이징 및 LCP 최적화"
+slug: "2025-08-22-aws-cloudfront-lambda-image-resizing"
 author: yulmwu
 date: 2025-08-22T01:58:08.671Z
 updated_at: 2026-03-06T13:53:07.193Z
-categories: ['AWS']
-tags: ['Misc', 'aws']
+categories: ["AWS"]
+tags: ["Misc", "aws"]
 series:
-    name: AWS
-    slug: aws
-thumbnail: ../../thumbnails/aws/aws-cloudfront-lambda-image-resizing.png
+  name: AWS
+  slug: aws
+thumbnail: https://mirror-cdn.swua.kr/thumbnails/aws/aws-cloudfront-lambda-image-resizing_960x540.png
 linked_posts:
-    previous: 2025-08-22-aws-click-heatmap-with-kds-msf-glue-athena
-    next: 2025-08-22-velog-backup-with-eventbridge
+  previous: 2025-08-22-aws-click-heatmap-with-kds-msf-glue-athena
+  next: 2025-08-22-velog-backup-with-eventbridge
 is_private: false
 ---
 
 > 해당 게시글은 [세명컴퓨터고등학교](https://smc.sen.hs.kr/) 보안과 동아리 세미나 발표 내용을 블로그 형식으로 정리한 글로, **본 글의 저작권은 [yulmwu (김준영)](https://github.com/yulmwu)에게 있습니다.** 개인적인 용도로만 사용 가능하며, 상업적 목적의 **무단 복제, 배포, 또는 변형을 금지합니다.**
->
+> 
 > 글에 오류가 댓글로 남겨주시거나 피드백해주시면 감사드리겠습니다.
 
 > 포스팅에서 사용한 소스코드는 깃허브에 올려두었습니다. 아래의 링크에 방문하여 확인하실 수 있습니다.
->
+> 
 > https://github.com/yulmwu/aws-image-resize-lambda
 >
 > 발표에 사용된 프레젠테이션(PPT)는 완성되는 대로 해당 포스팅에 첨부하겠습니다.
->
+> 
 > ...
 
 # 0. Overview
@@ -72,13 +72,13 @@ S3 + CloudFront를 통해 CDN을 만들고, 이미지들을 나열하는 단순�
 1. 이미지 업로드 후 S3 버킷에 리사이징된 이미지 저장
 2. 이미지 요청 시 즉석에서 리사이징 후 응답(On the Fly)
 
-첫번째의 경우 캐싱이 되지 않을 경우 유리하다. 버킷에 리사이징된 이미지가 저장되어 있기 때문에 해당 이미지를 가져오면 된다.
+첫번째의 경우 캐싱이 되지 않을 경우 유리하다. 버킷에 리사이징된 이미지가 저장되어 있기 때문에 해당 이미지를 가져오면 된다. 
 
 하지만 미리 정해진 사이즈로 리사이징된 이미지만 저장된다는 점과 버킷 저장 용량이 증가한다는 단점이 있다.
 
 두번째의 경우는 CloudFront와 같이 캐싱이 되는 경우 유리한데, 이미지를 동적으로 리사이징 후 캐싱하기 때문에 한번 처리하고 나면 빠르게 캐싱 + 리사이징된 이미지를 가져올 수 있다. (S3 버킷 저장 없음)
 
-다만 캐싱이 되기 전(Cache Miss) 첫번째 요청에 대해선 이미지 리사이징을 실시간으로 해야하기 때문에 그에 따른 레이턴시가 생기게 된다.
+다만 캐싱이 되기 전(Cache Miss) 첫번째 요청에 대해선 이미지 리사이징을 실시간으로 해야하기 때문에 그에 따른 레이턴시가 생기게 된다. 
 
 본 포스팅에선 2번째 방식을 사용한다.
 
@@ -94,7 +94,7 @@ S3 + CloudFront를 통해 CDN을 만들고, 이미지들을 나열하는 단순�
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/ee66adf8-1936-4d32-8f8d-5cd4811ba614.png)
 
-그런데 만약 캐싱된게 없다면 오리진(원본) 서버(S3 Origin)에서 해당 이미지를 가져오게 된다. 이때 오리진 서버에 CloudFront가 요청하는데, 이를 Origin Request라고 한다.
+그런데 만약 캐싱된게 없다면 오리진(원본) 서버(S3 Origin)에서 해당 이미지를 가져오게 된다. 이때 오리진 서버에 CloudFront가 요청하는데, 이를 Origin Request라고 한다. 
 
 오리진 서버의 응답(Origin Response)은 CloudFront로 돌아가 캐싱되고, 클라이언트에 최종적으로 응답한다. (Viewer Response)
 
@@ -112,7 +112,7 @@ Origin Request를 Lambda@Edge로 보낸 다음, 이미지를 S3 버킷에서 가
 
 그리고 파라미터가 제공되지 않았거나 파일 확장자가 지원하는 포맷이 아니라면 람다를 경유하여 지나가도록 하였다. (Through pass)
 
-다음으로 Lambda@Edge 함수 코드를 살펴보자.
+다음으로 Lambda@Edge 함수 코드를 살펴보자. 
 
 # 2. Let's write the Code
 
@@ -149,10 +149,10 @@ import { StreamingBlobPayloadOutputTypes } from '@smithy/types'
 
 type ImageExtension = 'png' | 'jpg' | 'jpeg' | 'webp' | 'gif'
 interface ParsedParams {
-	width?: number
-	height?: number
-	quality?: number
-	extension?: ImageExtension
+    width?: number
+    height?: number
+    quality?: number
+    extension?: ImageExtension
 }
 
 const S3_BUCKET = 'cf-image-resize-test-bucket'
@@ -163,242 +163,242 @@ const OUTPUT_MAX_BYTES = 1000 * 1000 // 1MB
 const ALLOWED_EXTENSIONS: ImageExtension[] = ['png', 'jpg', 'jpeg', 'webp', 'gif']
 
 class ImageResizeEdge {
-	private readonly s3: S3Client
+    private readonly s3: S3Client
 
-	constructor() {
-		this.s3 = new S3Client({ region: S3_BUCKET_REGION })
-	}
+    constructor() {
+        this.s3 = new S3Client({ region: S3_BUCKET_REGION })
+    }
 
-	async handle(event: CloudFrontRequestEvent): Promise<CloudFrontResultResponse> {
-		const request = event.Records[0].cf.request
+    async handle(event: CloudFrontRequestEvent): Promise<CloudFrontResultResponse> {
+        const request = event.Records[0].cf.request
 
-		const params = this.parseParams(request)
-		if (!this.shouldProcess(params)) {
-			return this.passThrough(request)
-		}
+        const params = this.parseParams(request)
+        if (!this.shouldProcess(params)) {
+            return this.passThrough(request)
+        }
 
-		const key = this.keyFromUri(request.uri)
-		if (!key) {
-			return this.badRequest('Invalid path.')
-		}
+        const key = this.keyFromUri(request.uri)
+        if (!key) {
+            return this.badRequest('Invalid path.')
+        }
 
-		let s3object: GetObjectCommandOutput
+        let s3object: GetObjectCommandOutput
 
-		try {
-			s3object = await this.getObject(key)
-		} catch (e: any) {
-			if (e.name === 'NoSuchKey') return this.notFound('Original image not found')
+        try {
+            s3object = await this.getObject(key)
+        } catch (e: any) {
+            if (e.name === 'NoSuchKey') return this.notFound('Original image not found')
 
-			return this.serverError('Error fetching image from S3', e)
-		}
+            return this.serverError('Error fetching image from S3', e)
+        }
 
-		if (typeof s3object.ContentLength === 'number' && s3object.ContentLength > S3_OBJECT_MAX_BYTES) {
-			return this.payloadTooLarge('Original image too large.')
-		}
+        if (typeof s3object.ContentLength === 'number' && s3object.ContentLength > S3_OBJECT_MAX_BYTES) {
+            return this.payloadTooLarge('Original image too large.')
+        }
 
-		try {
-			const buffer = await this.bufferFromBody(s3object.Body!)
-			const output = await this.transform(buffer, params)
+        try {
+            const buffer = await this.bufferFromBody(s3object.Body!)
+            const output = await this.transform(buffer, params)
 
-			if (output.byteLength > OUTPUT_MAX_BYTES) {
-				return this.payloadTooLarge('Image exceeds 1MB limit.')
-			}
+            if (output.byteLength > OUTPUT_MAX_BYTES) {
+                return this.payloadTooLarge('Image exceeds 1MB limit.')
+            }
 
-			return this.ok(output, this.contentTypeByExt(params.extension!))
-		} catch (e) {
-			return this.serverError('Image processing failed', e)
-		}
-	}
+            return this.ok(output, this.contentTypeByExt(params.extension!))
+        } catch (e) {
+            return this.serverError('Image processing failed', e)
+        }
+    }
 
-	private parseParams(req: CloudFrontRequest): ParsedParams {
-		const query = new URLSearchParams(req.querystring ?? '')
+    private parseParams(req: CloudFrontRequest): ParsedParams {
+        const query = new URLSearchParams(req.querystring ?? '')
 
-		return {
-			width: this.toInt(query.get('w') ?? undefined),
-			height: this.toInt(query.get('h') ?? undefined),
-			quality: this.toInt(query.get('q') ?? undefined, 1, 100),
-			extension: this.extensionFromUri(req.uri),
-		}
-	}
+        return {
+            width: this.toInt(query.get('w') ?? undefined),
+            height: this.toInt(query.get('h') ?? undefined),
+            quality: this.toInt(query.get('q') ?? undefined, 1, 100),
+            extension: this.extensionFromUri(req.uri),
+        }
+    }
 
-	private shouldProcess(params: ParsedParams): boolean {
-		if (!params.extension || !ALLOWED_EXTENSIONS.includes(params.extension)) return false
-		return Boolean(params.width || params.height || params.quality)
-	}
+    private shouldProcess(params: ParsedParams): boolean {
+        if (!params.extension || !ALLOWED_EXTENSIONS.includes(params.extension)) return false
+        return Boolean(params.width || params.height || params.quality)
+    }
 
-	private extensionFromUri(uri: string): ImageExtension | undefined {
-		const match = uri.match(/\.([a-zA-Z0-9]+)$/)
-		const raw = (match?.[1] || '').toLowerCase()
+    private extensionFromUri(uri: string): ImageExtension | undefined {
+        const match = uri.match(/\.([a-zA-Z0-9]+)$/)
+        const raw = (match?.[1] || '').toLowerCase()
 
-		return ALLOWED_EXTENSIONS.includes(raw as ImageExtension) ? (raw as ImageExtension) : undefined
-	}
+        return ALLOWED_EXTENSIONS.includes(raw as ImageExtension) ? (raw as ImageExtension) : undefined
+    }
 
-	private keyFromUri(uri: string): string | null {
-		let key = decodeURIComponent(uri)
-		if (key.startsWith('/')) key = key.slice(1)
-		if (key.includes('..')) return null
-		key = key.replace(/\/{2,}/g, '/')
-		return key.length ? key : null
-	}
+    private keyFromUri(uri: string): string | null {
+        let key = decodeURIComponent(uri)
+        if (key.startsWith('/')) key = key.slice(1)
+        if (key.includes('..')) return null
+        key = key.replace(/\/{2,}/g, '/')
+        return key.length ? key : null
+    }
 
-	private async getObject(key: string): Promise<GetObjectCommandOutput> {
-		return this.s3.send(new GetObjectCommand({ Bucket: S3_BUCKET, Key: key }))
-	}
+    private async getObject(key: string): Promise<GetObjectCommandOutput> {
+        return this.s3.send(new GetObjectCommand({ Bucket: S3_BUCKET, Key: key }))
+    }
 
-	private async transform(input: Buffer, p: ParsedParams): Promise<Buffer> {
-		const img = sharp(input, { animated: p.extension === 'gif', limitInputPixels: 100_000_000 })
+    private async transform(input: Buffer, p: ParsedParams): Promise<Buffer> {
+        const img = sharp(input, { animated: p.extension === 'gif', limitInputPixels: 100_000_000 })
 
-		let stream = img
-		if (p.width || p.height) {
-			stream = stream.resize({ width: p.width, height: p.height, fit: 'inside', withoutEnlargement: true })
-		}
+        let stream = img
+        if (p.width || p.height) {
+            stream = stream.resize({ width: p.width, height: p.height, fit: 'inside', withoutEnlargement: true })
+        }
 
-		switch (p.extension) {
-			case 'jpg':
-			case 'jpeg':
-				stream = p.quality ? stream.jpeg({ quality: p.quality }) : stream.jpeg()
-				break
-			case 'png': {
-				stream = p.quality
-					? stream.png({ compressionLevel: this.pngCompressionLevel(p.quality) })
-					: stream.png()
-				break
-			}
-			case 'webp':
-				stream = p.quality ? stream.webp({ quality: p.quality }) : stream.webp()
-				break
-			case 'gif':
-				stream = stream.gif()
-				break
-		}
+        switch (p.extension) {
+            case 'jpg':
+            case 'jpeg':
+                stream = p.quality ? stream.jpeg({ quality: p.quality }) : stream.jpeg()
+                break
+            case 'png': {
+                stream = p.quality
+                    ? stream.png({ compressionLevel: this.pngCompressionLevel(p.quality) })
+                    : stream.png()
+                break
+            }
+            case 'webp':
+                stream = p.quality ? stream.webp({ quality: p.quality }) : stream.webp()
+                break
+            case 'gif':
+                stream = stream.gif()
+                break
+        }
 
-		return stream.toBuffer()
-	}
+        return stream.toBuffer()
+    }
 
-	private pngCompressionLevel(quality?: number): number {
-		if (typeof quality !== 'number') return 6
+    private pngCompressionLevel(quality?: number): number {
+        if (typeof quality !== 'number') return 6
 
-		return Math.max(0, Math.min(9, Math.round((100 - quality) / 11)))
-	}
+        return Math.max(0, Math.min(9, Math.round((100 - quality) / 11)))
+    }
 
-	private toInt(value?: string, min = 1, max = 8192): number | undefined {
-		if (!value) return undefined
+    private toInt(value?: string, min = 1, max = 8192): number | undefined {
+        if (!value) return undefined
 
-		const parsed = Number.parseInt(value, 10)
-		if (Number.isNaN(parsed)) return undefined
+        const parsed = Number.parseInt(value, 10)
+        if (Number.isNaN(parsed)) return undefined
 
-		return Math.min(Math.max(parsed, min), max)
-	}
+        return Math.min(Math.max(parsed, min), max)
+    }
 
-	private contentTypeByExt(ext: ImageExtension): string {
-		switch (ext) {
-			case 'jpg':
-			case 'jpeg':
-				return 'image/jpeg'
-			case 'png':
-				return 'image/png'
-			case 'webp':
-				return 'image/webp'
-			case 'gif':
-				return 'image/gif'
-		}
-	}
+    private contentTypeByExt(ext: ImageExtension): string {
+        switch (ext) {
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg'
+            case 'png':
+                return 'image/png'
+            case 'webp':
+                return 'image/webp'
+            case 'gif':
+                return 'image/gif'
+        }
+    }
 
-	private async bufferFromBody(body: StreamingBlobPayloadOutputTypes): Promise<Buffer> {
-		if (this.isBlobLike(body)) {
-			const ab = await (body as Blob).arrayBuffer()
-			return Buffer.from(ab)
-		}
-		if (this.isWebReadableStream(body)) {
-			const nodeReadable = Readable.fromWeb(body as WebReadableStream)
-			return this.streamToBuffer(nodeReadable)
-		}
-		return this.streamToBuffer(body as Readable)
-	}
+    private async bufferFromBody(body: StreamingBlobPayloadOutputTypes): Promise<Buffer> {
+        if (this.isBlobLike(body)) {
+            const ab = await (body as Blob).arrayBuffer()
+            return Buffer.from(ab)
+        }
+        if (this.isWebReadableStream(body)) {
+            const nodeReadable = Readable.fromWeb(body as WebReadableStream)
+            return this.streamToBuffer(nodeReadable)
+        }
+        return this.streamToBuffer(body as Readable)
+    }
 
-	private isBlobLike(x: unknown): x is Blob {
-		return typeof x === 'object' && x !== null && 'arrayBuffer' in (x as Record<string, unknown>)
-	}
+    private isBlobLike(x: unknown): x is Blob {
+        return typeof x === 'object' && x !== null && 'arrayBuffer' in (x as Record<string, unknown>)
+    }
 
-	private isWebReadableStream(x: unknown): x is WebReadableStream {
-		return typeof x === 'object' && x !== null && 'getReader' in (x as Record<string, unknown>)
-	}
+    private isWebReadableStream(x: unknown): x is WebReadableStream {
+        return typeof x === 'object' && x !== null && 'getReader' in (x as Record<string, unknown>)
+    }
 
-	private async streamToBuffer(stream: Readable): Promise<Buffer> {
-		return new Promise<Buffer>((resolve, reject) => {
-			const chunks: Buffer[] = []
-			stream.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c as ArrayBufferLike)))
-			stream.on('end', () => resolve(Buffer.concat(chunks)))
-			stream.on('error', reject)
-		})
-	}
+    private async streamToBuffer(stream: Readable): Promise<Buffer> {
+        return new Promise<Buffer>((resolve, reject) => {
+            const chunks: Buffer[] = []
+            stream.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c as ArrayBufferLike)))
+            stream.on('end', () => resolve(Buffer.concat(chunks)))
+            stream.on('error', reject)
+        })
+    }
 
-	private headers(contentType?: string): CloudFrontHeaders {
-		const maxAge = 30 * 24 * 60 * 60
-		const h: CloudFrontHeaders = {
-			'cache-control': [{ value: `public, max-age=${maxAge}, immutable` }],
-			vary: [{ value: 'Accept,Accept-Encoding' }],
-		}
-		if (contentType) h['content-type'] = [{ value: contentType }]
-		return h
-	}
+    private headers(contentType?: string): CloudFrontHeaders {
+        const maxAge = 30 * 24 * 60 * 60
+        const h: CloudFrontHeaders = {
+            'cache-control': [{ value: `public, max-age=${maxAge}, immutable` }],
+            vary: [{ value: 'Accept,Accept-Encoding' }],
+        }
+        if (contentType) h['content-type'] = [{ value: contentType }]
+        return h
+    }
 
-	private ok(body: Buffer, contentType: string): CloudFrontResultResponse {
-		return {
-			status: '200',
-			statusDescription: 'OK',
-			bodyEncoding: 'base64',
-			body: body.toString('base64'),
-			headers: this.headers(contentType),
-		}
-	}
+    private ok(body: Buffer, contentType: string): CloudFrontResultResponse {
+        return {
+            status: '200',
+            statusDescription: 'OK',
+            bodyEncoding: 'base64',
+            body: body.toString('base64'),
+            headers: this.headers(contentType),
+        }
+    }
 
-	private badRequest(msg: string): CloudFrontResultResponse {
-		return {
-			status: '400',
-			statusDescription: 'Bad Request',
-			body: msg,
-			headers: this.headers('text/plain; charset=utf-8'),
-		}
-	}
+    private badRequest(msg: string): CloudFrontResultResponse {
+        return {
+            status: '400',
+            statusDescription: 'Bad Request',
+            body: msg,
+            headers: this.headers('text/plain; charset=utf-8'),
+        }
+    }
 
-	private notFound(msg: string): CloudFrontResultResponse {
-		return {
-			status: '404',
-			statusDescription: 'Not Found',
-			body: msg,
-			headers: this.headers('text/plain; charset=utf-8'),
-		}
-	}
+    private notFound(msg: string): CloudFrontResultResponse {
+        return {
+            status: '404',
+            statusDescription: 'Not Found',
+            body: msg,
+            headers: this.headers('text/plain; charset=utf-8'),
+        }
+    }
 
-	private payloadTooLarge(msg: string): CloudFrontResultResponse {
-		return {
-			status: '413',
-			statusDescription: 'Payload Too Large',
-			body: msg,
-			headers: this.headers('text/plain; charset=utf-8'),
-		}
-	}
+    private payloadTooLarge(msg: string): CloudFrontResultResponse {
+        return {
+            status: '413',
+            statusDescription: 'Payload Too Large',
+            body: msg,
+            headers: this.headers('text/plain; charset=utf-8'),
+        }
+    }
 
-	private serverError(msg: string, error: any): CloudFrontResultResponse {
-		console.error(msg, error)
+    private serverError(msg: string, error: any): CloudFrontResultResponse {
+        console.error(msg, error)
 
-		return {
-			status: '500',
-			statusDescription: 'Server Error',
-			body: msg,
-			headers: this.headers('text/plain; charset=utf-8'),
-		}
-	}
+        return {
+            status: '500',
+            statusDescription: 'Server Error',
+            body: msg,
+            headers: this.headers('text/plain; charset=utf-8'),
+        }
+    }
 
-	private passThrough(req: CloudFrontRequest): CloudFrontResultResponse {
-		return req as unknown as CloudFrontResultResponse
-	}
+    private passThrough(req: CloudFrontRequest): CloudFrontResultResponse {
+        return req as unknown as CloudFrontResultResponse
+    }
 }
 
 export const handler = async (event: CloudFrontRequestEvent): Promise<CloudFrontResultResponse> => {
-	const service = new ImageResizeEdge()
-	return service.handle(event)
+    const service = new ImageResizeEdge()
+    return service.handle(event)
 }
 ```
 
@@ -414,7 +414,7 @@ https://github.com/yulmwu/aws-image-resize-lambda
 
 # 3. Let's build the Infra
 
-이제 AWS 아키텍처를 만들어보자.
+이제 AWS 아키텍처를 만들어보자. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/0a33d84f-d151-4cf9-940a-e74b344e4ba7.png)
 
@@ -492,7 +492,7 @@ https://github.com/yulmwu/aws-image-resize-lambda
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/14b3011d-b3a8-4ea8-844b-409d6ed292a4.png)
 
-IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 버킷을 하나 만들자.
+IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 버킷을 하나 만들자. 
 
 ## (2) S3 Bucket
 
@@ -510,7 +510,7 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 
 ## (3) CloudFront
 
-그리고 CloudFront 배포를 설정하자.
+그리고 CloudFront 배포를 설정하자. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/8f2ba9d3-e332-42a0-a795-f5ebfcedb69b.png)
 
@@ -561,7 +561,7 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 
 ## (4) Lambda@Edge
 
-이름만 Lambda@Edge이지 생성 방법이나 배포 방법은 일반 람다 함수랑 똑같다. 다만 중요한 점이 있는데, Lambda@Edge는 기본적으로 `us-east-1`(버지니아 북부) 리전에서 생성된 람다 함수만 사용할 수 있다.
+이름만 Lambda@Edge이지 생성 방법이나 배포 방법은 일반 람다 함수랑 똑같다. 다만 중요한 점이 있는데, Lambda@Edge는 기본적으로 `us-east-1`(버지니아 북부) 리전에서 생성된 람다 함수만 사용할 수 있다. 
 
 때문에 `us-east-1`으로 리전을 변경한 뒤 람다 함수를 생성해주자.
 
@@ -569,7 +569,7 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/ef413d47-e699-4c2b-819d-2ac2d5b8748a.png)
 
-실행 역할은 아까 생성해두었던 IAM 역할을 선택한다.
+실행 역할은 아까 생성해두었던 IAM 역할을 선택한다. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/24451c60-1dc8-44f9-afa0-b8770eb60ab2.png)
 
@@ -579,7 +579,7 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 
 제한 시간 안에 이미지 처리가 끝나지 않을 경우 502 또는 503 에러가 뜨게 된다. 코드 상으로 버킷으로 부터 가져올 수 있는 이미지의 최대 크기는 3MB이므로 1GB 메모리에 제한 시간 15초 정도면 괜찮을 것이다. (이 경우엔 적절한 스윗 스팟을 찾아야 한다.)
 
-그리고 이제 소스코드를 람다 함수에 배포해야 하는데, 아까 말했듯이 `sharp` 라이브러리가 네이티브 라이브러리를 포함하고 있어 Amazon Linux 2 환경에서 빌드해야 한다.
+그리고 이제 소스코드를 람다 함수에 배포해야 하는데, 아까 말했듯이 `sharp` 라이브러리가 네이티브 라이브러리를 포함하고 있어 Amazon Linux 2 환경에서 빌드해야 한다. 
 
 예전엔 Cloud9을 통해 온라인으로 코드를 수정하고 터미널을 열어 빌드할 수 있었으나, 서비스가 종료되어 그 대신 CloudShell을 이용하기로 하였다. 기본적인 AWS CLI, NodeJS 등은 설치되어 있으니 문제 없다.
 
@@ -601,7 +601,7 @@ git clone https://github.com/yulmwu/aws-image-resize-lambda.git
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/6e56853f-a89f-4b3c-9b7b-0bf5408b7429.png)
 
-그리고 `npm i` 또는 `npm ci`를 통해 의존성을 설치하고, `node esbuild.config.js` 명령어를 통해 타입스크립트를 빌드하자.
+그리고 `npm i` 또는 `npm ci`를 통해 의존성을 설치하고, `node esbuild.config.js` 명령어를 통해 타입스크립트를 빌드하자. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/c1885588-3a3b-41de-b1c7-c39ee1ce996e.png)
 
@@ -684,7 +684,7 @@ LightHouse 또한 처참했던 LCP가 매우 정상 범위로 들어섰으며, �
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/dada295b-3cef-442a-9700-b1678002a17f.png)
 
-그렇게 사진이 리사이징되어 줄어들었어도 유저가 육안으로 보기엔 화질이 깨지거나 흐릿해지는 부분은 없다.
+그렇게 사진이 리사이징되어 줄어들었어도 유저가 육안으로 보기엔 화질이 깨지거나 흐릿해지는 부분은 없다. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/488d8466-53f3-46e8-96b1-edb5a113e974.png)
 
@@ -710,9 +710,9 @@ AWS Pricing Calculator와 같은 도구를 사용하여 계산할 수 도 있지
 
 ## S3 GET Request Price (Standard)
 
-원래 AWS 서비스(S3 등)에서 CloudFront로 Transfer되는 데이터는 요금이 부과되지 않는다.
+원래 AWS 서비스(S3 등)에서 CloudFront로 Transfer되는 데이터는 요금이 부과되지 않는다. 
 
-하지만 코드에선 어쩔 수 없이 AWS SDK를 사용하여 S3 Bucket에 직접 GET을 통해 이미지를 가져오는 로직이므로 GET 요청에 대한 요금이 부과된다.
+하지만 코드에선 어쩔 수 없이 AWS SDK를 사용하여 S3 Bucket에 직접 GET을 통해 이미지를 가져오는 로직이므로 GET 요청에 대한 요금이 부과된다. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/271b3865-dc4c-4a1f-ba4b-e089ad46e45b.png)
 
@@ -748,14 +748,15 @@ _참고: https://aws.amazon.com/ko/cloudfront/pricing_
 
 요금 표에선 10,000개의 요청을 기준으로 대한민국엔 0.0120\$가 부과된다. 즉 $100 × 0.0120$, CloudFront HTTPS 요청 비용으론 **1.2$**가 부과된다.
 
+
 ## Lambda@Edge Price
 
-> 참고로 2025년 8월 1일부터 람다 실행 시간 요금에서 INIT 단계도 포함된다.
->
+> 참고로 2025년 8월 1일부터 람다 실행 시간 요금에서 INIT 단계도 포함된다. 
+> 
 > ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/26d3ab16-81f4-4c04-81a3-251f6b78225f.png)
->
+> 
 > 이로 인해 Cold Start가 많아질수록 요금이 더욱 부과될 수 있으니 참고하자.
->
+> 
 > 참고: https://aws.amazon.com/ko/blogs/compute/aws-lambda-standardizes-billing-for-init-phase
 
 Lambda@Edge 경우 기존의 람다와는 살짝 다르며, 요금이 살짝 더 비싸다. Lambda@Edge도 마찬가지로 2가지의 요소로 요금이 부과된다.
@@ -799,6 +800,7 @@ $381GB × 0.120\$ = 45.72\$$
 
 즉 이미지 리사이징 적용 후 CloudFront 비용의 2배가 되는 것이다. 클라이언트 입장에서도 LCP가 높아지고, 요금도 더욱 발생하게 되니 적용하는 것이 여러므로 유리한 것이다.
 
+
 # 6. Troubleshooting
 
 마지막으로 구축하면서 발생했던 문제들에 대해 다뤄볼까 한다.
@@ -824,7 +826,7 @@ $381GB × 0.120\$ = 45.72\$$
 
 ## Lambda Concurrent Execution Quota
 
-그래서 테스트로 30개 정도로 늘려보려고 했는데, 기본이 1000개라며 1000개 이상으로 설정하라고 에러를 띄웠다.
+그래서 테스트로 30개 정도로 늘려보려고 했는데, 기본이 1000개라며 1000개 이상으로 설정하라고 에러를 띄웠다. 
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/3f55b043-4ce5-4622-8e95-ef8de5e9e726.png)
 
@@ -834,7 +836,7 @@ https://repost.aws/ko/questions/QUV9m5TMQCQCG5bimoYCLM7A/aws-lambda-edge-executi
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/2b1c1126-20c6-456a-85b0-a4bff4b6bd71.png)
 
-요약: Lambda@Edge도 람다 할당량(동시성 제한)을 따른다.
+요약: Lambda@Edge도 람다 할당량(동시성 제한)을 따른다. 
 
 지금 생각해보면 당연한 이야기지만 검색해도 확실하진 않아 질문했었다. 추가적으로 꼭 동시성 제한을 1000개 이상 설정해야 되는지도 문의했었다.
 
@@ -850,7 +852,7 @@ https://repost.aws/ko/questions/QUV9m5TMQCQCG5bimoYCLM7A/aws-lambda-edge-executi
 
 ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/b4a75599-f612-4654-8059-9ba6a56f9708.png)
 
-이로써 503 Lambda Limit Exceeded from Cloudfront 에러를 해결할 수 있었다. 혹시 같은 문제가 있다면 참고하자.
+이로써 503 Lambda Limit Exceeded from Cloudfront 에러를 해결할 수 있었다. 혹시 같은 문제가 있다면 참고하자. 
 
 ---
 
