@@ -92,9 +92,15 @@ const PostCard = ({ post, cfg }: { post: QuartzPluginData; cfg: any }) => {
 	const title = post.frontmatter?.title || post.slug
 	const description = post.description || ''
 	const tags = post.frontmatter?.tags || []
+	const thumbnail = post.frontmatter?.thumbnail as string | undefined
 
 	return (
 		<a href={`/${post.slug}`} class="post-card">
+			{thumbnail && (
+				<div class="post-thumbnail">
+					<img src={thumbnail} alt={title} loading="lazy" />
+				</div>
+			)}
 			<div class="post-card-content">
 				<h3 class="post-title">{title}</h3>
 				{description && <p class="post-description">{description}</p>}
@@ -156,7 +162,7 @@ const CollapsibleSection = ({
 		<div class="posts-section">
 			{directory !== 'root' && (
 				<>
-					<input type="checkbox" id={checkboxId} class="section-toggle" defaultChecked />
+					<input type="checkbox" id={checkboxId} class="section-toggle" />
 					<label htmlFor={checkboxId} class="section-header">
 						<span class="expand-icon" aria-hidden="true"></span>
 						<h2 class="section-title">{title}</h2>
