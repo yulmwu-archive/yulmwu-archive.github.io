@@ -4,7 +4,7 @@ description: '쿠버네티스의 GC(Garbage Collection)와 OwnerReferences, Fina
 slug: '2025-12-09-kubernetes-gc-ownerreferences-finalizer'
 author: yulmwu
 date: 2025-12-09T03:03:45.564Z
-updated_at: 2026-03-02T08:28:48.307Z
+updated_at: 2026-03-08T15:42:08.357Z
 categories: ['Kubernetes']
 tags: ['kubernetes']
 series:
@@ -25,7 +25,7 @@ is_private: false
 
 쿠버네티스도 GC가 존재한다. 쿠버네티스의 GC는 리소스를 일관되게 삭제하기 위하여 존재한다. 예시로 Deployment 리소스를 만들면 Deployment 리소스 자체만 생성되는게 아닌 ReplicaSet, 그리고 그 아래에 Pod 리소스가 생성된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/16cfd121-faf1-4799-986a-e96f5aa870cf/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-09-kubernetes-gc-ownerreferences-finalizer/16cfd121-faf1-4799-986a-e96f5aa870cf.png)
 
 우리가 Deployment를 삭제하게 된다면 Deployment 리소스 자체만 삭제되는 것 뿐만 아니라 ReplicaSet과 생성된 Pod들 또한 삭제가 되는 것을 확인해볼 수 있다.
 
@@ -145,7 +145,7 @@ metadata:
 
 만약 ALB와 연동된 Ingress를 지우게 된다면 컨트롤러에 의해 같이 생성된 AWS ALB(ELB) 또한 삭제가 되어야 할 것이다. 하지만 AWS ALB는 쿠버네티스 GC가 직접 삭제할 수 없기 때문에 컨트롤러에 의존하게 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d6ee667b-56ae-4aad-9770-9e69dcaac69c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-09-kubernetes-gc-ownerreferences-finalizer/d6ee667b-56ae-4aad-9770-9e69dcaac69c.png)
 
 하지만 모종의 이유로 컨트롤러가 동작하지 않아 Ingress 리소스 자체만 삭제가 되고 AWS ALB가 삭제되지 않은 상태로 남아있을 수 있다.
 

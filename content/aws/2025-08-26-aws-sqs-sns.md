@@ -31,7 +31,7 @@ https://velog.io/@yulmwu/aws-serverless
 
 짧게 설명하자면, 하나의 거대한 애플리케이션을 여러개의 작은 서비스(마이크로 서비스)로 분리하는 구조이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/97b68510-6b41-45cb-9d5a-17b7263a2b65/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/97b68510-6b41-45cb-9d5a-17b7263a2b65.png)
 
 사진과 같이 내부적으로 비즈니스 서비스들을 마이크로 서비스라는 단위로 분리한다.
 
@@ -53,13 +53,13 @@ RabbitMQ나 Kafka에 대한 내용은 나중에 따로 다뤄보도록 하고, �
 
 만약 메시지 브로커 없이 한번에 모두 끝낸다고 가정해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/59bd64c4-0d24-413d-b427-b7cb3cf4ac79/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/59bd64c4-0d24-413d-b427-b7cb3cf4ac79.png)
 
 한명의 유저에 메일을 보내는데 예시로 50ms가 걸린다고 가정해보자. 그럼 기존엔 30ms면 끝낼 처리를 메일 전송 때문에 총 230ms가 걸리게 된다.
 
 또한 MSA 구조에서 알림 서비스를 따로 분리시키는 경우도 있기 때문에 이렇게 한번에 로직을 처리하는건 비효율적이다. 그래서 메시지 브로커(SQS)를 사용한다면 아래와 같이 바뀔 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/edaabe62-7946-4ff1-aa18-493ef95e3334/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/edaabe62-7946-4ff1-aa18-493ef95e3334.png)
 
 알림(이메일)을 보내는 기능 자체를 다른 서비스로 분리시키고, 두 서비스 간엔 SQS 메시지 브로커를 통해 서로 상호작용한다.
 
@@ -67,7 +67,7 @@ RabbitMQ나 Kafka에 대한 내용은 나중에 따로 다뤄보도록 하고, �
 
 큐는 일종의 버퍼 역할도 하는데, 메시지가 바로 처리되는 것이 아닌 딜레이를 두거나 한번에 가져올 수 있는 메시지 수를 제한하여 백엔드의 부하를 막을 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0d46a5aa-7818-48a9-8fb5-448af2fa56df/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/0d46a5aa-7818-48a9-8fb5-448af2fa56df.png)
 
 사진에서 `DelaySeconds`는 메시지를 보낸 후 컨슈머가 큐에서 읽을 수 있게 노출되기 까지의 딜레이, `MaxNumberOfMessages`는 컨슈머에서 한번에 최대 몇개의 메시지를 Polling 할지 설정할 수 있다.
 (SQS는 RabbitMQ와 다르게 브로커에서 Push해서 컨슈머가 소비하는 방식이 아닌 컨슈머가 큐에 Polling하여 메시지를 가져온다.)
@@ -102,7 +102,7 @@ SQS에 대해선 3번째 목차(SQS: Let's build the Infra)에서 살짝 더 다
 
 그리고 컨슈머가 그 메시지를 처리했다면 SQS 큐에서 해당 메시지를 제거한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b9ccf7c5-21b6-4039-9e6c-943aa989498f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/b9ccf7c5-21b6-4039-9e6c-943aa989498f.png)
 
 그런데 모종의 이유로 컨슈머에서 실패하거나 컨슈머의 처리 제한 시간(Visibility Timeout, 큐에서 보여지지 않는 시간, 초과되면 실패로 간주함)을 초과하면 어떻게 될까?
 
@@ -114,7 +114,7 @@ SQS에 대해선 3번째 목차(SQS: Let's build the Infra)에서 살짝 더 다
 
 이를 이용하여 컨슈머의 무한 재시도를 방지하고, 서비스의 안정성을 유지하면서 문제의 원인을 쉽게 분석할 수 있게 할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7a75094d-a19f-45f1-9b44-6059969f418a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/7a75094d-a19f-45f1-9b44-6059969f418a.png)
 
 # 2. What is SNS ?
 
@@ -124,7 +124,7 @@ Exchange는 RabbitMQ에서 메시지를 어느 큐로 보낼지 라우팅하는 
 
 Topic 방식은 라우팅 키에 대해 패턴 매칭을 하여 키에 맞는 특정 큐로 메시지를 보내거나 Fanout 방식을 통해 브로드캐스팅 할 수 있다. (헤더 방식도 있으나 자세한 설명은 생략한다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d0e3edee-a14b-4716-90e2-16d130fd8d3c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/d0e3edee-a14b-4716-90e2-16d130fd8d3c.png)
 
 그런데 SQS는 이러한 좋은 기능을 기본적으로 탑재하고 있지 않은데, 이와 거의 흡사한 기능을 하는 서비스가 바로 SNS(Simple Notification Service)이다.
 
@@ -148,7 +148,7 @@ SQS 말고도 람다 함수나 EventBridge 연결, 이메일 전송 등의 여�
 
 또한 조건은 가능하나, RabbitMQ Topic Exchange와는 다르게 와일드카드를 사용할 수 없다. 그래서 `[{ "prefix": "order." }]` 등으로 접두사를 체크한다거나, `["order_created", "post_created"]` 등으로 조건과 같은 비교적 단순한 조건만 가능하다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2bbb6294-734d-4f4f-876d-c096caa14921/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/2bbb6294-734d-4f4f-876d-c096caa14921.png)
 
 다만 주의할 점은 RabbitMQ Exchange와 SNS 필터 정책은 겉보기엔 비슷해보이나, 차이가 있다. (애초에 SNS와 SQS는 별개의 서비스라는걸 잊으면 안된다.)
 
@@ -156,11 +156,11 @@ RabbitMQ Exchange는 큐 사이에 바인딩된 라우팅 키를 보고 브로�
 
 더 쉽게 말하자면 RabbitMQ는 끝까지 Push 하는 방식, SNS + SQS는 SNS가 SQS 큐 까진 Push 해주지만, 끝단의 컨슈머는 SQS 큐에서 Polling 방식으로 메시지를 가져오는 방식인 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7904c8c4-365e-4449-a5a2-a78834a2f669/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/7904c8c4-365e-4449-a5a2-a78834a2f669.png)
 
 (RabbitMQ 동작 과정)
 
-![](https://velog.velcdn.com/images/yulmwu/post/6c38cb79-e5b3-4437-af12-d2746093709c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/6c38cb79-e5b3-4437-af12-d2746093709c.png)
 
 (SNS + SQS 동작 과정)
 
@@ -174,17 +174,17 @@ RabbitMQ와 비교하느라 말이 길어졌는데, 결론적으로 SNS는 메�
 
 먼저 SQS 큐를 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9d7ba031-4521-4bae-a4b5-b398f987c4cc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/9d7ba031-4521-4bae-a4b5-b398f987c4cc.png)
 
 "대기열(큐) 생성"을 클릭한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/298dd614-3947-4193-a65e-ea96c76f9e8f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/298dd614-3947-4193-a65e-ea96c76f9e8f.png)
 
 그럼 맨 처음 유형을 선택할 수 있는데, Standard와 FIFO 방식을 선택할 수 있다. Standard는 큐의 순서가 보장되지 않고 최선의 정렬을 해주기 때문에 퍼포먼스가 FIFO 유형보다 더 빠르다.
 
 반면 FIFO 방식은 기존의 큐 방식과 같으며, 선입선출로 순서가 보장된다. 순서가 상관 없다면 Standard를 선택하면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/448a2c54-7988-4d9b-90c1-d9fc42794f9d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/448a2c54-7988-4d9b-90c1-d9fc42794f9d.png)
 
 다음으로 구성에선 위와 같이 여러 항목들이 나온다. 각 항목을 살펴보면 아래와 같다.
 
@@ -195,13 +195,13 @@ RabbitMQ와 비교하느라 말이 길어졌는데, 결론적으로 SNS는 메�
 
 그 외에 IAM 등의 설정은 추후에 해보도록 하고, 큐를 만들어보도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b55be278-a719-4fea-a383-cbe6a4a7ceae/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/b55be278-a719-4fea-a383-cbe6a4a7ceae.png)
 
 그리고 "메시지 전송 및 수신" 버튼을 클릭하면 간단하게 메시지를 보내고 Long Polling을 해볼 수 있다.
 
 메시지 수신에서 "메시지 폴링" 버튼을 눌러보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4b9950ad-cbf9-4eb3-81ee-3b1cbdf95ae3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/4b9950ad-cbf9-4eb3-81ee-3b1cbdf95ae3.png)
 
 그럼 큐에 있는 최대 10개의 메시지들을 가져오게 되고, 만약 10개가 되지 않는다면 대기한다.
 
@@ -214,11 +214,11 @@ RabbitMQ와 비교하느라 말이 길어졌는데, 결론적으로 SNS는 메�
 
 MaxNumberOfMessages 때문에 복잡할 수 있는데, 다시 본론으로 돌아와 테스트를 해보자. "메시지 폴링" 버튼을 클릭한 상태로 아무 메시지를 보내보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8921bf40-adef-4ae6-a6b5-c0b148208009/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/8921bf40-adef-4ae6-a6b5-c0b148208009.png)
 
 그럼 "메시지 수신"에서 보낸 메시지가 도착한 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3a4ed6ff-920d-4c3f-952b-bf0aeee02641/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/3a4ed6ff-920d-4c3f-952b-bf0aeee02641.png)
 
 그대로 냅두면 처리되지 않은 상태로 다음 Polling 시 다시 가져오니 삭제를 해서 처리를 해주자.
 
@@ -226,17 +226,17 @@ MaxNumberOfMessages 때문에 복잡할 수 있는데, 다시 본론으로 돌�
 
 그리고 "메시지 폴링" 버튼을 클릭해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8977cdc2-5a2d-4dd3-8a9f-75d756dd7a0a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/8977cdc2-5a2d-4dd3-8a9f-75d756dd7a0a.png)
 
 그러면 빠르게 10개의 메시지가 가져와지고, 10개를 모두 가져온 뒤 Polling이 바로 종료된다.
 
 나타난 10개의 메시지를 모두 삭제하고 다시 Polling 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dfa8f486-29e5-4469-9f4a-80d4e4a482f0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/dfa8f486-29e5-4469-9f4a-80d4e4a482f0.png)
 
 그러면 3개의 메시지를 가져온 뒤 대기한다. (실제 API 호출에선 대기하는게 아닌 3개의 메시지를 가져온 뒤 가져온 뒤 바로 종료된다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d8fff267-ab5b-4baf-93e1-256988572fb0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/d8fff267-ab5b-4baf-93e1-256988572fb0.png)
 
 > **" 컨슈머 메시지 핸들러에서 비동기로 처리하면 큐엔 항상 하나의 메시지와 ReceiveMessage 시 항상 하나의 메시지만 가져오는건 아닐까? (빠르게 비동기 핸들러로 배분되니깐) "**
 >
@@ -331,9 +331,9 @@ export class SqsProducerService {
 
 AWS SDK SQS 클라이언트를 사용하여 간단하게 메시지를 보내는 코드이다. 위 서비스만 연결해둔 상태로 실행해보고 AWS 콘솔로 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5c4daa87-ea59-41f4-9c07-8c37bd7266d1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/5c4daa87-ea59-41f4-9c07-8c37bd7266d1.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/473b2383-601c-4cff-b0c6-1943f4108e4b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/473b2383-601c-4cff-b0c6-1943f4108e4b.png)
 
 잘 나오는 것을 볼 수 있다. 이제 컨슈머 서비스 코드를 추가하여 잘 처리되는지 확인해보자.
 
@@ -445,55 +445,55 @@ AWS SDK를 직접 사용하지 않고 써드파티 라이브러리를 사용하�
 
 Postman에서 아래의 사진과 같이 요청을 보내보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f40f5bc3-b63e-4456-8aa5-231b691ae665/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/f40f5bc3-b63e-4456-8aa5-231b691ae665.png)
 
 그러면 서버의 로그에 아래와 같이 찍힐 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3f2b0120-1fc0-4bb4-a53e-4a6333a7524f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/3f2b0120-1fc0-4bb4-a53e-4a6333a7524f.png)
 
-성공이다. AWS 콘솔에서 보내는 메시지도 똑같이 테스트할 수 있다.![](https://velog.velcdn.com/images/yulmwu/post/147f9d35-e3d9-4c4a-81d1-9bab5e8eed07/image.png)
+성공이다. AWS 콘솔에서 보내는 메시지도 똑같이 테스트할 수 있다.![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/147f9d35-e3d9-4c4a-81d1-9bab5e8eed07.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/4a0dbc3c-11aa-4acf-aae8-d37ddf1c4a33/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/4a0dbc3c-11aa-4acf-aae8-d37ddf1c4a33.png)
 
 이때 만약 AWS 콘솔에서 Long Polling을 실행한다면 서버의 로그엔 아무것도 남지 않는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e9eede65-931b-492b-8cbb-38319f1a9e35/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/e9eede65-931b-492b-8cbb-38319f1a9e35.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/6081d0ea-6fc0-49fc-8be9-b004354b3f67/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/6081d0ea-6fc0-49fc-8be9-b004354b3f67.png)
 
 ## DLQ(Dead Letter Queue)
 
 그럼 DLQ는 어떻게 구현할까? 코드로 구현할 필요는 없고 SQS 설정에서 설정할 수 있다. 먼저 DLQ로 사용할 큐를 하나 만들어주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/039005d5-e244-4590-b4c9-a4419ac690bd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/039005d5-e244-4590-b4c9-a4419ac690bd.png)
 
 "리드라이브 허용 정책"에서 활성화를 해주고 모두 허용을 체크한다. 기본 값이 모두 허용이긴 한데 확실하게 해주기 위해 활성해두자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2607fbba-c35e-46bc-920b-47d7195fe623/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/2607fbba-c35e-46bc-920b-47d7195fe623.png)
 
 그리고 TestQueue에 들어가 "배달 못한 편지 대기열" 메뉴에 들어가보자. (그냥 큐 편집 버튼을 눌러도 된다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/11207cfc-dcc5-4eef-805e-f85783531cca/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/11207cfc-dcc5-4eef-805e-f85783531cca.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/fab6b4b0-ca78-4f97-9c06-7eedc11f32e2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/fab6b4b0-ca78-4f97-9c06-7eedc11f32e2.png)
 
 그럼 배달 못한 편지 대기열을 활성화하고 maxReceiveCount를 설정할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e342f058-d468-412f-9d72-a81f21f5a585/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/e342f058-d468-412f-9d72-a81f21f5a585.png)
 
 테스트를 위해 maxReceiveCount를 짧게 설정해주었다. 이제 서버를 키고 Postman에 들어가 아래와 같은 요청을 보내보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a958e4d5-34f9-4da8-a30a-8812ee78c4c3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/a958e4d5-34f9-4da8-a30a-8812ee78c4c3.png)
 
 그리고 20초 이상 기다린 후(visibilityTimeout를 10초로 설정해뒀기 때문) 서버의 로그를 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3b7643d3-e79a-4f07-bafd-d2b9eb5f0166/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/3b7643d3-e79a-4f07-bafd-d2b9eb5f0166.png)
 
 원래라면 무한으로 반복될 메시지 핸들링이 2번만 실행되고 멈춘걸 볼 수 있다. maxReceiveCount를 2로 설정해뒀기 때문이다. 이제 TestDLQ에서 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/286d99b5-24b6-48e5-8c41-92207f2d24df/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/286d99b5-24b6-48e5-8c41-92207f2d24df.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/84d94ff8-6960-43fb-8de8-551561de5696/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/84d94ff8-6960-43fb-8de8-551561de5696.png)
 
 에러가 발생되어 메시지가 컨슈머에 의해 처리(삭제)되지 않았고, maxReceiveCount(=2)를 초과하였기 때문에 TestDLQ로 리드라이브 된걸 볼 수 있다.
 
@@ -503,41 +503,41 @@ Postman에서 아래의 사진과 같이 요청을 보내보자.
 
 SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 해보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cd922964-d860-468c-8d0a-6a5658ed82cd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/cd922964-d860-468c-8d0a-6a5658ed82cd.png)
 
 "주제 생성"을 클릭한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/765f1ad8-53e5-42a6-bbcc-eec47982f004/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/765f1ad8-53e5-42a6-bbcc-eec47982f004.png)
 
 유형은 똑같이 Standard로 선택하였다. 필요 시 FIFO 유형으로 선택하면 될 것 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/71fda693-a94a-418e-a18e-2c1d6f95d93a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/71fda693-a94a-418e-a18e-2c1d6f95d93a.png)
 
 그러면 구독을 생성할 수 있다. 예시로 아까 SQS TestQueue 큐와 이메일 전송을 구독시키도록 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d78af942-33b8-4c50-97a8-5162a0183e88/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/d78af942-33b8-4c50-97a8-5162a0183e88.png)
 
 그러면 프로토콜을 선택할 수 있고, 엔드포인트를 선택할 수 있다. 프로토콜은 SQS, 엔드포인트는 만들어둔 큐를 선택하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2b1c39b5-3123-4745-b521-b68e99641c97/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/2b1c39b5-3123-4745-b521-b68e99641c97.png)
 
 그럼 구독이 만들어졌다. 테스트로 SNS에 메시지를 발행해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6d9ad89d-e6ce-44eb-b67c-9170ea94093b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/6d9ad89d-e6ce-44eb-b67c-9170ea94093b.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ccc8db6a-cba5-4e07-a11d-9c1984b08f1c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/ccc8db6a-cba5-4e07-a11d-9c1984b08f1c.png)
 
 그리고 메시지 본문을 적어주자. 참고로 각 프로토콜 별로 페이로드를 다르게 할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0979aa10-33c7-4024-9e04-18149dc7ca88/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/0979aa10-33c7-4024-9e04-18149dc7ca88.png)
 
 그리고 메시지 속성을 정해줄 수 있다. 필터 정책에 사용할 수 있으니 참고하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3db745bf-1d6e-493d-997f-5881d4a8394d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/3db745bf-1d6e-493d-997f-5881d4a8394d.png)
 
 이렇게 메시지를 게시해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b3b317a1-9041-44b8-9a5d-fc323d1b6aaa/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/b3b317a1-9041-44b8-9a5d-fc323d1b6aaa.png)
 
 그럼 이렇게 SNS 메시지가 TestQueue SQS 큐로 전달된다. (Type = Notification)
 
@@ -547,45 +547,45 @@ SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 �
 >
 > 그래서 단순 라우팅 정도라면 메시지 속성 기반의 필터 정책을 사용하는 것을 추천한다. (이 경우엔 무료이다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d5ff711e-8ae2-45b5-a772-b76032f58ae1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/d5ff711e-8ae2-45b5-a772-b76032f58ae1.png)
 
 사진과 같이 프로토콜을 정하고 자신의 이메일을 입력해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d804e8c1-cd10-4b20-b708-3aa6abd2b989/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/d804e8c1-cd10-4b20-b708-3aa6abd2b989.png)
 
 그리고 위와 같이 구독 필터 정책을 적어주자. 그러면 본문(`Message` 속성)에서 JSON이라면 `type`이 `order.created`에 해당하는지 확인한다. 만약 확인이 된다면 해당 구독자에게 메시지가 보내지게 되는 것이다.
 
 구독을 생성하였으면 아직 대기 상태일 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/87482512-95f5-4f91-8069-74f545e38bbe/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/87482512-95f5-4f91-8069-74f545e38bbe.png)
 
 이메일 인증을 해야하는데, 메일로 도착하였을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/931aa26c-28e4-4390-a99c-693d414bfafc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/931aa26c-28e4-4390-a99c-693d414bfafc.png)
 
 확인해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e02696af-f53b-4f58-94c0-054edc8ba1bd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/e02696af-f53b-4f58-94c0-054edc8ba1bd.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d8c39ae4-9888-4d63-a277-ae6d030f8b9e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/d8c39ae4-9888-4d63-a277-ae6d030f8b9e.png)
 
 그럼 이메일 구독 생성이 완료되었다. 먼저 `type`이 `order.created`가 아닌 SNS 메시지를 보내보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c76a9343-968f-4b47-bf9c-33126370e30e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/c76a9343-968f-4b47-bf9c-33126370e30e.png)
 
 그럼 아무런 필터 정책이 없는 SQS 큐엔 그대로 갈 것이고, 이메일은 도착하지 않았을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7473f579-4ea0-4ff4-ab85-2770e0647094/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/7473f579-4ea0-4ff4-ab85-2770e0647094.png)
 
 이제 본문에서 `type`이 `order.created`인 메시지를 보내보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b8394875-a59a-4b51-b6f9-914b6aec6ea5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/b8394875-a59a-4b51-b6f9-914b6aec6ea5.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/692038aa-6d34-41a6-9257-95c9847fa52a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/692038aa-6d34-41a6-9257-95c9847fa52a.png)
 
 그리고 메일을 봐보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4fe19d12-9a8e-4dbb-8f83-83e3690b62d7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/4fe19d12-9a8e-4dbb-8f83-83e3690b62d7.png)
 
 그럼 사진과 같이 본문 내용이 포함된 메일을 받게 된다. SNS에서 프로토콜 별로 메시지 내용을 다르게 하여 보낼 수 있으니 적절히 사용하면 좋을 것 같다.
 
@@ -597,11 +597,11 @@ SNS는 어려운 개념이 아니니 인프라만 만들어보고 테스트를 �
 
 자세한건 https://aws.amazon.com/ko/sqs/pricing 를 참고해보자. 일단 같은 리전이라면 SQS의 데이터 Transfer 비용은 무료다. 다만 API 요청(SendMessage, ReceiveMessage 등) 수에 따라 요금이 청구된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/183fa31f-3e05-4453-a4a6-20d5770adc6b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/183fa31f-3e05-4453-a4a6-20d5770adc6b.png)
 
 그런데 페이로드의 크기에 따라 요청 수가 달라진다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e06c4d04-23ea-4b86-925f-11e41e687fc5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/e06c4d04-23ea-4b86-925f-11e41e687fc5.png)
 
 > 2025년 8월 4일 부로 메시지의 최대 크기가 1MB로 변경되었으며, 요청의 페이로드 최대 크기도 1MB로 확장되었다.
 >
@@ -626,7 +626,7 @@ Standard 요금(FIFO는 살짝 더 비쌈)을 대입하여 계산하면 $(8 - 1)
 
 SNS 요금 또한 [AWS 공식 문서](https://aws.amazon.com/ko/sns/pricing)에서 자세하게 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f9e7a973-06c1-4f5c-a19d-66868fdc0c95/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/f9e7a973-06c1-4f5c-a19d-66868fdc0c95.png)
 
 SNS도 요청에 대한 요금이 발생하고 똑같이 64KB의 청크로 나눠 요금을 계산한다. (백만개의 요청 당 0.5$)
 
@@ -639,7 +639,7 @@ SNS는 메시지를 리시브하거나 삭제하는 일은 없고, 구독을 만
 
 구독자의 프로토콜에 따라 요금이 다르게 발생하는데, 아래의 사진을 참고하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9d667229-58d2-4d06-8fc2-66ecabf4a8ee/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/9d667229-58d2-4d06-8fc2-66ecabf4a8ee.png)
 
 여기서 같은 리전에 있는 SQS와 람다의 경우 전송 비용 자체는 없다. (사이에 발생하는 데이터 전송 요금은 다른 리전이나 인터넷을 경유하는 경우)
 
@@ -651,7 +651,7 @@ SNS는 메시지를 리시브하거나 삭제하는 일은 없고, 구독을 만
 
 다만 페이로드 기반 필터 정책은 요금이 발생하는데, 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/91607ad5-e8e0-411d-964c-3cb2e5bcdc26/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-26-aws-sqs-sns/91607ad5-e8e0-411d-964c-3cb2e5bcdc26.png)
 
 여기서 스캔한 페이로드의 데이터는 곧 SNS에 보내지는 모든 메시지들의 페이로드를 의미하고, 서울 기준으로 GB 당 0.11$가 발생한다. (그래서 메시지 속성 기반의 필터 정책을 사용하는 것을 추천한다.)
 

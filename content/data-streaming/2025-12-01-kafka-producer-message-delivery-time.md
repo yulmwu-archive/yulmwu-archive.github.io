@@ -29,7 +29,7 @@ is_private: false
 
 이때 Producer의 동작은 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7cfa6cc4-eb43-403f-aeed-9035e5b02ea1/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2025-12-01-kafka-producer-message-delivery-time/7cfa6cc4-eb43-403f-aeed-9035e5b02ea1.png)
 
 먼저 Kafka Producer가 위치한 애플리케이션에서 `send()` 함수를 통해 ProducerRecord 객체에 토픽과 키(옵션), 값을 넣고 보내면 첫번째로 카프카가 처리할 수 있도록 하는 바이트의 배열로 Serializing이 된다.
 
@@ -45,13 +45,13 @@ is_private: false
 
 이는 Kafka가 성공적인 응답을 보낼때 까지 대기하거나 재시도, 또는 실패를 받아들이는 시간에 영향을 끼치는 옵션들인 것이다. _(포스팅에선 아래 다이어그램에 포함된 옵션만 간단하게 다루겠다.)_
 
-![](https://velog.velcdn.com/images/yulmwu/post/ffe811e9-3397-4a24-9b77-f33126164181/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2025-12-01-kafka-producer-message-delivery-time/ffe811e9-3397-4a24-9b77-f33126164181.png)
 
 먼저 `send()`를 호출한 시점부터 리턴이 될때까지 해당 스레드가 블록되고, 리턴이 되었다면 Kafka의 응답을 받을 때 까지(즉 콜백이 호출될 때 까지) 걸리는 시간이 발생하게 된다.
 
 ## 2-1. `max.block.ms` and `linger.ms`
 
-![](https://velog.velcdn.com/images/yulmwu/post/a852fe24-d3a8-465b-9779-13212fc51d89/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2025-12-01-kafka-producer-message-delivery-time/a852fe24-d3a8-465b-9779-13212fc51d89.png)
 
 먼저 `max.block.ms` 옵션은 `send()` 함수를 호출했을 때 Record Accumulator 버퍼에 공간이 없다면 대기, 또는 메타데이터를 가져올 때 까지 대기하는데 이러한 대기 시간에 대한 타임 아웃을 지정한다.
 
@@ -65,7 +65,7 @@ _(이 외에도 어떠한 이유로 배치에 대한 백그라운드 스레드�
 
 ## 2-2. `request.timeout.ms`
 
-![](https://velog.velcdn.com/images/yulmwu/post/1081c0bc-5b0a-441a-854b-ff6722763934/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2025-12-01-kafka-producer-message-delivery-time/1081c0bc-5b0a-441a-854b-ff6722763934.png)
 
 이 옵션은 Producer가 데이터(배치)를 전송한 "뒤" 서버로 부터 응답을 받기 위해 얼마나 기다릴지를 지정하는 옵션이다. 즉 앞선 실제 전송 이전에 소요되는 시간과 설명할 재시도 등은 포함하지 않는다.
 
@@ -77,7 +77,7 @@ _(이 외에도 어떠한 이유로 배치에 대한 백그라운드 스레드�
 
 ## 2-3. `retries` and `retry.backoff.ms`
 
-![](https://velog.velcdn.com/images/yulmwu/post/34617fbb-fd61-4f74-8074-7b751484fc5c/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2025-12-01-kafka-producer-message-delivery-time/34617fbb-fd61-4f74-8074-7b751484fc5c.png)
 
 앞서 언급한 듯 만약 In-Flight 요청에 대해 에러를 받게 되었는데, 이것이 일시적인(Transient) 오류(예시로 Timeout/Network 오류나 리더 브로커의 다운타임 등이 해당됨)일 경우 판단하게 재시도(재전송)를 할 수 있다.
 
@@ -89,7 +89,7 @@ _(여기서 일시적인 오류는 메시지의 최대 크기를 초과하는 �
 
 ## 2-4. `delivery.timeout.ms`
 
-![](https://velog.velcdn.com/images/yulmwu/post/52db2f4c-f0f6-4ff8-9113-c1cdf965e27d/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2025-12-01-kafka-producer-message-delivery-time/52db2f4c-f0f6-4ff8-9113-c1cdf965e27d.png)
 
 마지막으로 이 옵션은 `send()` 비동기 함수가 성공적으로 리턴되었고, 레코드가 배치에 저장되며 브로커의 응답을 대기하는 전체 시점을 나타내는 것으로, 즉 `linger.ms` 및 `request.timeout.ms`를 포함하며, 재시도(재전송)을 고려하여 이들보다 큰 값을 가져야 한다.
 

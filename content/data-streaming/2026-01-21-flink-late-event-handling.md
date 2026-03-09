@@ -34,7 +34,7 @@ is_private: false
 
 이 경우 이미 10:00에 시작된 윈도우는 10:00:59에 종료되어 집계를 끝낸 상태이다. 이로 인해 실제 매출보다 집계 금액이 더 적게 계산되기 때문에, 적절한 시간 제어 전략이 없다면 잘못된 정산 처리나 잘못된 리포트가 보고될 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ff2dd33c-20c8-4742-9881-4d2e6349e867/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2026-01-21-flink-late-event-handling/ff2dd33c-20c8-4742-9881-4d2e6349e867.png)
 
 이러한 문제를 해결하고자 Flink에서는 WatermarkStrategy의 `forBoundedOutOfOrderness`와 Allowed Lateness 등으로 완화할 수 있다. (여기서 '완화'라는 표현한 이유는 이 개념들을 도입하였을때 Late Event가 실제 이벤트 발생 시간의 윈도우에 포함된다는 보장이 없기 때문이다. 아무리 허용 시간을 준다고는 하지만 그 사이의 레이턴시는 무한할 수 있기 때문이다.)
 
@@ -84,7 +84,7 @@ Event Time과 Processing Time은 이벤트의 발생 시간(Timestamp)을 기반
 
 ## How does it work?
 
-![](https://velog.velcdn.com/images/yulmwu/post/60aae107-1a81-4be1-8ad7-50f3b8baca52/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2026-01-21-flink-late-event-handling/60aae107-1a81-4be1-8ad7-50f3b8baca52.png)
 
 이러한 Watermark는 아래와 같은 공식으로 동작한다. (`out_of_orderness` = `forBoundedOutOfOrderness` 값)
 
@@ -262,7 +262,7 @@ window [1767261900000 ~ 1767262200000] -> [E2, E4]
 
 즉 Watermark가 `window_end`를 지났더라도 `window_end + allowed_lateness` 까지 들어온 이벤트는 해당 윈도우에 다시 반영되어 해당 윈도우는 state에 누적 반영되어 다시 트리거된다. 즉 Allowed Lateness 기간동안 윈도우의 State를 유지하기 때문에 윈도우가 완전히 정리(Cleanup)되는 시간이 Allowed Lateness 기간 만큼 증가한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/bc31bdf0-8135-4717-af4a-9901df63bd07/image.png)
+![](https://mirror-cdn.swua.kr/images/data-streaming/2026-01-21-flink-late-event-handling/bc31bdf0-8135-4717-af4a-9901df63bd07.png)
 
 (윈도우의 라이프사이클을 다루기엔 블로그의 주제를 벗어날 것 같아 아래의 공식 문서로 대체한다.)
 

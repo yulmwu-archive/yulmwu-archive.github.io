@@ -31,7 +31,7 @@ is_private: false
 
 아래의 자료를 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/58a64353-11f0-414a-a5c8-2adda18c89a9/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/58a64353-11f0-414a-a5c8-2adda18c89a9.png)
 
 클러스터 내 3개의 파드는 클러스터 CIDR(CNI에서 결정함) 10.244.0.0/16 범위에서 IP를 부여받았다. 하지만 이는 파드가 생성될 때 고정된 IP가 아닌 동적으로 IP가 바뀌며, 파드는 일종의 일회성 소모품과 같은 개념이기 때문에 특정한 파드에 파드 IP로 직접 접근하는 것은 어렵다. (1번 문제)
 
@@ -51,7 +51,7 @@ is_private: false
 
 아래의 예시를 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/982ee299-803b-42ee-b3dd-166276bf3c10/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/982ee299-803b-42ee-b3dd-166276bf3c10.png)
 
 ClusterIP 서비스를 통해 내부의 파드들은 고정된 IP(또는 DNS)를 통해 서로 통신할 수 있고, 이때 kube-proxy 데몬이 이를 가능하도록 해주며, 여러 파드가 있다면 트래픽을 분산해주기도 한다.
 
@@ -66,7 +66,7 @@ NodePort 서비스를 적용하게 되면 클러스터에 있는 모든 노드�
 NodePort가 클러스터 외부로 파드를 노출시키는데, 여기서 외부로 노출된다는게 일반적인 배포 환경에선 노드에 Public IP를 할당해서 쓰진 않는다.
 (물론 로드밸런서나 Ingress 등을 쓰지 않고 노드 포트를 직접 열어 Public IP를 할당하는 특이한 경우가 있긴 할 것이다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/f7fb2324-b9a4-455a-a6d8-e655d2e15885/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/f7fb2324-b9a4-455a-a6d8-e655d2e15885.png)
 
 이처럼 노드들의 특정한 포트를 열어서 클러스터 내부로 접근하는 것이다. 그런데 ClusterIP 다이어그램과 비슷한 모습을 하고 있다. 이는 필자가 잘못 그린게 아닌, NodePort는 내부적으로 ClusterIP를 자동으로 생성하기 때문이다.
 
@@ -78,7 +78,7 @@ NodePort가 클러스터 외부로 파드를 노출시키는데, 여기서 외�
 >
 > 즉 아래와 같은 상황이 발생할 수 있는 것이다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/e8c81133-9cc9-4eb5-9393-4b681bc32de7/image.png)
+> ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/e8c81133-9cc9-4eb5-9393-4b681bc32de7.png)
 >
 > 외부의 클라이언트는 Worker Node 1의 IP(또는 DNS)를 사용하여 접근을 시도하였으나 Worker Node 1의 모종의 이유로 Worker Node 2로 트래픽이 다시 보내지게 되었다.
 >
@@ -108,7 +108,7 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 
 그래서 로드밸런서를 앞에 두는데, 이 로드밸런서가 각 노드들(특정 NodePort)로 트래픽을 분산하고 로드밸런서 IP를 통해 서비스에 쉽게 접근할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2dbc8f47-c82a-4357-ab18-afce1082bd24/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/2dbc8f47-c82a-4357-ab18-afce1082bd24.png)
 
 사진의 예시에선 AWS에서 제공하는 로드밸런서(NLB, L4)를 이용하였는데, 쿠버네티스에서 로드밸런서는 물리적인 장비(L4 로드밸런서)가 필요하다. (클라우드 환경에서 로드밸런서 타입의 서비스를 생성하면 자동으로 클라우드의 로드 밸런서가 생성된다.)
 
@@ -118,7 +118,7 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 
 만약 여러개의 Deployment(배포될 서비스)를 외부에 서비스하려면 어떻게 해야할까? 단순히 로드밸런서 타입의 여러 서비스를 붙인다는 생각이 들 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a1b957d9-87e4-4197-b815-1b89b9c31754/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/a1b957d9-87e4-4197-b815-1b89b9c31754.png)
 
 그런데 이러면 문제가 생긴다.
 
@@ -146,7 +146,7 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 
 클라우드 환경이라면 Nginx Ingress Controller가 아닌 AWS ALB Ingress Controller와 같이 클라우드에서 제공하는 컨트롤러를 사용하여 더욱 간결하게 구성할 수 있으나, 로컬이나 온프레미스에서 Nginx Ingress Controller를 구성한다면 그 앞에 NodePort나 LoadBalancer(L4) 서비스를 붙여야 한다. (Nginx Ingress Controller도 결국엔 파드로 실행됨)
 
-![](https://velog.velcdn.com/images/yulmwu/post/63b98936-87d8-402e-9bc8-0acb900d04c3/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/63b98936-87d8-402e-9bc8-0acb900d04c3.png)
 
 다만 이때 Nginx Ingress를 거친 트래픽이 NodePort를 통해 들어가지 않는다. 그 이유는 Nginx Ingress Controller는 클러스터 내부에 있고, 굳이 NodePort를 열지 않고 ClusterIP만 생성해둬도 되기 때문이다. (Nginx Ingress 매니페스트에 ClusterIP 서비스를 지정한다.)
 
@@ -163,7 +163,7 @@ NodePort는 노드의 포트를 열어 클러스터 외부에서 접근할 수 �
 
 때문이 이 글에서도 `target-type: ip` 기준으로 설명하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d3c75701-c916-4f84-aaf8-8608589d04e7/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/d3c75701-c916-4f84-aaf8-8608589d04e7.png)
 
 보면 Nginx Ingress Controller에 비해 다른 모습을 보이고 있다. 가장 큰 점을 보면 바로 ALB Ingress Controller를 직접 지나지 않는다는 점이다.
 
@@ -240,13 +240,13 @@ eksctl create cluster -f cluster-config.yml
 aws eks update-kubeconfig --name eks-test --region ap-northeast-2
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/b257200a-e0fd-4edd-bc86-4cbade0f0791/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/b257200a-e0fd-4edd-bc86-4cbade0f0791.png)
 
 클러스터가 만들어지는데 시간이 좀 걸릴 수 있다. 10분~15분 정도 기다리면 CloudFormation 스택을 통해 EKS 클러스터가 만들어진다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2a97ed3c-8554-435c-aa3d-7e231cd15469/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/2a97ed3c-8554-435c-aa3d-7e231cd15469.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c1da69d9-8b87-4291-b45b-f6a8e864e439/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/c1da69d9-8b87-4291-b45b-f6a8e864e439.png)
 
 그럼 사진과 같이 kubectl을 통해 EKS를 관리할 수 있고, 노드 목록을 확인해보면 하나의 노드에 Public IP가 부여된 것을 볼 수 있다. EKS 클러스터 세팅은 완료되었다.
 
@@ -318,7 +318,7 @@ spec:
 
 이제 kubectl을 사용하여 적용해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ed226fa2-c8bd-47b0-891a-1a27a672e797/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/ed226fa2-c8bd-47b0-891a-1a27a672e797.png)
 
 필요 시 클러스터에 curl 명령어 테스트용 파드를 하나 만들 수 있다. 팔자는 아래와 같이 구성하였다.
 
@@ -330,7 +330,7 @@ kubectl run testbox --rm -it --image=alpine -- sh
 > curl 10.0.115.25:8080
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/0f46af7e-193d-41db-8fe1-fe4c9c56be5f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/0f46af7e-193d-41db-8fe1-fe4c9c56be5f.png)
 
 잘 된다. 이제 각 서비스들과 Ingress를 테스트 해보겠다.
 
@@ -357,7 +357,7 @@ spec:
 
 적용하고 서비스를 조회해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7018bdec-0e02-491b-a71d-7276131a0a4a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/7018bdec-0e02-491b-a71d-7276131a0a4a.png)
 
 그럼 `app-clusterip-svc`가 보여지고 CLUSTER-IP에 우리가 원하는 클러스터 IP가 나타난다. (기존적으로 있는 `kubernetes` 서비스는 K8s API를 위한 서비스이므로 냅두자.)
 
@@ -367,7 +367,7 @@ spec:
 for i in $(seq 1 10); do curl '172.20.145.82:3000'; echo; done
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/1b9a396c-a781-4856-a527-55fdabb08913/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/1b9a396c-a781-4856-a527-55fdabb08913.png)
 
 이렇게 잘 분산되어 나오는 것을 볼 수 있다.
 
@@ -395,23 +395,23 @@ spec:
 
 적용 후 서비스 목록을 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fa47c9cd-f220-49d7-98e9-1d0f66fcc471/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/fa47c9cd-f220-49d7-98e9-1d0f66fcc471.png)
 
 아까와 동일하게 CLUSTER-IP가 보여진다. NodePort는 노드의 특정 포트를 열어서 인터넷으로 노출하므로 Public IP를 가진 노드로 테스트해봐야 한다. 우리는 Public 노드를 하나 만들어뒀기 때문에 문제가 없다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f1a12a41-7f7d-44d9-a2f1-b538817d65c9/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/f1a12a41-7f7d-44d9-a2f1-b538817d65c9.png)
 
 여기서 퍼블릭 노드의 IP는 `13.209.73.50`이다. 즉 `13.209.73.50:30001`으로 외부에서 접속해보면 파드로 접근이 되며 분산까지 될 것이다. (ClusterIP를 포함하니깐)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5570fecc-a0fa-49cc-9e36-646883233c36/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/5570fecc-a0fa-49cc-9e36-646883233c36.png)
 
 접속이 안된다. 왜일까? 바로 접속하려는 Public IP를 가진 노드에서 보안 그룹의 인바운드 규칙에 노드 포트를 허용시키지 않았기 때문이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0b2422f1-d2f4-4171-b2e1-cadf0e25ea54/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/0b2422f1-d2f4-4171-b2e1-cadf0e25ea54.png)
 
 접속하려는 노드에 사진과 같이 30000~32767 (또는 30001) 포트를 열어주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a8f44cef-0d41-4ea9-9350-78f98da488ca/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/a8f44cef-0d41-4ea9-9350-78f98da488ca.png)
 
 그럼 이처럼 외부에서 노드의 Public IP와 NodePort를 통해 접속할 수 있다.
 
@@ -442,15 +442,15 @@ spec:
 
 테스트를 위해 대상 그룹의 타입을 Instance로 설정한다. 실제 서비스에선 IP 타입으로 설정하는 것을 권장한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/be1f6e5c-3f37-448d-aacf-2b2fbb2658f3/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/be1f6e5c-3f37-448d-aacf-2b2fbb2658f3.png)
 
 서비스 목록을 조회해보면 LoadBalancer 서비스에 EXTERNAL-IP에 ELB(NLB) 주소가 나타난다. 바로 접속은 안되는데, 프로비저닝 되기 까지 조금만 기다리자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8f0428f2-ff7e-469a-ac94-6f15a3a5e04e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/8f0428f2-ff7e-469a-ac94-6f15a3a5e04e.png)
 
 그럼 NLB가 생성이 되었고, 접속해보면 아래와 같이 잘 로드밸런싱 되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/914bbd92-42fa-41b8-9458-4cd392b96a08/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/914bbd92-42fa-41b8-9458-4cd392b96a08.png)
 
 보여지는 모습 자체는 ClusterIP, NodePort와 비슷하지만, 로드밸런싱은 노드들을 대상으로 로드밸런싱 한다는 점이 있다.
 
@@ -458,7 +458,7 @@ spec:
 
 로드밸런서 서비스를 삭제하면 자동으로 ELB(NLB) 또한 삭제된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/73f92fb1-2852-4337-b092-cbd06f9b0f40/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/73f92fb1-2852-4337-b092-cbd06f9b0f40.png)
 
 ## Nginx Ingress
 
@@ -476,7 +476,7 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
 
 그럼 아래와 같이 Nginx Ingress Controller에 대한 서비스가 생기게 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e1ac99c6-8c19-42a0-94fe-ba59a52f0d94/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/e1ac99c6-8c19-42a0-94fe-ba59a52f0d94.png)
 
 이제 Nginx Ingress Controller 설치는 되었고, Ingress와 연결하기 위해 Deployment 앱들에 대해 ClusterIP 서비스를 만들어주자.
 
@@ -562,7 +562,7 @@ spec:
 
 모두 적용 후, 서비스 목록과 Ingress를 조회해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ad6e2eb1-4b98-4d64-ac77-c0cee54d3b00/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/ad6e2eb1-4b98-4d64-ac77-c0cee54d3b00.png)
 
 ```
 > kubectl get svc,ing -o wide
@@ -579,7 +579,7 @@ ingress.networking.k8s.io/app-ingress   nginx   *       172.20.174.15   80      
 
 `service/ingress-nginx-controller`에서 HTTPS 30265번 포트로 NodePort가 열렸다고 한다. 그럼 퍼블릭 노드의 IP와 함께 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/84f2e995-8757-450f-89c8-8e4a5c5dfc44/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/84f2e995-8757-450f-89c8-8e4a5c5dfc44.png)
 
 사진과 같이 경로에 따라 라우팅되면서 로드밸런싱되는 것을 볼 수 있다. (`kpcz9`, `bnpx4`, `sgr9n`은 app1, `t2qdg`, `v967j`, `jlblj`는 app2에 있다)
 
@@ -632,7 +632,7 @@ helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-contro
 
 명령어가 복잡한데, ALB Ingress Controller가 AWS ALB 서비스를 직접 다루기 때문에 권한이 필요하기 때문이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/654f0601-90ac-4921-8df9-81eb936f6538/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/654f0601-90ac-4921-8df9-81eb936f6538.png)
 
 다음으로 Ingress 오브젝트 만들건데, 먼저 ClusterIP 등의 서비스가 Deployment 앞에 붙어야한다. (Ingress에서 서비스 명시, EndpointSlice를 조회하여 대상 그룹에 파드를 등록시키기 위함)
 
@@ -719,23 +719,23 @@ spec:
 
 그리고 조금 기다리면 아래와 같이 ALB가 프로비저닝이 된걸 볼 수 있다. 해당 로드밸런서를 자세히 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ace4b46a-501d-4efb-a1fb-047809246395/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/ace4b46a-501d-4efb-a1fb-047809246395.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/84bd7a1a-a1f7-4c72-acbb-2b49ccbb7750/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/84bd7a1a-a1f7-4c72-acbb-2b49ccbb7750.png)
 
 HTTP(80)만 설정해주었기 때문에 리스너엔 HTTP:80만 보여진다. 대상 그룹을 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2aeed709-d8ca-49d0-8b7e-7bb498e5d75e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/2aeed709-d8ca-49d0-8b7e-7bb498e5d75e.png)
 
 노드(인스턴스)가 아닌 파드의 프라이빗 IP가 등록된걸 볼 수 있다. (대상 그룹 타입이 IP)
 
 또한 Health Check도 잘 되고, 설정해뒀던 Health Check 경로도 잘 나타난다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/90fdcfba-4b3d-41cd-8d14-e67d85b9fad8/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/90fdcfba-4b3d-41cd-8d14-e67d85b9fad8.png)
 
 이제 로드밸런싱이 잘 되는지 테스트해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3481c518-d2bf-4611-b5ad-00983dd98e25/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-08-31-kubernetes-service-ingress/3481c518-d2bf-4611-b5ad-00983dd98e25.png)
 
 이처럼 경로에 따라 서비스 분산도 되고, 로드밸런싱도 잘 되는 모습을 볼 수 있다.
 

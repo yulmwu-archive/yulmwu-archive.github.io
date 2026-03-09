@@ -35,7 +35,7 @@ ServiceAccount와 함께 AWS IRSA(IAM Roles for Service Accounts)도 함께 다�
 
 _디스코드(Discord)를 사용해봤다면 매우 익숙한 형태일 것이다. 디스코드의 역할 기능이 바로 이 RBAC이다._
 
-![](https://velog.velcdn.com/images/yulmwu/post/f3144750-1245-4601-8531-a3e9e3b67f03/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-30-kubernetes-serviceaccount/f3144750-1245-4601-8531-a3e9e3b67f03.png)
 
 즉 사용자나 애플리케이션*(쿠버네티스에선 Pod, Deployment 등이 해당된다)*에 직접적으로 권한을 부여하는 것이 아니라 역할을 만들고 그 역할에 권한을 부여, 그리고 사용자나 애플리케이션에 Role을 부여하는 형태이다.
 
@@ -45,7 +45,7 @@ RBAC 기반의 ServiceAccount를 설명하기 전, 쿠버네티스 API에서 어
 
 쿠버네티스 API 또한 HTTP 서버이기 때문에 이해하는데 있어 어렵지 않다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a5718059-edd1-4833-b2b5-ca9ef3436156/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-30-kubernetes-serviceaccount/a5718059-edd1-4833-b2b5-ca9ef3436156.png)
 
 먼저 HTTP 서버이므로 HTTP 요청을 처리하기 위한 핸들러를 거친다. 이후 클라이언트가 쿠버네티스 사용자가 맞는지 확인하는 AuthN(인증), 그리고 해당 서비스나 기능을 사용할 수 있는지(AuthN, 인가) 확인한다.
 
@@ -190,13 +190,13 @@ rules:
 
 그리고 이를 ServiceAccount에 적용하기 위해선 ServiceAccount나 Role을 수정하는 것이 아닌 RoleBinding 및 ClusterRoleBinding을 만들어 ServiceAccount와 Role을 바인딩해줘야 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/17ff11f5-212c-45db-bcc9-8354586f6020/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-30-kubernetes-serviceaccount/17ff11f5-212c-45db-bcc9-8354586f6020.png)
 
 > 범위(레벨)를 클러스터로 두냐 네임스페이스로 두냐는 Role과 ClusterRole이 아닌 RoleBinding과 ClusterRoleBinding으로 결정된다.
 >
 > 즉 아래와 같은 상황에선 역할 자체는 ClusterRole 이지만, 권한은 네임스페이스로 제한된다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/935d9c0f-0261-42a4-907f-9549e9a3b30f/image.png)
+> ![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-30-kubernetes-serviceaccount/935d9c0f-0261-42a4-907f-9549e9a3b30f.png)
 >
 > 즉 클러스터 레벨에서 공통으로 사용되는 역할을 ClusterRole로 설정해둘 수 있는데, 이럴 경우 일단 권한의 의도가 명확하지 않고 ClusterRole 자체가 모든 네임스페이스에 대한 접근 권한을 가지고 있기 때문에 보안상, 또는 휴먼 에러에 취약할 수 있다.
 

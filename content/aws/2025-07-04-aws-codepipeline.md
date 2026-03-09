@@ -21,7 +21,7 @@ is_private: false
 
 > 이 포스팅에서 사용된 아키텍처는 마이스터넷 지방기능경기대회 클라우드 부분 2024 1과제를 참고하였으며, 저작권은 마이스터넷(한국산업인력공단)에 있음을 미리 알립니다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/cfccee72-b147-4427-949d-b0a003e93666/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/cfccee72-b147-4427-949d-b0a003e93666.png)
 >
 > 사용된 자료는 마이스터넷 "시행자료 및 공개 과제"를 참고하였습니다.
 >
@@ -32,7 +32,7 @@ is_private: false
 
 # 1. AWS Architecture
 
-![](https://velog.velcdn.com/images/yulmwu/post/882bc9d0-d719-4925-b035-49e05915f545/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/882bc9d0-d719-4925-b035-49e05915f545.png)
 
 > ### ~~CodeCommit~~, CodeBuild, CodeDeploy: **CodePipeline**
 >
@@ -71,7 +71,7 @@ S3는 정적 웹 페이지 호스팅 옵션이 켜져있고, 맨 앞단의 Cloud
 
 ## Frontend
 
-![](https://velog.velcdn.com/images/yulmwu/post/b9bebe90-c4ba-442c-b59b-720040c55447/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/b9bebe90-c4ba-442c-b59b-720040c55447.png)
 
 ### (1) S3
 
@@ -81,17 +81,17 @@ S3는 정적 웹 페이지 호스팅 옵션이 켜져있고, 맨 앞단의 Cloud
 
 먼저 S3 버킷을 만들어보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/888690ec-7812-4671-9c1c-5efda22a3800/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/888690ec-7812-4671-9c1c-5efda22a3800.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/e81463b4-e344-4ac6-ba77-5983c5eae256/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/e81463b4-e344-4ac6-ba77-5983c5eae256.png)
 
 나중에 CloudFront OAC를 설정하여 접근하게 할 것이기 때문에 퍼블릭 엑세스는 차단한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f4421100-40ce-4de7-b41b-167149cde554/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/f4421100-40ce-4de7-b41b-167149cde554.png)
 
 그리고 버킷 속성의 맨 아래에 내려가면 정적 웹 호스팅을 설정할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0ce7949d-d984-4e67-8ac1-bff7d4da469d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/0ce7949d-d984-4e67-8ac1-bff7d4da469d.png)
 
 오류 문서도 index.html로 설정하였다. 나중에 BrowserRouter(History API) 등의 정적 웹에서의 라우팅 사용 시 이렇게 해줘야 한다.
 
@@ -101,29 +101,29 @@ S3는 정적 웹 페이지 호스팅 옵션이 켜져있고, 맨 앞단의 Cloud
 
 그리고 CDN을 위한 CloudFront와 OAC 설정을 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cd8a9777-133d-40f0-89bf-8413a46a3ad2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/cd8a9777-133d-40f0-89bf-8413a46a3ad2.png)
 
 CloudFront 배포 생성 UI가 좀 간단하게 바뀌어서 위 사진에서 Create Distribution을 클릭하여 예전 UI로 들어가자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/32afc514-0fd5-4f31-9ff7-b3940717892e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/32afc514-0fd5-4f31-9ff7-b3940717892e.png)
 
 원본 설정을 만들어둔 S3로 설정한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/18d82732-9543-4f5a-a837-aff358183815/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/18d82732-9543-4f5a-a837-aff358183815.png)
 
 그리고 바로 아래의 원본 엑세스는 원본 엑세스 제어 설정을 선택한다. 이게 OAC고, 아래가 예전에 사용하던 OAI다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6f7e28b1-a05c-4294-a38d-542d490f4da4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/6f7e28b1-a05c-4294-a38d-542d490f4da4.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/2c8f2708-6b8f-432a-a37c-60ad710c9580/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/2c8f2708-6b8f-432a-a37c-60ad710c9580.png)
 
 그리고 마지막으로 기본값 루트 객체를 아래와 같이 `index.html`로 설정해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/28c38bd8-eee2-4ceb-aecd-a580d7c6992c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/28c38bd8-eee2-4ceb-aecd-a580d7c6992c.png)
 
 나머지는 그대로 냅두거나 알아서 설정하고 CloudFront를 생성한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/64daed9f-bd25-45f4-b773-284ec518c1b6/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/64daed9f-bd25-45f4-b773-284ec518c1b6.png)
 
 그럼 위 사진과 같이 버킷 정책을 업데이트해야 한다고 나온다. 정책 복사 버튼을 클릭한다. 그럼 아래와 같은 정책이 복사된다.
 
@@ -153,22 +153,22 @@ CloudFront 배포 생성 UI가 좀 간단하게 바뀌어서 위 사진에서 Cr
 
 이제 S3 버킷의 권한 탭에 들어가 방금 복사하였던 JSON을 붙여넣자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/570b9563-84fd-4017-b80b-121bab51ff86/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/570b9563-84fd-4017-b80b-121bab51ff86.png)
 
 예시로 `index.html`을 만들어서 버킷에 업로드해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/37855af3-5782-4254-8f6d-2515ea0cfab6/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/37855af3-5782-4254-8f6d-2515ea0cfab6.png)
 
 만약 S3 정적 웹 호스팅에서 제공하는 URL로 들어가면 Access Denied가 뜬다. (떠야함)
 
 그리고 CloudFront 주소로 접속해보면 잘 나오는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3df9d6fd-bce2-49b0-9cac-3a3eab61f812/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/3df9d6fd-bce2-49b0-9cac-3a3eab61f812.png)
 
 참고로 CloudFront에서도 모든 경로에 대해 `index.html`로 리다이렉트를 원한다면 아래와 같이 에러 페이지를 커스텀할 때 `/index.html`로 설정해주면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fa7ba73b-cf9b-4be6-82ea-0589e4ae520d/image.png)
-![](https://velog.velcdn.com/images/yulmwu/post/3e2cbccb-fa70-4842-8c35-1d9f37b28586/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/fa7ba73b-cf9b-4be6-82ea-0589e4ae520d.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/3e2cbccb-fa70-4842-8c35-1d9f37b28586.png)
 
 ### (3) Github Repository
 
@@ -178,39 +178,39 @@ CodeCommit은 지원이 종료되었으나 CodePipeline에서 Github와 연동�
 
 먼저 깃허브 레포지토리 부터 만든다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4183b09c-0a79-4fb0-b7ab-73e5e5f2f4d6/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/4183b09c-0a79-4fb0-b7ab-73e5e5f2f4d6.png)
 
 그리고 코드를 올려보자. `git` 명령어를 쓰던 직접 업로드하던 상관은 없다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/626b219e-bfdc-480e-8a13-cc84f49caf08/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/626b219e-bfdc-480e-8a13-cc84f49caf08.png)
 
 그 다음으로 CodePipeline 설정을 통해 해당 레포지토리에 커밋이 push 되었을 때 트리거되게 설정해볼 것이다.
 
 ### (4) CodePipeline(CodeDeploy)
 
-![](https://velog.velcdn.com/images/yulmwu/post/11aea2eb-06a7-4a9c-af0e-97fb3de7d3a7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/11aea2eb-06a7-4a9c-af0e-97fb3de7d3a7.png)
 
 파이프라인 생성을 클릭한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/17b2bca0-bd56-49fa-99e2-9f9a3938c9f0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/17b2bca0-bd56-49fa-99e2-9f9a3938c9f0.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ebbd89f9-0fae-4bb5-9173-4f762b7d372e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/ebbd89f9-0fae-4bb5-9173-4f762b7d372e.png)
 
 실행 모드는 대기됨으로 선택한다. 그리고 소스 스테이지에서 소스 공급자는 Github를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/aebccca3-3e5b-4d69-a434-40f255624723/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/aebccca3-3e5b-4d69-a434-40f255624723.png)
 
 최초로 설정한다면 깃허브 연결이 필요하다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3c76fcdc-baa5-4fa2-aaa1-171333199a76/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/3c76fcdc-baa5-4fa2-aaa1-171333199a76.png)
 
 앱은 옆에 앱 설치 버튼을 눌러 설치할 수 있다. 필자는 이미 있으므로 생략하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0ec7ea5b-15a7-489d-a04b-ed834ed73a67/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/0ec7ea5b-15a7-489d-a04b-ed834ed73a67.png)
 
 위와 같이 설정하였다. 그리고 웹훅 설정을 통해 이벤트가 트리거 되는 조건을 걸 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6500fcbf-bdfd-4270-8ebc-a26ede21dc46/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/6500fcbf-bdfd-4270-8ebc-a26ede21dc46.png)
 
 만약 위 조건들을 Github Actions 워크플로우로 표현하면 아래와 같을 것이다.
 
@@ -225,31 +225,31 @@ on:
 
 정적 웹 페이지 코드만 있기 때문에 빌드할 필요가 없고, 테스트도 생략하였다. 그리고 마지막으로 배포 스테이지에서 S3를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7e3b06e1-cef0-4821-8405-3ebedd734d62/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/7e3b06e1-cef0-4821-8405-3ebedd734d62.png)
 
 그리고 아까 만들어둔 S3 버킷을 선택한다. 배포하기 전 파일 압축 풀기 옵션을 체크하고 배포 경로는 비워두자. 그럼 알아서 루트 경로에 업로드된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/04c75b1d-a5cf-47e5-94f0-afbc5d82e8bf/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/04c75b1d-a5cf-47e5-94f0-afbc5d82e8bf.png)
 
 그리고 파이프라인을 생성해보면 배포가 진행되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7d6cfe94-98e7-4de0-ab9b-bdb4f94d826f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/7d6cfe94-98e7-4de0-ab9b-bdb4f94d826f.png)
 
 빌드 스테이지와 테스트 스테이지가 없기 때문에 빠르게 완료된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/52e6f684-487b-48c2-bce2-379fe322c257/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/52e6f684-487b-48c2-bce2-379fe322c257.png)
 
 이렇게 잘 배포가 된다. 다음으로 코드를 수정 후 push 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/96877b2c-67d2-40a7-92b1-f5f5f101db52/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/96877b2c-67d2-40a7-92b1-f5f5f101db52.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/7d147626-6b6c-4a76-8921-8ffd91eae943/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/7d147626-6b6c-4a76-8921-8ffd91eae943.png)
 
 그리고 CloudFront를 사용하기 때문에 캐시 무효화를 해줘야 바로 적용된 결과를 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/df12dc03-ce7b-4ad4-9458-163772f61e3f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/df12dc03-ce7b-4ad4-9458-163772f61e3f.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5fa2ae67-893c-46dc-96a0-028d11af83c9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/5fa2ae67-893c-46dc-96a0-028d11af83c9.png)
 
 물론 이것 또한 자동으로 처리할 수 있다. CodeBuild에서 AWS CLI를 통해 CloudFront 캐시 무효화를 요청할 수 있으며, 이걸 위해선 CodeBuild IAM 설정(`cloudfront:CreateInvalidation` 권한)과 아래와 같은 `buildspec.yml` 파일이 소스코드 내 필요하다.
 
@@ -269,13 +269,13 @@ phases:
 
 ## Backend
 
-![](https://velog.velcdn.com/images/yulmwu/post/d3bd5d03-1fdb-446c-9892-d80152ca1540/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/d3bd5d03-1fdb-446c-9892-d80152ca1540.png)
 
 ### (1) Github Repository
 
 만찬가지로 깃허브 레포지토리를 생성해주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1f68d16d-e422-41f5-ad62-f92107b5ecf0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/1f68d16d-e422-41f5-ad62-f92107b5ecf0.png)
 
 프로젝트의 파일 구조는 아래와 같다.
 
@@ -306,19 +306,19 @@ CMD ["node", "index.js"]
 
 그리고 도커 컨테이너 이미지를 저장할 ECR을 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1c69f3f7-a994-479d-a24f-a8e23f2621a8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/1c69f3f7-a994-479d-a24f-a8e23f2621a8.png)
 
 참고로 필수는 아니지만 이미지 push 후 이전 이미지들을 제거해줘야 용량 절약이 된다. 그러한 기능은 수명 주기 규칙으로 설정할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0e780e88-31eb-4cb8-ae44-31a018e41521/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/0e780e88-31eb-4cb8-ae44-31a018e41521.png)
 
 그리고 도커 이미지를 올려보자. 레포지토리에서 푸시 명령 보기를 클릭하면 명령어를 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6188d4f5-f3a1-44b4-9dc2-851d5b9d5178/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/6188d4f5-f3a1-44b4-9dc2-851d5b9d5178.png)
 
 (참고로 맥의 경우 `--platform linux/amd64` 옵션을 달아줘야 한다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5a5ab162-f0ec-45f7-bea5-477300ce490a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/5a5ab162-f0ec-45f7-bea5-477300ce490a.png)
 
 ECR 레포지토리 설정과 이미지 업로드는 끝났다.
 
@@ -326,11 +326,11 @@ ECR 레포지토리 설정과 이미지 업로드는 끝났다.
 
 다음으로 ECS를 설정하기 전, 원활한 진행을 위해 ALB부터 설정해보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3c123586-6cca-44aa-9bbd-6bf69fb13ab5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/3c123586-6cca-44aa-9bbd-6bf69fb13ab5.png)
 
 대상 그룹 설정은 나중에 따로 설정할건데, 임시로 하나를 만들어주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4447af4f-5a95-49c2-ba97-a5c39d80128a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/4447af4f-5a95-49c2-ba97-a5c39d80128a.png)
 
 그럼 로드밸런서 설정은 끝났다.
 
@@ -338,33 +338,33 @@ ECR 레포지토리 설정과 이미지 업로드는 끝났다.
 
 그 다음으로 ECS Fargate 설정을 해보자. 먼저 클러스터 하나를 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c6e84f67-e742-48d9-83f3-bdd3ba90595e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/c6e84f67-e742-48d9-83f3-bdd3ba90595e.png)
 
 인프라는 Fargate로 설정하였다. 그리고 태스크 정의를 만들도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2ea767fc-8ba8-46c6-8804-efbadc6a2d68/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/2ea767fc-8ba8-46c6-8804-efbadc6a2d68.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/90575e60-fd2a-4a26-a47f-10a4d2acae26/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/90575e60-fd2a-4a26-a47f-10a4d2acae26.png)
 
 그리고 이 태스크 정의를 바탕으로 서비스를 만든다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0d45939e-20ab-4782-9ccb-32fedc4d4f06/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/0d45939e-20ab-4782-9ccb-32fedc4d4f06.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/0e090fa9-43d3-45b4-81a7-6ae490659da3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/0e090fa9-43d3-45b4-81a7-6ae490659da3.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/bc04d1f9-f55f-47c9-8537-ff8bd14ea001/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/bc04d1f9-f55f-47c9-8537-ff8bd14ea001.png)
 
 그리고 여기서 대상 그룹을 만든다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cfb628cd-2805-4b2f-a39f-7d5202972dd9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/cfb628cd-2805-4b2f-a39f-7d5202972dd9.png)
 
 대상 그룹을 새롭게 만들었으니 ALB의 설정을 바꿔주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f8742a8d-63b3-49bb-8253-477b8b5ed81d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/f8742a8d-63b3-49bb-8253-477b8b5ed81d.png)
 
 사실 어차피 CloudFront에서 경로 설정을 `/api/*`라고 또 해줄거라 안해줘도 되긴 하다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/54718e19-444b-4178-b42f-2feaf959478e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/54718e19-444b-4178-b42f-2feaf959478e.png)
 
 혹시 따라왔는데 문제가 생겼다면 네트워크 설정은 잘 했는지(프라이빗 서브넷인데 IGW나 NAT Gateway가 없는 경우, 퍼블릭 IP 할당을 안한 경우), IAM 설정이 이상하진 않는지, Health Check 설정을 잘못한건 아닌지 등을 체크해보자.
 
@@ -374,15 +374,15 @@ ECR 레포지토리 설정과 이미지 업로드는 끝났다.
 
 아까 프론트엔드에서 CloudFront를 만들어둔게 있으므로 원본만 생성하고 연결해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d76cc9f1-507f-4744-bf38-e5f0e9fe121a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/d76cc9f1-507f-4744-bf38-e5f0e9fe121a.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/4b4be789-c2b6-4ccf-9440-efa9ad43ef1a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/4b4be789-c2b6-4ccf-9440-efa9ad43ef1a.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a7e0c6c1-deaa-4e47-ac36-19fc6ddbf2e7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/a7e0c6c1-deaa-4e47-ac36-19fc6ddbf2e7.png)
 
 위 사진처럼 설정하면 된다. 나머지는 알잘딱
 
-![](https://velog.velcdn.com/images/yulmwu/post/393ba81e-5649-4f62-a9a1-923147cb4568/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/393ba81e-5649-4f62-a9a1-923147cb4568.png)
 
 그럼 이제 `/api/*` 엔드포인트를 통해 CloudFront 주소에서 ALB를 사용할 수 있다.
 
@@ -390,17 +390,17 @@ ECR 레포지토리 설정과 이미지 업로드는 끝났다.
 
 CodeBuild를 따로 만들고 CodePipeline에서 연결해야 편하다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/31d45e57-5ddc-4f37-bbd7-6254f53daa1f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/31d45e57-5ddc-4f37-bbd7-6254f53daa1f.png)
 
 환경은 아래와 같이 설정하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6ce030fb-359c-432b-bab5-df5651c73c0d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/6ce030fb-359c-432b-bab5-df5651c73c0d.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/46ecbd64-64bc-481b-a49c-7c68ebe87ef2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/46ecbd64-64bc-481b-a49c-7c68ebe87ef2.png)
 
 그리고 Buildspec 파일 사용을 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6963d22d-0251-4008-96dd-96e81d74746e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/6963d22d-0251-4008-96dd-96e81d74746e.png)
 
 나머지 설정은 필요 시 설정하고 프로젝트를 생성하자.
 
@@ -449,7 +449,7 @@ ECS Fargate 빌드업 과정이 좀 길었다. 이제 본격적으로 CodePipeli
 
 마찬가지로 CodePipeline을 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/eefb22fb-1756-4299-a876-c99035c90e22/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/eefb22fb-1756-4299-a876-c99035c90e22.png)
 
 템플릿 중에 ECS Fargate에 배포라고 있지만, 사용자 지정 템플릿을 만들어서 사용해보겠다.
 
@@ -457,35 +457,35 @@ ECS Fargate 빌드업 과정이 좀 길었다. 이제 본격적으로 CodePipeli
 >
 > https://velog.io/@yulmwu/ecs-deploy
 
-![](https://velog.velcdn.com/images/yulmwu/post/84372cd8-0e2c-49c5-aad7-6330434d9f27/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/84372cd8-0e2c-49c5-aad7-6330434d9f27.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/82ee60d3-f682-40f3-ad02-f11bbb68779d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/82ee60d3-f682-40f3-ad02-f11bbb68779d.png)
 
 소스 스테이지는 아까와 같이 깃허브 레포지토리로 설정한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ede217e8-c6cf-4850-af21-19c579130c0f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/ede217e8-c6cf-4850-af21-19c579130c0f.png)
 
 빌드 스테이지는 만들었던 만들었던 CodeBuild 프로젝트를 선택한다.
 
 테스트 스테이지는 건너뛴다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e7afe4b9-439f-42fb-abcf-83f531ad6cd0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/e7afe4b9-439f-42fb-abcf-83f531ad6cd0.png)
 
 마지막으로 배포 설정은 위와 같이 설정해주었다. 이렇게 파이프라인을 생성하면 최초로 배포가 진행된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/83424aee-4697-47e0-adf4-eae895e5867f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/83424aee-4697-47e0-adf4-eae895e5867f.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/62433be8-e7ba-4cea-b353-30accff57b32/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/62433be8-e7ba-4cea-b353-30accff57b32.png)
 
 그리고 코드 업데이트 후 push하여 잘 되는지 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c31d5fa5-47b6-46a7-b499-f3425aaacf6d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/c31d5fa5-47b6-46a7-b499-f3425aaacf6d.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/79d26697-e930-402b-9424-50c4658564b4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/79d26697-e930-402b-9424-50c4658564b4.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/aa305b7a-dec6-4daf-878b-d71740a87224/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/aa305b7a-dec6-4daf-878b-d71740a87224.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/06446b79-d430-4a23-bade-ab42b7ef7f09/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-04-aws-codepipeline/06446b79-d430-4a23-bade-ab42b7ef7f09.png)
 
 잘 된는 듯 하다. 이 포스팅에선 아주 간단하게 설정만 해보았고, 추후 Blue/Green 배포 방식을 사용하거나 더욱 더 디테일하게 설정하여 실제 서비스에서 사용하면 될 듯 하다.
 

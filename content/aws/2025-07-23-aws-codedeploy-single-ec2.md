@@ -37,7 +37,7 @@ EC2에 도커 컨테이너만 올려서 쓸거면 차라리 ECS(Elastic Containe
 
 # 1. AWS Architecture
 
-![](https://velog.velcdn.com/images/yulmwu/post/8770cec0-e9f0-4158-9883-f79445236933/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/8770cec0-e9f0-4158-9883-f79445236933.png)
 
 아키텍처를 설명하면 아래와 같다.
 
@@ -51,7 +51,7 @@ EC2에 도커 컨테이너만 올려서 쓸거면 차라리 ECS(Elastic Containe
 
 Github Actions와 CodeDeploy를 사용한 자동화 아키텍처는 위와 같고, 포스팅에서 사용할 아키텍처는 아래와 같다. (단일 EC2 인스턴스)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d91cb204-85ed-4ec6-969b-d9413bbfec71/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/d91cb204-85ed-4ec6-969b-d9413bbfec71.png)
 
 ## What is CodeDeploy?
 
@@ -76,7 +76,7 @@ CodeDeploy는 배포 그룹(Deployment Group)으로 어디에, 어떤 방식으�
 >
 > 즉 롤링 업데이트의 일종인데, 인스턴스가 교체되는 동안 다른 유효 인스턴스에 트래픽이 몰릴 수 있다는 단점이 있으나, 기존의 인스턴스에 덮어 쓰기 때문에 새로운 인스턴스는 만들지 않는다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/6030932e-5dc7-42d5-876c-16e0bb6c0c72/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/6030932e-5dc7-42d5-876c-16e0bb6c0c72.png)
 >
 > **Blue/Green** 방식은 정 반대로, 새로운 분기점을 만든다. 무슨 말이냐, 예를 들어 기존에 오토스케일링 그룹이 있고 그 안에 5개의 인스턴스가 돌아간다면 업데이트된 새로운 오토스케일링 그룹을 만들고 그 안에 새로운 인스턴스를 새로 만든다는 것이다.
 >
@@ -86,7 +86,7 @@ CodeDeploy는 배포 그룹(Deployment Group)으로 어디에, 어떤 방식으�
 >
 > 하지만 업데이트되는 동안엔 새로운 인스턴스가 만들어지고 그 만큼 리소스가 2배로 소비되기 때문에 그럴 환경이 안된다면 사용할 수 없는 배포 방식이다. 다만 우리는 클라우드 환경이기 때문에 큰 문제 없이 사용할 수 있고, 업데이트 후 기존의 리소스는 제거되기 때문에 리소스 사용량 또한 큰 걱정을 할 필요는 없다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/ceae6c98-fea0-4d2d-99d0-72221f78c2ce/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/ceae6c98-fea0-4d2d-99d0-72221f78c2ce.png)
 >
 > 이 포스팅에선 Blue/Green 배포 방식을 사용한다.
 
@@ -165,7 +165,7 @@ CodeDeploy Agent는 해당 인스턴스에서 애플리케이션 소스코드를
 서버로 사용할 EC2를 만들어주자. 퍼블릭 서브넷에 EC2를 만들고, 퍼블릭 IP를 부여한다.
 실제로 사용할 서비스는 아니니 대충 만들어주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e4417e70-e681-4c1f-84e1-c92c48cabb59/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/e4417e70-e681-4c1f-84e1-c92c48cabb59.png)
 
 EC2가 프로비저닝되었다면 SSH 접속 후 아래의 명령어를 통해 CodeDeploy Agent와 NodeJS / NPM, 그리고 무중단 구동을 위한 PM2를 설치해주겠다.
 
@@ -190,7 +190,7 @@ npm -v
 pm2 -v
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/3ce2c7d7-278b-490c-9966-71fef5f660fd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/3ce2c7d7-278b-490c-9966-71fef5f660fd.png)
 
 그리고 테스트를 위해 홈 디렉토리(`~`, `/home/ubuntu`)에 `app` 디렉토리를 만들고 돌리고자 하는 소스코드를 다운로드하여 PM2를 통해 실행해보자.
 
@@ -198,13 +198,13 @@ pm2 -v
 
 https://github.com/eocndp/aws-codedeploy-example
 
-![](https://velog.velcdn.com/images/yulmwu/post/9db23f93-b860-47b2-acfb-59751a348c2c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/9db23f93-b860-47b2-acfb-59751a348c2c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/3255e0a5-bb34-4730-aad3-20250c2fd74e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/3255e0a5-bb34-4730-aad3-20250c2fd74e.png)
 
 이러면 SSH 세션을 꺼도 무중단으로 실행된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a5839ed1-2f55-47b3-bab5-e8ef8575dd87/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/a5839ed1-2f55-47b3-bab5-e8ef8575dd87.png)
 
 이제 CodeDeploy를 통해 업데이트를 해보도록 하자.
 
@@ -218,15 +218,15 @@ CodeDeploy를 설정하기 전에 IAM 정책을 몇가지 만들어둬야 편하
 
 EC2에 붙일 IAM 역할을 만든다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9f27a35f-fb03-4b15-b3e0-f1e2f13ec17e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/9f27a35f-fb03-4b15-b3e0-f1e2f13ec17e.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/85f15338-c192-49ae-b728-4763e70a6945/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/85f15338-c192-49ae-b728-4763e70a6945.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/9fb902e2-ac99-4011-b789-b89c0ba476f8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/9fb902e2-ac99-4011-b789-b89c0ba476f8.png)
 
 그리고 아까 만들어둔 EC2에 이 IAM 역할을 붙이도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/43ab576f-5628-46c7-806b-0c469573bc64/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/43ab576f-5628-46c7-806b-0c469573bc64.png)
 
 그리고 EC2 IAM 역할을 수정했다면 CodeDeploy Agent 서비스를 재시작해야한다.
 
@@ -240,43 +240,43 @@ sudo service codedeploy-agent restart
 
 다음으로 CodeDeploy를 위한 IAM 역할을 하나 만들자. CodeDeploy가 EC2, ASG 등에 접근할 수 있도록 하기 위함이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/28d88fc4-41e5-421c-8e46-9dfb08263d4c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/28d88fc4-41e5-421c-8e46-9dfb08263d4c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/8a001de4-8b22-443c-b0a1-d9975ea06641/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/8a001de4-8b22-443c-b0a1-d9975ea06641.png)
 
 CodeDeploy에 부여할 수 있는 정책은 저거 하나밖에 없다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/04899b4c-4a42-461d-afc0-e9da59766df0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/04899b4c-4a42-461d-afc0-e9da59766df0.png)
 
 ## CodeDeploy
 
 이제 본격적으로 CodeDeploy 설정을 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a7d6fe51-d69e-4b86-a79d-cbbfece06558/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/a7d6fe51-d69e-4b86-a79d-cbbfece06558.png)
 
 애플리케이션을 만드는데, 컴퓨팅 플랫폼은 EC2/온프레미스를 선택한다. EC2 ASG를 적용할때도 저걸 선택하면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/04413a13-85a3-4bd5-bad6-3887503467e1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/04413a13-85a3-4bd5-bad6-3887503467e1.png)
 
 이렇게 만들어졌다면 다음으로 배포 그룹을 만들어야 한다. CodeDeploy는 배포 그룹 단위로 배포를 진행한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cb86aa8d-34ff-4b75-b87a-62e88ba95569/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/cb86aa8d-34ff-4b75-b87a-62e88ba95569.png)
 
 아까 만들어둔 IAM 역할을 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4441316e-be4e-4510-8897-d54c320fbab0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/4441316e-be4e-4510-8897-d54c320fbab0.png)
 
 배포 유형은 현재 위치, 즉 In Place를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a9d5c1da-9f9f-4c5f-a4bc-724a6161bce1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/a9d5c1da-9f9f-4c5f-a4bc-724a6161bce1.png)
 
 아까 만들어둔 EC2를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d579d6e6-d5cc-4d55-93b6-11f4f0ac34d3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/d579d6e6-d5cc-4d55-93b6-11f4f0ac34d3.png)
 
 그리고 Systems Manager를 사용하여 CodeDeploy Agent를 설치하라는데 우리는 아까 설치해뒀으니 생략한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a06f5d62-9e07-4f7b-92c5-c4951afc387f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/a06f5d62-9e07-4f7b-92c5-c4951afc387f.png)
 
 로드밸런싱도 선택하지 않는다.
 
@@ -451,33 +451,33 @@ https://github.com/eocndp/aws-codedeploy-example
 
 이제 코드를 깃허브에 업로드하면 아래와 같이 워크플로우가 잘 실행되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2fc99540-8078-48db-9f91-965041e95d7c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/2fc99540-8078-48db-9f91-965041e95d7c.png)
 
 그리고 CodeDeploy의 로그를 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7368f713-e146-4c13-81d7-757c2d419f2b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/7368f713-e146-4c13-81d7-757c2d419f2b.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d113c593-a38b-4a48-9865-c570bedfd902/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/d113c593-a38b-4a48-9865-c570bedfd902.png)
 
 잘 배포되는 모습을 볼 수 있으며, 속도도 빠르게 배포된다. (빌드하는 과정 없이 Express 하나만 있으니 빠른게 당연하긴 함)
 
 그리고 예시로 코드를 수정하고 다시 배포해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/156f54ca-1656-4eff-ba3e-e17d2ff3b5ae/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/156f54ca-1656-4eff-ba3e-e17d2ff3b5ae.png)
 
 이제 코드를 수정하고 깃허브 레포지토리에 Push하기만 하면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3777f5af-c21b-4293-a850-a90758be0aed/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/3777f5af-c21b-4293-a850-a90758be0aed.png)
 
 접속해보면 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6ca47be9-ad7a-47dc-af69-b81f7f2163bc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/6ca47be9-ad7a-47dc-af69-b81f7f2163bc.png)
 
 ---
 
 만약 에러가 뜬다면 아래의 사진처럼 Lifecycle 이벤트별로 쉽게 확인할 수 도 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8a168e35-d50a-442f-bee2-d903ec7e0329/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-23-aws-codedeploy-single-ec2/8a168e35-d50a-442f-bee2-d903ec7e0329.png)
 
 참고로 위 에러는 pm2 실행 직후 바로 `curl`을 통해 Health Check를 해서 그런데, 살짝의 틈을 주거나 루프를 돌려 좀 기다린다면 잘 작동한다.
 

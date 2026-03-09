@@ -37,7 +37,7 @@ is_private: false
 
 물론 작은 사이즈의 이미지라면 봐줄만한 속도로 로딩되겠지만, 사진의 크기가 커진다면 로딩 속도 또한 매우 느려질 것이다. 예를 들어 아래의 경우를 보도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cfa0a267-600d-4c29-9b08-d472a6d5b142/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/cfa0a267-600d-4c29-9b08-d472a6d5b142.png)
 
 S3 + CloudFront를 통해 CDN을 만들고, 이미지들을 나열하는 단순한 페이지이다.
 
@@ -45,15 +45,15 @@ S3 + CloudFront를 통해 CDN을 만들고, 이미지들을 나열하는 단순�
 
 ## Testing with LightHouse
 
-![](https://velog.velcdn.com/images/yulmwu/post/85460622-5ef9-470a-aab1-c9d162195543/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/85460622-5ef9-470a-aab1-c9d162195543.png)
 
 크롬 DevTools LightHouse에서 테스트해보면 데스크탑 환경에서 LCP(Largest Contentful Paint)가 높은 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/be0b10b6-e663-4eef-9fa3-6ade1611233b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/be0b10b6-e663-4eef-9fa3-6ade1611233b.png)
 
 일반적으로 LCP는 2.5초 미만이여야 "좋음"으로 본다. 그런데 데이터를 가져오고 랜더링하기 까지 약 4초가 걸려서 저러한 처참한 결과가 나타난 것이다. (이미지 사이즈가 커서 랜더링 또한 오래 걸린다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5de376f4-9ae8-486e-96a2-07137b77e6e7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/5de376f4-9ae8-486e-96a2-07137b77e6e7.png)
 
 그리고 LightHouse에서 절감할 수 있는 이미지 용량을 추정해준다. 랜더링된 요소에서 불필요한 용량을 추정해주는 것이다.
 
@@ -86,13 +86,13 @@ S3 + CloudFront를 통해 CDN을 만들고, 이미지들을 나열하는 단순�
 
 먼저 전체적인 아키텍처를 보기 전, CloudFront의 요청-응답 과정을 보도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3a171acf-2283-4332-9ac2-cd91d18348ae/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/3a171acf-2283-4332-9ac2-cd91d18348ae.png)
 
 클라이언트가 CloudFront에 어느 이미지를 요청한다고 가정하자. 그러면 View Request로 CloudFront에 요청이 가게 된다.
 
 이후 CloudFront에서 해당 이미지가 캐싱되어 있다면 Cache Hit로 해당 이미지를 바로 응답한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ee66adf8-1936-4d32-8f8d-5cd4811ba614/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/ee66adf8-1936-4d32-8f8d-5cd4811ba614.png)
 
 그런데 만약 캐싱된게 없다면 오리진(원본) 서버(S3 Origin)에서 해당 이미지를 가져오게 된다. 이때 오리진 서버에 CloudFront가 요청하는데, 이를 Origin Request라고 한다.
 
@@ -102,7 +102,7 @@ S3 + CloudFront를 통해 CDN을 만들고, 이미지들을 나열하는 단순�
 
 Response에서 S3 결과물을 가져오는 방식으로 사용할 수 있다면 좋겠지만, 람다 이벤트 페이로드로 CloudFront Origin Response 바디는 포함하지 않기 때문에 Origin Request에서 동작하도록 하였다. 즉 구축해볼 아키텍처는 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0a33d84f-d151-4cf9-940a-e74b344e4ba7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/0a33d84f-d151-4cf9-940a-e74b344e4ba7.png)
 
 Origin Request를 Lambda@Edge로 보낸 다음, 이미지를 S3 버킷에서 가져온 뒤 리사이징 후 반환한다.
 
@@ -416,7 +416,7 @@ https://github.com/yulmwu/aws-image-resize-lambda
 
 이제 AWS 아키텍처를 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0a33d84f-d151-4cf9-940a-e74b344e4ba7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/0a33d84f-d151-4cf9-940a-e74b344e4ba7.png)
 
 여기서 S3 버킷과 CloudFront 배포를 만들고, OAC(Origin Access Control)를 통해 연동해보겠다. 이후 람다 함수를 배포하고 CloudFront 오리진 동작에서 작동하도록 설정해보자.
 
@@ -426,7 +426,7 @@ https://github.com/yulmwu/aws-image-resize-lambda
 
 먼저 역할에 적용할 `ImageResizerLambdaPolicy` 정책을 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/05c8359c-e3dc-4826-8baf-2e1f636bd520/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/05c8359c-e3dc-4826-8baf-2e1f636bd520.png)
 
 정책 생성을 클릭하고 아래와 같은 JSON으로 정책을 만들자.
 
@@ -454,13 +454,13 @@ https://github.com/yulmwu/aws-image-resize-lambda
 }
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/cd3a61a3-76d5-4399-a4e5-3741b46c3d7d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/cd3a61a3-76d5-4399-a4e5-3741b46c3d7d.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ea040b6f-96b8-4007-aab7-70311ce6da43/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/ea040b6f-96b8-4007-aab7-70311ce6da43.png)
 
 정책을 생성해주었다면 람다 실행에 적용할 역할을 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cf9cf2f0-296c-44f3-b3f1-8b2a6765914d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/cf9cf2f0-296c-44f3-b3f1-8b2a6765914d.png)
 
 역할 생성을 클릭하자. 일반 람다 함수였다면 사용 사례에서 람다를 선택하면 되지만, Lambda@Edge로 동작하기 때문에 신뢰 정책을 커스텀해야 한다.
 
@@ -482,45 +482,45 @@ https://github.com/yulmwu/aws-image-resize-lambda
 }
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/375aa636-c9d4-4c6e-9395-2c5e0f596b8a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/375aa636-c9d4-4c6e-9395-2c5e0f596b8a.png)
 
 그리고 정책은 만들어둔 `ImageResizerLambdaPolicy`를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2f11ff83-8a95-4e40-8f51-cb9594566c2d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/2f11ff83-8a95-4e40-8f51-cb9594566c2d.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/0db393c0-6d09-4dd4-a49b-fd04612935f1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/0db393c0-6d09-4dd4-a49b-fd04612935f1.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/14b3011d-b3a8-4ea8-844b-409d6ed292a4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/14b3011d-b3a8-4ea8-844b-409d6ed292a4.png)
 
 IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 버킷을 하나 만들자.
 
 ## (2) S3 Bucket
 
-![](https://velog.velcdn.com/images/yulmwu/post/c4c1b068-b893-4e1b-b44b-4e6da8a88267/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/c4c1b068-b893-4e1b-b44b-4e6da8a88267.png)
 
 그리고 퍼블릭 엑세스는 차단한다. 이후 CloudFront에서 OAC를 만들고 버킷 정책을 변경할 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1e88be34-f51c-406a-92d9-1f56897c00e7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/1e88be34-f51c-406a-92d9-1f56897c00e7.png)
 
 그리고 테스트용 이미지를 S3 버킷에 업로드해보자. 테스트용 이미지는 [깃허브 레포지토리](https://github.com/yulmwu/aws-image-resize-lambda/tree/main/examples)에 포함되어 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3f8f0aad-9cb5-45c2-9348-75f7f5b83c31/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/3f8f0aad-9cb5-45c2-9348-75f7f5b83c31.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/09614b5f-7331-465a-9fd6-23d3fd1d7bca/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/09614b5f-7331-465a-9fd6-23d3fd1d7bca.png)
 
 ## (3) CloudFront
 
 그리고 CloudFront 배포를 설정하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8f2ba9d3-e332-42a0-a795-f5ebfcedb69b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/8f2ba9d3-e332-42a0-a795-f5ebfcedb69b.png)
 
 오리진은 만들어둔 S3 버킷을 선택한다. 그리고 원본 엑세스는 "원본 엑세스 제어(OAC) 설정"을 선택하고 Create new OAC를 통해 OAC를 하나 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/71850b0a-5b7d-47d5-b664-1f4e1441c035/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/71850b0a-5b7d-47d5-b664-1f4e1441c035.png)
 
 나머지 설정은 일단 생략하고 배포를 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2f50e766-5c4e-48a2-a475-c78a9dcee695/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/2f50e766-5c4e-48a2-a475-c78a9dcee695.png)
 
 그러면 S3 버킷 정책을 업데이트해야 한다고 알림이 뜬다. "정책 복사" 버튼을 누르거나 아래의 버킷 정책을 복사하여 S3 버킷 정책을 업데이트하자.
 
@@ -547,17 +547,17 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 }
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/ae5a19cc-8056-488e-b5bb-02eb2db57930/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/ae5a19cc-8056-488e-b5bb-02eb2db57930.png)
 
 그럼 이제 CloudFront를 통해 S3 버킷에 접근할 수 있다. 테스트로 이미지를 가져와보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/84d6085b-4c59-48ae-800c-9dd0957188cc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/84d6085b-4c59-48ae-800c-9dd0957188cc.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/b49954f9-b1d3-4e51-abb1-e4d8b3da1efb/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/b49954f9-b1d3-4e51-abb1-e4d8b3da1efb.png)
 
 처음 접속했을 때 Miss가 뜨는 것도 볼 수 있다. 그 다음엔 Hit으로 뜰 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/92db3dd6-8eee-4073-a96c-da3c5c36821b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/92db3dd6-8eee-4073-a96c-da3c5c36821b.png)
 
 ## (4) Lambda@Edge
 
@@ -565,17 +565,17 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 
 때문에 `us-east-1`으로 리전을 변경한 뒤 람다 함수를 생성해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8d0d7a17-f4b2-4bb8-85cb-c66ce0eac1fd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/8d0d7a17-f4b2-4bb8-85cb-c66ce0eac1fd.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ef413d47-e699-4c2b-819d-2ac2d5b8748a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/ef413d47-e699-4c2b-819d-2ac2d5b8748a.png)
 
 실행 역할은 아까 생성해두었던 IAM 역할을 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/24451c60-1dc8-44f9-afa0-b8770eb60ab2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/24451c60-1dc8-44f9-afa0-b8770eb60ab2.png)
 
 함수가 생성되었다면 설정에서 메모리와 제한 시간을 좀 늘려주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7b89299c-34e4-416c-88ef-a568d87c9ef7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/7b89299c-34e4-416c-88ef-a568d87c9ef7.png)
 
 제한 시간 안에 이미지 처리가 끝나지 않을 경우 502 또는 503 에러가 뜨게 된다. 코드 상으로 버킷으로 부터 가져올 수 있는 이미지의 최대 크기는 3MB이므로 1GB 메모리에 제한 시간 15초 정도면 괜찮을 것이다. (이 경우엔 적절한 스윗 스팟을 찾아야 한다.)
 
@@ -583,15 +583,15 @@ IAM 설정은 끝났다. 다음으로 테스트 이미지들이 업로드될 S3 
 
 예전엔 Cloud9을 통해 온라인으로 코드를 수정하고 터미널을 열어 빌드할 수 있었으나, 서비스가 종료되어 그 대신 CloudShell을 이용하기로 하였다. 기본적인 AWS CLI, NodeJS 등은 설치되어 있으니 문제 없다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c0b5fc87-1802-4fc4-92e9-6c7bf11c01bf/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/c0b5fc87-1802-4fc4-92e9-6c7bf11c01bf.png)
 
 헤더에 있는 터미널 아이콘을 클릭하면 CloudShell을 사용할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8c4db920-9050-450c-80dc-19b940e9d581/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/8c4db920-9050-450c-80dc-19b940e9d581.png)
 
 Open us-east-1 environment를 클릭하여 환경을 만든다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b27479c9-8095-4fe5-99c5-fe8d8d9c4ddc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/b27479c9-8095-4fe5-99c5-fe8d8d9c4ddc.png)
 
 CloudShell에 소스코드를 가져오자. 필자는 깃허브에 소스코드가 있으므로 `git clone` 명령어를 통해 가져와보겠다.
 
@@ -599,11 +599,11 @@ CloudShell에 소스코드를 가져오자. 필자는 깃허브에 소스코드�
 git clone https://github.com/yulmwu/aws-image-resize-lambda.git
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/6e56853f-a89f-4b3c-9b7b-0bf5408b7429/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/6e56853f-a89f-4b3c-9b7b-0bf5408b7429.png)
 
 그리고 `npm i` 또는 `npm ci`를 통해 의존성을 설치하고, `node esbuild.config.js` 명령어를 통해 타입스크립트를 빌드하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c1885588-3a3b-41de-b1c7-c39ee1ce996e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/c1885588-3a3b-41de-b1c7-c39ee1ce996e.png)
 
 이제 람다 함수에 배포하기 위해 압축하고 배포해보겠다. 50MB를 넘길 경우 S3 버킷에 아키팩트를 업로드한 뒤 람다 함수에서 사용하도록 해야겠지만 다행히 50MB를 넘기지 않으므로(48.7MB) 그냥 압축해서 바로 배포해보겠다.
 
@@ -622,27 +622,27 @@ aws lambda update-function-code \
     --zip-file fileb://dist.zip
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/a3920a9e-6d83-49a6-9d50-91e3cf488290/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/a3920a9e-6d83-49a6-9d50-91e3cf488290.png)
 
 잘 배포된 것을 볼 수 있다. 이제 CloudShell은 필요가 없으므로 종료시키자. 켜두면 요금이 나간다.
 
 그리고 CloudFront 오리진 동작에 Lambda@Edge를 사용하려면 버전 명시가 필요하므로 버전을 생성해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9b32a61d-1526-434c-8b9a-bacd2b96b6ad/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/9b32a61d-1526-434c-8b9a-bacd2b96b6ad.png)
 
 이제 CloudFront와 연결해보자. 람다 함수 대시보드에서 직접 트리거를 추가할 수 도 있고, CloudFront에서 설정할 수 도 있다. 필자는 후자로 해보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e90bbb42-9d2f-4415-920a-0a082dafedaa/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/e90bbb42-9d2f-4415-920a-0a082dafedaa.png)
 
 여기서 "편집"을 클릭한다. 그리고 해줘야 할 작업은 2개이다. 먼저 캐시 키 설정을 해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/739d51d0-0ee4-4ac6-af0f-777c51d25693/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/739d51d0-0ee4-4ac6-af0f-777c51d25693.png)
 
 위 사진 처럼 파라미터(쿼리) `w`, `h`, `f`를 추가해주자. 그렇게 해야 해당 파라미터에 맞게 캐싱된다.
 
 그리고 함수 연결에서 만들어둔 람다를 연결한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/50e3e928-e1d4-43cd-86d6-286e90682c42/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/50e3e928-e1d4-43cd-86d6-286e90682c42.png)
 
 원본 요청으로 설정하는데, 바디에 대한 정보는 필요하지 않으므로 체크하지 않는다. 오히려 체크 시 데이터 크기가 커져 불리하다.
 
@@ -650,43 +650,43 @@ aws lambda update-function-code \
 
 이제 CloudFront URL 뒤에 `?w=300` 등의 쿼리를 붙여 잘 동작하는지 확인해보자. (Lambda@Edge가 적용되는데 시간이 걸릴 수 있다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/1310be49-b369-461b-b106-8f2a1c478ceb/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/1310be49-b369-461b-b106-8f2a1c478ceb.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/60c5f532-3a58-4f8f-914d-ebec07b14dcb/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/60c5f532-3a58-4f8f-914d-ebec07b14dcb.png)
 
 첫 로딩에 대해선 이미지 리사이징 프로세스 때문에 레이턴시가 있긴 한데, 새로고침해서 캐싱된 이미지를 가져와보면 매우 짧아진 모습을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fada5cc4-d6a8-4650-a8ca-6cd1a840a6e7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/fada5cc4-d6a8-4650-a8ca-6cd1a840a6e7.png)
 
 이제 맨 처음 문제가 됐었던 QWER 쵸단 갤러리에서 테스트해보자. 아까는 4G 쓰로틀링 환경에서 4.8초, 리소스 사이즈는 약 4.5MB에 LightHouse에선 LCP 수치에서 랜더링까지 약 4초가 걸렸었다.
 
 이제 `?w=600` 정도로 리사이징 후 불러와보면 어떨까? (각 이미지의 CSS width가 `300px` 정도니 넉넉하게 `?w=600`로 설정하였다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/e260ec49-ed59-485c-adbc-d6d352efd73f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/e260ec49-ed59-485c-adbc-d6d352efd73f.png)
 
 먼저 처음으로 접속했을 때(Cache Miss) 모습이다. 테스트로 인해 캐싱된 `1.jpg`를 제외하면 1초 대로 불러와진다. 이제 새로고침해서 캐싱이 되었을 때 성능을 보자. (크롬 메모리 캐시는 꺼야 제대로 테스트할 수 있다.)
 
 아까와 동일한 조건(4G 쓰로틀링)으로 테스트해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/89dd9fef-4671-4b93-83a5-4f105154b026/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/89dd9fef-4671-4b93-83a5-4f105154b026.png)
 
 리사이징 적용 전엔 4.8초 만에 리소스를 불러왔으나, 적용 후 1.9초 정도로 2배 이상 줄어든 것을 볼 수 있다.
 
 또한 불러온 데이터의 크기 또한 4.5MB에서 1.6MB로 2~3배 가량 줄어든 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2669cff7-d15b-48fa-8bc8-b51d3833fd21/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/2669cff7-d15b-48fa-8bc8-b51d3833fd21.png)
 
 LightHouse 또한 처참했던 LCP가 매우 정상 범위로 들어섰으며, 자세히 확인해봐도 전혀 문제가 없다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9b88c9d2-6f80-4b92-943b-8c458de3a1ba/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/9b88c9d2-6f80-4b92-943b-8c458de3a1ba.png)
 
 리사이징 적용 전엔 랜더링까지 LCP로 4초 정도가 걸렸다면, 적용 후 1초 정도로 매우 빨라졌다. 특히 이미지 크기가 작으니 랜더링 레이턴시 또한 매우 줄어든 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dada295b-3cef-442a-9700-b1678002a17f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/dada295b-3cef-442a-9700-b1678002a17f.png)
 
 그렇게 사진이 리사이징되어 줄어들었어도 유저가 육안으로 보기엔 화질이 깨지거나 흐릿해지는 부분은 없다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/488d8466-53f3-46e8-96b1-edb5a113e974/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/488d8466-53f3-46e8-96b1-edb5a113e974.png)
 
 심지어 이미지 사이즈를 더 줄여도 문제가 없다고 하는데, 이건 CSS width/height와 DPR을 잘 따져가며 스윗 스팟을 찾아 적용하면 될 듯 하다.
 
@@ -714,7 +714,7 @@ AWS Pricing Calculator와 같은 도구를 사용하여 계산할 수 도 있지
 
 하지만 코드에선 어쩔 수 없이 AWS SDK를 사용하여 S3 Bucket에 직접 GET을 통해 이미지를 가져오는 로직이므로 GET 요청에 대한 요금이 부과된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/271b3865-dc4c-4a1f-ba4b-e089ad46e45b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/271b3865-dc4c-4a1f-ba4b-e089ad46e45b.png)
 
 _참고: https://aws.amazon.com/ko/s3/pricing_
 
@@ -731,7 +731,7 @@ CloudFront는 크게 2가지로 요금이 부과된다.
 
 먼저 인터넷으로 Transfer되는 비용을 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a092bb8e-67ac-49dd-9907-ff1b138f150e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/a092bb8e-67ac-49dd-9907-ff1b138f150e.png)
 
 _참고: https://aws.amazon.com/ko/cloudfront/pricing_
 
@@ -744,7 +744,7 @@ _참고: https://aws.amazon.com/ko/cloudfront/pricing_
 
 다음으로 CloudFront HTTPS 요청 수는 동일하게 1,000,000회가 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fda51448-849d-46c3-b922-6d317b307462/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/fda51448-849d-46c3-b922-6d317b307462.png)
 
 요금 표에선 10,000개의 요청을 기준으로 대한민국엔 0.0120\$가 부과된다. 즉 $100 × 0.0120$, CloudFront HTTPS 요청 비용으론 **1.2$**가 부과된다.
 
@@ -752,7 +752,7 @@ _참고: https://aws.amazon.com/ko/cloudfront/pricing_
 
 > 참고로 2025년 8월 1일부터 람다 실행 시간 요금에서 INIT 단계도 포함된다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/26d3ab16-81f4-4c04-81a3-251f6b78225f/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/26d3ab16-81f4-4c04-81a3-251f6b78225f.png)
 >
 > 이로 인해 Cold Start가 많아질수록 요금이 더욱 부과될 수 있으니 참고하자.
 >
@@ -765,7 +765,7 @@ Lambda@Edge 경우 기존의 람다와는 살짝 다르며, 요금이 살짝 더
 
 요금 표를 보자. (CloudFront 요금 표에 있다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/65871b2d-7c50-4850-8c58-47c3b8a7c3da/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/65871b2d-7c50-4850-8c58-47c3b8a7c3da.png)
 
 먼저 우리는 메모리는 1GB(1024MB), 평균 실행 시간을 1초로 설정하였고, GB-초당 0.00005001$가 부과되므로 아래와 같이 계산할 수 있다.
 
@@ -807,9 +807,9 @@ $381GB × 0.120\$ = 45.72\$$
 
 먼저 CloudFront에서 무효화를 진행 후 이미지들을 불러왔을 때 일부가 불러와지지 않는 문제가 있었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4e64a673-a152-4e70-ac29-d284bffad16a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/4e64a673-a152-4e70-ac29-d284bffad16a.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c6172f0d-7296-48e9-9926-0e3c791cda82/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/c6172f0d-7296-48e9-9926-0e3c791cda82.png)
 
 사진과 같이 Lambda Limit Exceeded from Cloudfront라는 메세지와 함께 503 Service Unavailable 에러가 발생하였다.
 
@@ -817,7 +817,7 @@ $381GB × 0.120\$ = 45.72\$$
 
 그렇게 30분 정도 삽질하다가 항상 10개의 이미지만 처리된다는 것을 눈치챘는데, 바로 AWS Service Quotas에 들어가 Lambda Concurrent Executions 항목을 살펴보았다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/be0a504c-5ccf-49c1-92fc-81e12b6ecbee/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/be0a504c-5ccf-49c1-92fc-81e12b6ecbee.png)
 
 (7 count는 무시하자.)
 기억 상으론 분명 1000개의 동시 실행 제한이 있었던 걸로 기억하는데, 현재 계정엔 10개로 제한되어 있었다. 해외 포럼을 찾아보는데 아마 해킹으로 피해를 줄이고자 기본적으로 10개로 제한해둔 것 같다.
@@ -826,29 +826,29 @@ $381GB × 0.120\$ = 45.72\$$
 
 그래서 테스트로 30개 정도로 늘려보려고 했는데, 기본이 1000개라며 1000개 이상으로 설정하라고 에러를 띄웠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3f55b043-4ce5-4622-8e95-ef8de5e9e726/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/3f55b043-4ce5-4622-8e95-ef8de5e9e726.png)
 
 일단 애초에 이게 Lambda@Edge에도 적용이 되는지 확실하게 알기 위해 re:Post에 질문을 남겼다.
 
 https://repost.aws/ko/questions/QUV9m5TMQCQCG5bimoYCLM7A/aws-lambda-edge-execution-limits-quota
 
-![](https://velog.velcdn.com/images/yulmwu/post/2b1c1126-20c6-456a-85b0-a4bff4b6bd71/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/2b1c1126-20c6-456a-85b0-a4bff4b6bd71.png)
 
 요약: Lambda@Edge도 람다 할당량(동시성 제한)을 따른다.
 
 지금 생각해보면 당연한 이야기지만 검색해도 확실하진 않아 질문했었다. 추가적으로 꼭 동시성 제한을 1000개 이상 설정해야 되는지도 문의했었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cc1c9994-2877-4387-ba7d-71d9fb886207/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/cc1c9994-2877-4387-ba7d-71d9fb886207.png)
 
 요약: ㅇㅇ
 
 그래서 람다 동시성 제한을 1000개로 늘려주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0a058245-13ef-4c7b-b632-68e9740d4323/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/0a058245-13ef-4c7b-b632-68e9740d4323.png)
 
 요청 후 12시간 정도 지나니 동시성 제한 할당량이 1000개로 늘어났다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b4a75599-f612-4654-8059-9ba6a56f9708/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-22-aws-cloudfront-lambda-image-resizing/b4a75599-f612-4654-8059-9ba6a56f9708.png)
 
 이로써 503 Lambda Limit Exceeded from Cloudfront 에러를 해결할 수 있었다. 혹시 같은 문제가 있다면 참고하자.
 

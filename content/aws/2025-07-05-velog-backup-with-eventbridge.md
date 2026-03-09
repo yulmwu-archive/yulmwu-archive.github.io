@@ -29,7 +29,7 @@ is_private: false
 
 아키텍처를 미리 스포하자면 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0cda45f2-fba6-465f-bda7-6fb41bfc4788/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/0cda45f2-fba6-465f-bda7-6fb41bfc4788.png)
 
 > 해당 포스팅에서 사용한 소스코드는 아래의 깃허브 레포지토리에서 확인할 수 있다.
 >
@@ -41,7 +41,7 @@ is_private: false
 
 먼저 velog에서 공식적으로 API에 대한 정보를 제공해주지 않는다. 그러거나 말거나 브라우저의 DevTools로 velog의 API를 조사해보았다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2507366c-21a7-4634-99e8-97d4b1931f8b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/2507366c-21a7-4634-99e8-97d4b1931f8b.png)
 
 velog는 GraphQL API를 사용한다. 일반적인 REST API를 사용할 줄 알았는데 의외다.
 
@@ -147,11 +147,11 @@ NodeJS의 GraphQL 요청 클라이언트 구현체 중 대표적으로 프론트
 
 사용자의 글 목록을 확인한다. 어떤 GraphQL 쿼리를 사용하는지 확인하기 위해 DevTools로 확인해보았다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7ce0db99-e8f1-4b31-a71e-9392b4876e3f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/7ce0db99-e8f1-4b31-a71e-9392b4876e3f.png)
 
 위 요청의 페이로드를 바탕으로 Postman에서 테스트를 진행해보았다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/54e2de10-ecd9-442e-88b3-fef7f4975704/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/54e2de10-ecd9-442e-88b3-fef7f4975704.png)
 
 잘 작동하는 것이 보이며, `limit`은 `cursor`(글 ID)를 기준으로 하여 최근 몇개의 글을 가져올 것인지를 나타내고 최대 값은 100이다.
 
@@ -168,9 +168,9 @@ NodeJS의 GraphQL 요청 클라이언트 구현체 중 대표적으로 프론트
 
 > 더욱 더 확실하게 보자면 velog의 소스코드는 [깃허브](https://github.com/velopert/velog-server)에 공개되어 있기 때문에 해당 소스코드를 참조하면 아래와 같은 GraphQL 스키마를 확인할 수 있다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/7cf542e0-843c-4069-bc4d-0bfb5aefeba8/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/7cf542e0-843c-4069-bc4d-0bfb5aefeba8.png)
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/8fbcb8de-47ca-4b61-ace6-3bed7a4cafdd/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/8fbcb8de-47ca-4b61-ace6-3bed7a4cafdd.png)
 >
 > 여담으로 한가지 특이한것은 Lambda + API Gateway를 사용한 서버리스 아키텍처라는 것이다.
 
@@ -178,7 +178,7 @@ NodeJS의 GraphQL 요청 클라이언트 구현체 중 대표적으로 프론트
 
 특정한 글에 들어갔을 때 요청되는 GraphQL이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f7e0e98c-9083-431f-9066-e50bcf83666f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/f7e0e98c-9083-431f-9066-e50bcf83666f.png)
 
 Postman을 사용하여 글에 들어갔을 때 호출되는 `ReadPost`에 대한 GraphQL 요청을 날려보았다.
 
@@ -186,15 +186,15 @@ Postman을 사용하여 글에 들어갔을 때 호출되는 `ReadPost`에 대�
 
 원래라면 SSR으로 본문의 내용을 GraphQL 요청으로 날리지 않고 HTML로 보내져오는데, 전 게시글/다음 게시글을 표시하기 위해 GraphQL 요청을 통해 가져오는 것을 확인하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5e1945ee-df09-4a12-b454-0ecbc517e8fa/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/5e1945ee-df09-4a12-b454-0ecbc517e8fa.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c11d5a99-4e14-4775-8c12-b53056ed865c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/c11d5a99-4e14-4775-8c12-b53056ed865c.png)
 
 또한 velog 백엔드의 코드 상 URL Slug(페이지 식별에서 간결하고 이해하기 쉽게 표현된 문자, SEO에 유리함)를 바탕으로 가져오거나 게시글의 ID를 사용하여 가져올 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/92214a6b-e89e-46d8-9a71-6cbd8cdb4ab1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/92214a6b-e89e-46d8-9a71-6cbd8cdb4ab1.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/aa43b03e-ec75-484e-ae56-d6a4f8ffea31/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/aa43b03e-ec75-484e-ae56-d6a4f8ffea31.png)
 
 하지만 프론트엔드에선 URL Slug를 통해 게시글을 가져오니 필자도 URL Slug를 사용하여 가져오도록 하겠다.
 
@@ -204,13 +204,13 @@ Postman을 사용하여 글에 들어갔을 때 호출되는 `ReadPost`에 대�
 
 먼저 타입스크립트를 사용하여 타입 안전성을 챙길 것이기 때문에 velog 백엔드 소스코드에서 GraphQL 스키마를 찾아서 GraphQL 스키마와 Documents(실제 쿼리문이나 뮤테이션 등의 요청 쿼리문이 선언된 파일)를 만들어주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9e9f079c-a533-4bac-8c86-78991fa1374b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/9e9f079c-a533-4bac-8c86-78991fa1374b.png)
 
 그리고 npx를 통해 `graphql-codegen`을 실행하거나 npm scripts에 아래와 같이 명령어를 등록해두고 실행하면 정의해둔 스키마와 Documents를 바탕으로 자동으로 타입스크립트 타입과 요청 함수를 작성해준다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/525797c1-7774-4054-9055-2b326a41cf01/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/525797c1-7774-4054-9055-2b326a41cf01.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/3955c746-4da3-4242-b7ed-f1b7cdf39b2e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/3955c746-4da3-4242-b7ed-f1b7cdf39b2e.png)
 
 그러면 아래와 같이 간단한 코드를 통해 요청을 보낼 수 있다.
 
@@ -240,19 +240,19 @@ fetchUser()
 	.catch((error) => console.error('Error fetching user:', error))
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/a883d1f3-34d6-4c14-b885-9d41e4fdf99b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/a883d1f3-34d6-4c14-b885-9d41e4fdf99b.png)
 
 그럼 위와 같이 성공적으로 요청이 보내지며 로그가 찍히는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cbf87aa9-689d-4ef3-a95b-29a099b5ba53/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/cbf87aa9-689d-4ef3-a95b-29a099b5ba53.png)
 
 `cursor`를 설정하지 않은 상태의 글 목록인데, 위 코드를 기준으로 최신 10개의 글들을 가져온다. (현재 공개 상태의 글이 5개 밖에 없으므로 정상임)
 
 만약 `cursor`를 `Server Deployment with Docker, ECR, ECS and Fargate` 글을 기준으로 설정하면 아래와 같이 출력된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b769a266-48fe-4c33-9b90-51b732066ea8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/b769a266-48fe-4c33-9b90-51b732066ea8.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ecc7fe89-e5fb-4360-8d83-06c5baf4d188/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/ecc7fe89-e5fb-4360-8d83-06c5baf4d188.png)
 
 페이지네이션으로 한번에 가져올 수 있는 글들의 최대 수를 20개로 제한하였으므로, `limit`을 20으로 설정하고 마지막 글을 기준으로 다음 최신 20개를 글을 가져오는 식으로 로직을 작성하면 된다.
 
@@ -262,7 +262,7 @@ fetchUser()
 
 DevTools에서 JWT 엑세스 토큰을 추출한 뒤 GraphQL 클라이언트 헤더에 넣어 요청하면 비공개 글 까지 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/90605161-6f49-4674-a3ef-acaf96bb11d5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/90605161-6f49-4674-a3ef-acaf96bb11d5.png)
 
 다만 모든걸 자동화를 할 예정이기 때문에 이 또한 자동으로 해야하는데, 자체적인 로그인 시스템을 사용했다면 쉽게 로직을 작성할 수 있었을 것이다.
 
@@ -311,9 +311,9 @@ const fetchPosts = async (username: string, cursor?: string, posts: Post[] = [])
 
 로직은 위에서 설명하였는데, 쉽게 말해 먼저 가장 최신의 게시글 20개를 가져오고 마지막 글(`posts[length - 1]`)의 ID로 다시 다음 20개의 게시글을 가져온 다음 20개 미만이라면 함수를 끝낸다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cc8910bf-d9c2-44b5-b7a9-99dbcfe43e0d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/cc8910bf-d9c2-44b5-b7a9-99dbcfe43e0d.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/8773f0ca-b2ae-4015-8542-5ce25818c0aa/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/8773f0ca-b2ae-4015-8542-5ce25818c0aa.png)
 
 잘 작동한다.
 
@@ -329,7 +329,7 @@ type Query {
 
 위 스키마와 실제 요청을 보냈을 때 요청되는 쿼리문을 바탕으로 Document를 작성하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/95afbe79-849f-4676-b0f5-aebb12c53b08/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/95afbe79-849f-4676-b0f5-aebb12c53b08.png)
 
 마찬가지로 잘 나타나는 것을 볼 수 있다. 이로써 백업 기능의 90%는 완성했다고 보면 된다.
 이제 모든 리펙토링 후 각 게시글 별 마크다운 저장 및 Jeykll 블로그 형태의 메타데이터도 같이 작성되게 만들면 된다.
@@ -338,17 +338,17 @@ type Query {
 
 마지막으로 개별 포스트를 바탕으로 파일을 작성하면 코드는 완성된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/958205c6-67ed-431f-a69a-dccd29c4a52d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/958205c6-67ed-431f-a69a-dccd29c4a52d.png)
 
 또한 ESBuild를 적용하여 번들링을 하였고, 다음으로 AWS 람다에서 실행하기 위해 코드를 약간 수정하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8c5ccfb2-7a2a-4137-ac4a-9cdc3740d000/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/8c5ccfb2-7a2a-4137-ac4a-9cdc3740d000.png)
 
 먼저 AWS 람다에 실행하여 zip 파일로 S3에 저장할것이기 때문에 위와 같이 람다에서 `/tmp` 디렉토리를 사용한다.
 
 또한 S3의 용량을 아끼기 위해 최근 5개의 백업본만 남겨두기 위해 아래와 같은 코드도 작성하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/401a33c1-38b9-49a5-997b-b41bf7106e14/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/401a33c1-38b9-49a5-997b-b41bf7106e14.png)
 
 # 3. Let's build the AWS Infra
 
@@ -356,13 +356,13 @@ type Query {
 
 백업 파일들을 저장할 버킷을 만든다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/42478e4e-3570-4a43-aa8b-5927ce462bf6/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/42478e4e-3570-4a43-aa8b-5927ce462bf6.png)
 
 버킷을 만들고 환경 변수를 설정한 뒤 코드를 실행해보면 아래와 같이 잘 작동하는 모습을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ccd253dd-d92b-4f33-ac6d-5192c8a18b9a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/ccd253dd-d92b-4f33-ac6d-5192c8a18b9a.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a6e01f8c-63e6-40dd-95c7-c0d39b36e569/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/a6e01f8c-63e6-40dd-95c7-c0d39b36e569.png)
 
 다음으로 람다에 업로드하여 나중에 EventBridge와 연동하도록 해보자.
 
@@ -370,23 +370,23 @@ type Query {
 
 먼저 람다 함수를 만들고 코드를 업로드하여 테스트를 해보았다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/657de5f2-0090-4b59-91b7-7889a29b3ca3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/657de5f2-0090-4b59-91b7-7889a29b3ca3.png)
 
 다음으로 S3에 접근할 수 있도록 IAM 정책을 수정해주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/92b8b79b-bcd5-4edd-a211-7b71a57c568a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/92b8b79b-bcd5-4edd-a211-7b71a57c568a.png)
 
 또한 로컬에서 돌려도 3초는 턱없이 부족하니 아래와 같이 3분으로 타임아웃 설정을 해두었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/bf866fab-00d2-487c-98cd-33da9ae8dc4d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/bf866fab-00d2-487c-98cd-33da9ae8dc4d.png)
 
 이후 람다를 실행해보면 아래와 같이 잘 작동한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b58ff758-1fcf-4299-9311-8ce15159a0f3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/b58ff758-1fcf-4299-9311-8ce15159a0f3.png)
 
 S3에도 백업본이 잘 저장되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ea055080-2e46-454f-90d5-9c0114c671a8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/ea055080-2e46-454f-90d5-9c0114c671a8.png)
 
 ## EventBridge + Scheduler
 
@@ -394,11 +394,11 @@ S3에도 백업본이 잘 저장되는 것을 볼 수 있다.
 
 먼저 EventBridge의 일정(Scheduler) 항목에 들어가 "일정 생성"을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c1fe5a16-273e-4ad7-9f20-4403b4ec328e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/c1fe5a16-273e-4ad7-9f20-4403b4ec328e.png)
 
 일정의 이름을 정하고 아래에 보면 "일정 패턴"이라는 항목이 있는데, 여기서 어느 주기로 반복할지(rate), 또는 언제 반복할지(cron)를 지정할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f03264d1-fc51-42cf-88a2-b172b74e403d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/f03264d1-fc51-42cf-88a2-b172b74e403d.png)
 
 특정 시간마다 반복을 할것이기 때문에 cron을 선택하고, 아래와 같이 설정하였다.
 
@@ -406,24 +406,24 @@ S3에도 백업본이 잘 저장되는 것을 볼 수 있다.
 cron(0 0 * * ? *)
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/7ac3a241-39ee-4e1c-bb09-0abc1183b51e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/7ac3a241-39ee-4e1c-bb09-0abc1183b51e.png)
 
 cron 표현 식에서 `*`는 모두(예: 1월~12월), `?`는 따로 지정하지 않음을 의미한다. (요일 등)
 그리고 0시 0분으로 설정하여 오전 12시에만 작동하도록 하였고, "유연한 기간"은 해당 기간 사이에 실행되게 한다는 것인데 여기서는 사용하지 않는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/089991a5-f63c-47b5-bde4-66f93b7fb0c8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/089991a5-f63c-47b5-bde4-66f93b7fb0c8.png)
 
 다음으로 대상을 선택하는데, 일정 시간마다 람다 함수를 실행하기 위해 람다 Invoke를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f5bf7065-2e15-43c6-91c7-d5de4e0e1074/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/f5bf7065-2e15-43c6-91c7-d5de4e0e1074.png)
 
 그리고 event 페이로드는 사용하지 않고, 설정을 완료하면 EventBridge Scheduler 설정이 끝난다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/61df08cc-4241-4766-8bff-91222c4713a7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/61df08cc-4241-4766-8bff-91222c4713a7.png)
 
 요금의 경우 100만개의 이벤트 당 1달러로, 매달 최대 31개의 Scheduler를 사용하므로 사실상 무료라고 봐도 된다. (매달 거의 0.000031달러 수준)
 
-![](https://velog.velcdn.com/images/yulmwu/post/602daf7e-21f2-4734-8f0c-face2815da61/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/602daf7e-21f2-4734-8f0c-face2815da61.png)
 
 람다 사용량도 거의 발생하지 않으며, S3 또한 넉넉하게 1GB로 잡아도 요금은 거의 발생하지 않는다.
 
@@ -503,11 +503,11 @@ jobs:
                     --region ap-northeast-2
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/9e6ef3b2-4c54-40c8-95e6-8dd4baad7f82/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/9e6ef3b2-4c54-40c8-95e6-8dd4baad7f82.png)
 
 환경 변수까지 설정해두면 아래와 같이 Github Actions를 사용한 CI/CD도 잘 작동한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d855e9c2-91ad-4116-ab7e-817af0e60590/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/d855e9c2-91ad-4116-ab7e-817af0e60590.png)
 
 ---
 
@@ -517,7 +517,7 @@ jobs:
 
 한동안 사용해봤는데 생각해보니 람다 함수의 실행 시간이 최대 15분이고, 이미지가 많아질 경우 속도도 느려지고 `/tmp` 용량도 아슬아슬 해질 듯 싶긴 하다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/33446047-8ff9-4a9c-8da0-4aa0d9d7234b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-05-velog-backup-with-eventbridge/33446047-8ff9-4a9c-8da0-4aa0d9d7234b.png)
 
 특히 이미지가 좀 많은 경우 더욱 심해질 듯 한데, 이미지는 CDN 링크 그대로 냅두고 글만 백업한다거나 방식을 바꿔 람다가 아닌 다른 EC2나 ECS와 같은 서비스를 이용하면 어떨까 싶다. (안쓸땐 꺼두고)
 

@@ -130,7 +130,7 @@ https://github.com/nestjs/mapped-types/blob/master/lib/intersection-type.helper.
 
 그런데 `IntersectionType` 함수를 사용하려고 하면 아래와 같이 인텔리센스가 두가지 라이브러리의 `IntersectionType`를 보여준다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3cab195e-2e4f-48ea-86e2-7760f4db9353/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/3cab195e-2e4f-48ea-86e2-7760f4db9353.png)
 
 하나는 NestJS에서 제공하는 Swagger 관련 라이브러리인 `@nestjs/swagger`, 다른 하나는 NestJS에서 제공하는 유용한 Mapped 타입들을 모아둔 `@nestjs/mapped-types` 라이브러리이다.
 
@@ -140,28 +140,28 @@ https://github.com/nestjs/mapped-types/blob/master/lib/intersection-type.helper.
 
 직접 확인해보자. 먼저 `@nestjs/mapped-types`의 `IntersectionType`를 사용했다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fc895f16-3097-4ab7-92d4-218e176116b7/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/fc895f16-3097-4ab7-92d4-218e176116b7.png)
 
 Swagger 문서는 아래와 같이 표시된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/adc7e419-4052-454c-92c2-4d6dd512f853/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/adc7e419-4052-454c-92c2-4d6dd512f853.png)
 
 보다시피 `TopicNameDto`의 프로퍼티인 `topicName`이 보이지 않는다. 다만 `CreatePostDto` 사용 시 `topicName`은 존재한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/07ec5e73-ba16-4caa-9eb0-f5e0273bd622/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/07ec5e73-ba16-4caa-9eb0-f5e0273bd622.png)
 
 이유는 앞서 설명했듯이 Swagger 데코레이터(`@ApiProperty()`)는 복사하지 않기 때문이다. 그럼 이제 `@nestjs/swagger` 라이브러리의 `IntersectionType`를 사용해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/efc1eced-7d38-4065-b7bc-67de556c59eb/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/efc1eced-7d38-4065-b7bc-67de556c59eb.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c8b7c17f-fa83-4961-81b6-1ab9d081b2d0/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/c8b7c17f-fa83-4961-81b6-1ab9d081b2d0.png)
 
 이렇게 Swagger 문서에 잘 표시된다. 내부의 구현 코드를 봐도 다르다.
 
 - `@nestjs/mapped-types`
-  ![](https://velog.velcdn.com/images/yulmwu/post/ef7a8b13-bd88-48c8-8449-0cda10ecd145/image.png)
+  ![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/ef7a8b13-bd88-48c8-8449-0cda10ecd145.png)
 - `@nestjs/swagger`
-  ![](https://velog.velcdn.com/images/yulmwu/post/12dd4dae-94ea-48b7-b58e-580db9bd8119/image.png)
+  ![](https://mirror-cdn.swua.kr/images/nestjs/2025-07-29-nestjs-intersectiontype/12dd4dae-94ea-48b7-b58e-580db9bd8119.png)
 
 ---
 

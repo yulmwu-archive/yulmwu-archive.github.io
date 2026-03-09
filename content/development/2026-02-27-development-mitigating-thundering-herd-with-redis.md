@@ -4,7 +4,7 @@ description: '실시간 스코어보드 구현에 대한 아키텍처 고안, �
 slug: '2026-02-27-development-mitigating-thundering-herd-with-redis'
 author: yulmwu
 date: 2026-02-27T04:37:08.306Z
-updated_at: 2026-03-07T13:07:23.856Z
+updated_at: 2026-03-08T23:49:26.190Z
 categories: ['Development']
 tags: ['go', 'project/smctf', 'redis']
 series:
@@ -33,9 +33,9 @@ is_private: false
 
 아무튼 플랫폼에선 스코어보드라는 것을 제공한다. 여기엔 타임라인과 리더보드로 구성되어 있고, 전자는 시간대 별로 참여자가 어떤 문제를 해결하여 어느 점수를 받았는지를 그래프로 나타내고 후자는 순위를 매김과 동시에 어떤 문제를 풀었는지, 또 First Blood 인지 등을 확인할 수 있도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b61bd6f3-39e9-47c8-a9c7-bcab0fc37f25/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/b61bd6f3-39e9-47c8-a9c7-bcab0fc37f25.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/0deb2ea0-506c-43a5-af76-c96dbd64fa51/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/0deb2ea0-506c-43a5-af76-c96dbd64fa51.png)
 
 개인적으로 이 UI가 CTF 플랫폼에 있어 가장 중요한 UI이지 않을까 싶고, 이에 따라 신경도 많이 쓴 편이다. 그런 와중에 하나의 의견을 받았는데, "실시간 업데이트" 기능을 구현하자는 의견이였다.
 
@@ -109,7 +109,7 @@ func (h *Handler) SubmitFlag(ctx *gin.Context) {
 
 하지만 앞서 클라이언트는 스코어보드 업데이트 이벤트를 받으면 새롭게 스코어보드 API를 호출한다고 하였고, 이는 곧 거의 같은 시간에 여러 요청이 Burst로 들어오고 다수의 Cache Miss가 발생하여 **Thundering Herd** 문제가 발생할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0967b292-e47c-4938-82d8-2761ade35175/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/0967b292-e47c-4938-82d8-2761ade35175.png)
 
 _아키텍처에서 Distributed Backend Nodes와 Redis 모양이 여러개지만, 이는 이해를 돕기 위함으로 착각하지 말자._
 
@@ -123,7 +123,7 @@ _아키텍처에서 Distributed Backend Nodes와 Redis 모양이 여러개지만
 
 이를 해결하기 위해 처음으로 고안한 대책은 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3f5347b7-ab09-48de-8a93-d3da6dc4e2ff/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/3f5347b7-ab09-48de-8a93-d3da6dc4e2ff.png)
 
 _가독성을 위해 Redis Cache Miss 시 내부 흐름은 포함하지 않았다._
 
@@ -137,7 +137,7 @@ _가독성을 위해 Redis Cache Miss 시 내부 흐름은 포함하지 않았�
 
 하지만 몇가지 문제가 있었다. 사실 앞으로 진행될, 그리고 이 플랫폼을 사용하여 운영할 CTF의 규모가 크진 않아 문제는 없지만 프로젝트의 규모를 무제한으로 수용할 수 있도록 메인테인하고 있기 때문에 짚고 넘어가야 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f58d119a-107e-478a-bcbe-9181e3dd1eab/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/f58d119a-107e-478a-bcbe-9181e3dd1eab.png)
 
 _필자의 미적 감각 부재로 가독성이 떨어진 점 양해 부탁한다._
 
@@ -161,7 +161,7 @@ CTF 플랫폼 특성상 장기적으로 봤을때 이런 경우는 많지 않을
 
 또한 여기서 핵심은 불특정한 하나의 노드에서만 스코어보드 계산이 처리된다는 점으로 비즈니스 로직 실행(DB 접근 포함)을 최소화할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4a2cab39-aa2f-4e21-b497-dbccb752a4a3/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/4a2cab39-aa2f-4e21-b497-dbccb752a4a3.png)
 
 _이미지 사이즈가 길어서 `scoreboard.rebuilt`에 대한 Subscribe 이후 다이어그램은 생략하였다. 기존과 동일하니 참고하자. 디바운스 기간은 300ms이다._
 
@@ -198,7 +198,7 @@ TTL(기본 10초)로 인해 락이 해제되어 다른 노드의 락이 생기�
 
 - https://github.com/nullforu/smctf/pull/43
 
-![](https://velog.velcdn.com/images/yulmwu/post/de3a3075-4cca-4f62-a779-074d05a6c354/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/de3a3075-4cca-4f62-a779-074d05a6c354.png)
 
 # 4. 구현하기 in Go
 
@@ -415,7 +415,7 @@ _중간에 익명 함수는 타이머가 nil일 경우 `timer.C`를 사용하면
 
 즉 아래와 같이 동작한다. 이때 락을 잡을 때 TTL이 필요한데 너무 짧다면 중복으로 실행될 가능성이, 너무 길거나 아예 없다면 장애 발생 시 처리가 장시간 정지될 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9b5a2a4f-0906-4176-b96f-2d99dcb28007/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/9b5a2a4f-0906-4176-b96f-2d99dcb28007.png)
 
 _물론 이 다이어그램의 전제 조건은 네트워크 레이턴시를 비롯한 걸림이 전혀 없다는 가정하에 `락 TTL ≥ 최대 처리 시간`이 성립할 때 유효하다. 이에 대해선 아래에서 다시 설명하겠다._
 
@@ -434,7 +434,7 @@ _물론 이 다이어그램의 전제 조건은 네트워크 레이턴시를 비
 
 만약 TTL 만료에 대해 토큰과 같은 전략을 사용하지 않는다면 아래은 상황이 발생할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e8c42b94-5b7e-4905-8872-24714ff6a519/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/e8c42b94-5b7e-4905-8872-24714ff6a519.png)
 
 노드 B가 락을 먼저 잡고 처리를 하지만 너무 오래 걸려 TTL을 초과하여 해당 락이 삭제된다. 이후 디바운드 기간이 지나 새로운 노드 A의 락이 걸리는데 노드 B의 처리가 이제서야 끝나 락을 삭제하게 된다.
 
@@ -443,7 +443,7 @@ _물론 이 다이어그램의 전제 조건은 네트워크 레이턴시를 비
 
 이를 해결하기 위해 락 키에 대한 임의의 토큰 전략을 사용하고, 락킹 시 같이 생성되는 토큰 값과 동일해야 락을 회수(삭제)할 수 있도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/77f00ce9-7b10-4b9a-adc3-b23649610f83/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/77f00ce9-7b10-4b9a-adc3-b23649610f83.png)
 
 이론 설명은 여기까지만 하고, 본격적으로 `handleEvent` 코드를 살펴보겠다.
 
@@ -632,7 +632,7 @@ func (h *SSEHub) Broadcast(payload string) {
 
 ---
 
-![](https://velog.velcdn.com/images/yulmwu/post/de3a3075-4cca-4f62-a779-074d05a6c354/image.png)
+![](https://mirror-cdn.swua.kr/images/development/2026-02-27-development-mitigating-thundering-herd-with-redis/de3a3075-4cca-4f62-a779-074d05a6c354.png)
 
 이로써 실시간 스코어보드 대해 Thundering Herd 완화를 위한 아키텍처 고안, 그리고 디바운스(Debounce)를 전략과 이후의 분산 락(Distributed Lock) 등을 도입해보고 Redis Pub/Sub를 활용해보는 시간을 가져보았다.
 

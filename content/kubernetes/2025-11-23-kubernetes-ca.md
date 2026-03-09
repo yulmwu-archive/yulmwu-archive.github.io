@@ -21,7 +21,7 @@ is_private: false
 
 지난 포스팅에서 쿠버네티스의 오토스케일링 기능 중 하나인 **HPA(Horizontal Pod AutoScaler)**에 대해 다루었었다. (https://velog.io/@yulmwu/kubernetes-hpa)
 
-![](https://velog.velcdn.com/images/yulmwu/post/50d4964c-e165-4e51-ba1a-61347311ea25/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/50d4964c-e165-4e51-ba1a-61347311ea25.png)
 
 HPA는 위 사진과 같이 파드의 수를 수평적으로 증가시키거나 감소시키는데, HPA를 사용하였을 때 발생하는 근본적인 문제가 있다.
 
@@ -37,7 +37,7 @@ Cluster Autoscaling에 대해 정확하게 설명해보자면, 스케줄러가 �
 
 이때 CA는 HPA와는 다르게 실제 CPU/메모리 사용률을 기반으로 하지 않고 리소스 요청량(requests)를 보고 판단한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4cdf147d-ba77-4dfd-9efc-8b8b2f3f2774/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/4cdf147d-ba77-4dfd-9efc-8b8b2f3f2774.png)
 
 AWS EKS(EC2 인스턴스)에선 EC2 AutoScaling Group 및 Managed Node Group을 통해 API를 호출하여 노드의 수를 스케일링한다. Fargate는 노드를 신경쓰지 않는 서버리스 환경이기 때문에 직접 Cluster Autoscaling을 할 필요가 없다.
 
@@ -155,7 +155,7 @@ helm upgrade --install cluster-autoscaler autoscaler/cluster-autoscaler \
   -f ca/ca-values.yaml
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/b907a85f-711f-4838-afc0-e878227eb02b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/b907a85f-711f-4838-afc0-e878227eb02b.png)
 
 여기까지 클러스터를 만들고 Helm을 통해 AutoScaler를 설치하는 과정이였다. 실제 운영에선 여기에 HPA를 더해 사용하겠지만, 본 포스팅에선 CA와 Karpenter의 EC2 노드 프로비저닝 속도를 비교해보는 것에 중점을 두었기 때문에 수동으로 파드의 수를 조절하여 테스트해보겠다.
 
@@ -279,13 +279,13 @@ node/ip-192-168-19-145.ap-northeast-2.compute.internal   Ready    <none>   6m30s
 
 참고로 `kubectl -n kube-system logs -f deploy/cluster-autoscaler-aws-cluster-autoscaler`를 통해 CA 로그를 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/206cbf1a-7bbe-44d6-88b9-32cf5e72a7d9/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/206cbf1a-7bbe-44d6-88b9-32cf5e72a7d9.png)
 
 시간이 지나 확인해보면 아래와 같이 모두 Running 상태로 잘 스케줄링이 된 것을 볼 수 있고, 또한 노드가 증가된 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1866633f-721f-4fa3-8e50-8124e4bfdff9/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/1866633f-721f-4fa3-8e50-8124e4bfdff9.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/da0807b4-0518-440c-8de0-5e6f960e5b1f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/da0807b4-0518-440c-8de0-5e6f960e5b1f.png)
 
 ```
 Elapsed time: 93.2 seconds
@@ -312,7 +312,7 @@ I1124 08:58:03.920562       1 nodes.go:126] ip-192-168-31-97.ap-northeast-2.comp
 
 10분이 지날 때 까지 기다려보고 다시 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ebe34275-edcf-4ad7-997e-aa24ebe5fc5a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-23-kubernetes-ca/ebe34275-edcf-4ad7-997e-aa24ebe5fc5a.png)
 
 ```
 > kubectl get pods,nodes

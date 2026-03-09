@@ -23,11 +23,11 @@ is_private: false
 
 즉 아래와 같이 클러스터가 구성되는 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/713bc0b7-99d7-4911-b1a7-bc3ae22c0ce2/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/713bc0b7-99d7-4911-b1a7-bc3ae22c0ce2.png)
 
 만약 AWS EKS(Elastic Kubernetes Service)를 사용하게 될 경우 완전 관리형 서비스이기 때문에 컨트롤 플레인은 AWS에서 자체적으로 관리하고, 워커 노드는 EC2를 프로비저닝하여 구성한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7cc8ff72-bcbf-4de6-aa00-d2d653e36907/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/7cc8ff72-bcbf-4de6-aa00-d2d653e36907.png)
 
 그런데 ECS(Elastic Container Service)를 사용해봤다면 알 수 있겠지만, EC2 노드 그룹 대신 Fargate를 통해 노드 프로비저닝 없이 클러스터를 구성할 수 있다.
 
@@ -37,7 +37,7 @@ Fargate는 서버(노드)를 프로비저닝 하지 않고 컨테이너를 실�
 
 AWS에서 제공하는 컨테이너 오케스트레이션 서비스인 ECS나 EKS(Kubernetes)에서 사용할 수 있으며, 노드(EC2) 관리를 하지 않고 컨테이너 오케스트레이션에 집중할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5a0bb551-b9eb-474b-b8b6-811b770fe556/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/5a0bb551-b9eb-474b-b8b6-811b770fe556.png)
 
 때문에 노드에 설치되는 kubelet과 kube-proxy 등이 설치되지 않고 AWS에서 관리한다.
 
@@ -105,21 +105,21 @@ aws eks update-kubeconfig --name eks-fargate-demo --region ap-northeast-2
 
 그럼 아래와 같이 EKS 클러스터가 생성된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d01ae3fc-42c9-4b2b-9c2a-9e153839dfe8/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/d01ae3fc-42c9-4b2b-9c2a-9e153839dfe8.png)
 
 그리고 Fargate 프로필 또한 정상적으로 생성된 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e8d586b3-a4e8-496c-8a3c-9c1585b2c5db/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/e8d586b3-a4e8-496c-8a3c-9c1585b2c5db.png)
 
 > 만약 `failed to create Fargate profile "..." on EKS cluster`와 같은 에러가 발생한다면 클러스터를 지우고(`eksctl delete -f ...`) 다시 만들거나 EKS 클러스터만 만들고 Fargate 프로필은 따로 만드는 방법으로 시도해보자.
 
 그런데 AWS 콘솔이나 `kubectl get nodes -o wide` 등의 명령어로 노드를 확인해보면 아래와 같이 1개 이상의 노드가 존재하는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b3a263ea-6525-4130-b7b4-f1537ddb51e4/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/b3a263ea-6525-4130-b7b4-f1537ddb51e4.png)
 
 이는 쿠버네티스 클러스터 관점에선 노드가 있어야 스케쥴링이 될 수 있기 때문에 AWS에서 논리적으로 할당해준 노드고, 아래와 같이 EC2 인스턴스 목록을 확인해보면 물리적인 노드는 없는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2d2c60b6-4a15-48bf-8d84-90f637de5ba5/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/2d2c60b6-4a15-48bf-8d84-90f637de5ba5.png)
 
 ## (2) Deployment
 
@@ -178,11 +178,11 @@ kubectl apply -f deployment.yaml
 kubectl get pods -o wide -n apps
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/9ba6bfc7-6125-4b6d-a4dd-6102188c5f73/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/9ba6bfc7-6125-4b6d-a4dd-6102188c5f73.png)
 
 그럼 위 사진과 같이 `apps` 네임스페이스와 `run: on-fargate`이 Fargate 프로필과 매칭되어 Fargate 위에 올라간 것을 볼 수 있다. 같은 네임스페이스에 `curl`이 동작하는 파드를 하나 임시로 만들고 두 Nginx 파드의 IP로 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2257f405-f050-4674-9713-d493e5a7bbd1/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-23-kubernetes-eks-fargate/2257f405-f050-4674-9713-d493e5a7bbd1.png)
 
 잘 동작하는 것을 볼 수 있다. Fargate에 대한 개념만 설명하는 간단한 포스팅이였기 때문에 실습은 여기까지 매우 간단하게 진행해보았다.
 

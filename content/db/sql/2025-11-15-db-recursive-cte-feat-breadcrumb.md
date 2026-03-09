@@ -25,7 +25,7 @@ is_private: false
 
 그래서 지난 여름방학 시즌 묵혀두었던 프로젝트 코드베이스를 바탕으로, AWS S3를 기반으로 한 STaaS(Storage as a Service) 스토리지 서비스를 제작하기에 들어섰다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/28cf2567-d8e9-4f44-a184-6bb946bd96cd/image.png)
+![](https://mirror-cdn.swua.kr/images/db/sql/2025-11-15-db-recursive-cte-feat-breadcrumb/28cf2567-d8e9-4f44-a184-6bb946bd96cd.png)
 
 ---
 
@@ -33,7 +33,7 @@ is_private: false
 
 때문에 아래와 같은 DB 스키마를 만들어 사용자가 파일을 업로드하거나 디렉토리를 만들면 DB에 메타데이터 형태로 저장되도록 고안하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/46331c60-c71b-4d77-9259-e9e896faf1ac/image.png)
+![](https://mirror-cdn.swua.kr/images/db/sql/2025-11-15-db-recursive-cte-feat-breadcrumb/46331c60-c71b-4d77-9259-e9e896faf1ac.png)
 
 파일이나 디렉토리(이하 오브젝트) 모두 File 엔티티를 사용하도록 하고, `type` 컬럼을 통해 구분하도록 한다.
 
@@ -41,7 +41,7 @@ is_private: false
 
 # 1. Breadcrumb ..?
 
-![](https://velog.velcdn.com/images/yulmwu/post/3e97f1cc-4abc-4db3-8b62-1982c0ca9989/image.jpg)
+![](https://mirror-cdn.swua.kr/images/db/sql/2025-11-15-db-recursive-cte-feat-breadcrumb/3e97f1cc-4abc-4db3-8b62-1982c0ca9989.jpg)
 
 _(사진 허락 받음)_
 
@@ -51,7 +51,7 @@ _(사진 허락 받음)_
 
 어렵게 생각할 필요도 없이
 
-![](https://velog.velcdn.com/images/yulmwu/post/c0133cf4-78a2-436f-bd29-6fd298c8bde8/image.png)
+![](https://mirror-cdn.swua.kr/images/db/sql/2025-11-15-db-recursive-cte-feat-breadcrumb/c0133cf4-78a2-436f-bd29-6fd298c8bde8.png)
 
 이걸 말하는 것이다.
 
@@ -94,7 +94,7 @@ async getBreadcrumb(uuid: string, userId: number): Promise<FileResponseDto[]> {
 
 이걸 작성할 때 디스코드 화면 공유를 키면서 작성했었는데..
 
-![](https://velog.velcdn.com/images/yulmwu/post/c843c95b-417a-49f0-9d9f-541cf9f709c1/image.png)
+![](https://mirror-cdn.swua.kr/images/db/sql/2025-11-15-db-recursive-cte-feat-breadcrumb/c843c95b-417a-49f0-9d9f-541cf9f709c1.png)
 
 로직은 현재 디렉토리를 기준으로 하여 부모 디렉토리를 가져오고(findOne), 또 부모 요소의 부모 요소.. 이걸 부모 요소가 없을 때 까지 반복한다.
 
@@ -102,7 +102,7 @@ async getBreadcrumb(uuid: string, userId: number): Promise<FileResponseDto[]> {
 
 사실 UI 테스트를 위해 간단하게 제작된 비즈니스 로직이였던터라.. 아래와 같이 UI를 구현하는게 주된 목적이였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e27df7a3-8248-41c5-bb63-be4d6441c1ea/image.png)
+![](https://mirror-cdn.swua.kr/images/db/sql/2025-11-15-db-recursive-cte-feat-breadcrumb/e27df7a3-8248-41c5-bb63-be4d6441c1ea.png)
 
 # 3. Second Attempt — Recursive CTE
 

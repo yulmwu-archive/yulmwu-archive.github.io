@@ -30,7 +30,7 @@ is_private: false
 >
 > 실습에서는 Nginx Ingress Controller를 사용하고, AWS NLB는 TLS Passthrough가 되도록 설정하겠다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/f74958ec-ca61-41ba-8460-e364cafd834f/image.png)
+> ![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/f74958ec-ca61-41ba-8460-e364cafd834f.png)
 
 # 1. Kubernetes Native Objects
 
@@ -210,7 +210,7 @@ EOF
 openssl x509 -in crt.pem -text -noout | grep -A2 "Subject Alternative Name"
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/37763e55-f501-43c7-ae20-170c463c433a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/37763e55-f501-43c7-ae20-170c463c433a.png)
 
 생성이 완료되었다면 아래의 명렁어로 TLS 타입의 Secret 리소스를 생성하자.
 
@@ -262,15 +262,15 @@ kubectl apply -f ingress.yaml
 
 이제 브라우저에서 NLB 주소로 접속해보자. 그럼 Nginx로 인해 자동으로 HTTP to HTTPS로 리다이렉트가 된다. 하지만 접속 시 아래와 같이 경고 안내가 나오는 것을 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/60068c4b-6a83-4610-8380-29dbd485bb58/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/60068c4b-6a83-4610-8380-29dbd485bb58.png)
 
 여기서 인증서 세부사항을 보면 아래와 같이 우리가 만들었던(Self Signed) 인증서가 보여지는 것을 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/02e04989-ea72-4329-8a93-440c551b9c2c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/02e04989-ea72-4329-8a93-440c551b9c2c.png)
 
 그럼에도 에러가 발생하는 이유는 Self Signed 인증서이기 때문인데, `openssl s_client -connect $NLB_DNS:443 -servername $NLB_DNS` 명령어를 통해서 테스트해봐도 Self Signed라면서 에러를 반환하는 것을 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7938649a-8914-4a71-9f2d-f7b2f0f43002/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/7938649a-8914-4a71-9f2d-f7b2f0f43002.png)
 
 다만 SSL Handshake는 잘 되는 것도 확인해볼 수 있다. (Kubernetes/Ingress 레벨에서 TLS Termination이 동작하는지 확인하기 위한 PoC 였음)
 
@@ -295,7 +295,7 @@ kubectl apply -f ingress.yaml
 
 실습을 하기 전 cert-manager의 주요 컴포넌트를 알아보고 넘어가도록 하겠다. 공식적으로 제공하는 쓸만한 다이어그램이 없어서 직접 제작하였고, 각 요소 별 역할을 짧게 적어두었으니 참고하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8cc4e9f2-4285-4008-8679-029b5fe2f57b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/8cc4e9f2-4285-4008-8679-029b5fe2f57b.png)
 
 ## Webhook, CA Injector
 
@@ -327,7 +327,7 @@ CRD 중 어디에서 인증서 발급 방식 정의하는 **Issuer** 또는 **Cl
 
 Cloudflare(No Proxied, DNS Only)를 사용할 수도 있지만, EKS 환경에선 IRSA를 통해 Route53과 통합되기 쉬우니 Route53을 사용하였다. cert-manager 공식적으로 Route53 및 Cloudflare 등을 지원하니 필요시 참고하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d3665fea-7a81-4ec2-b55f-c9efa6a8551a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/d3665fea-7a81-4ec2-b55f-c9efa6a8551a.png)
 
 실습에서 사용할 도메인은 `rlawnsdud.shop`이며, FQDN은 `demo.rlawnsdud.shop`이다. 또한 클러스터와 애플리케이션(`application.yaml`), Ingress `values.yaml` 및 설치 방법은 아까와 동일하니 생략하도록 하겠다.
 
@@ -335,19 +335,19 @@ Cloudflare(No Proxied, DNS Only)를 사용할 수도 있지만, EKS 환경에선
 
 ## (1) Route53 Hosted Zone and NLB Record
 
-![](https://velog.velcdn.com/images/yulmwu/post/0796037b-0b4a-4475-82c3-d513047ceab0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/0796037b-0b4a-4475-82c3-d513047ceab0.png)
 
 Route53 DNS 서버를 사용하기 위해서는 호스팅 영역(Hosted Zone)이 필요하다. Cloudflare와는 다르게 추가적인 요금이 발생할 수 있으니 참고하도록 하고, 아래와 같이 퍼블릭 호스팅 영역을 생성하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d87325c9-9770-42db-9f04-07770a2dc498/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/d87325c9-9770-42db-9f04-07770a2dc498.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/7167ebea-2180-4d49-91da-fc81c446c084/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/7167ebea-2180-4d49-91da-fc81c446c084.png)
 
 생성이 완료되었다면 아래와 같이 네임 서버 주소를 제공해주는데, 이를 복사하고 도메인 업체에서 네임 서버를 변경하도록 하자. 적용되는데 시간이 오래걸릴 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7818214a-b74d-4642-bc28-207c4744661f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/7818214a-b74d-4642-bc28-207c4744661f.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/aff7256d-a2a1-4f77-9929-f23e09159e15/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/aff7256d-a2a1-4f77-9929-f23e09159e15.png)
 
 ---
 
@@ -363,11 +363,11 @@ NLB_DNS=ae9b30d9bd40447f3a4507cd2bffdc14-f86832c25ee1bbb4.elb.ap-northeast-2.ama
 
 위 주소를 레코드로 등록하는데, CNAME으로 등록해도 되고 A 레코드에 별칭을 구성하여 등록할 수도 있다. (이는 AWS 자체 기능이다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/9033a138-52be-4bdd-8ace-d435f56a59ef/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/9033a138-52be-4bdd-8ace-d435f56a59ef.png)
 
 ## (2) cert-manager Helm Chart
 
-![](https://velog.velcdn.com/images/yulmwu/post/b619876b-3632-4f6a-9273-221fbc1d0cd0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/b619876b-3632-4f6a-9273-221fbc1d0cd0.png)
 
 마찬가지로 cert-manager도 Helm Chart로 설치할 수 있다. 아래의 명령어로 cert-manager를 설치하자.
 
@@ -418,11 +418,11 @@ kubectl -n cert-manager rollout restart deploy cert-manager
 kubectl -n cert-manager get sa cert-manager -o yaml | yq '.metadata.annotations'
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/85ff5c30-75d3-4e5f-b348-0ab430473046/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/85ff5c30-75d3-4e5f-b348-0ab430473046.png)
 
 ## (3) ClusterIssuer
 
-![](https://velog.velcdn.com/images/yulmwu/post/d2db0dbb-bc2b-48c2-b3c8-a7bde02d9489/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/d2db0dbb-bc2b-48c2-b3c8-a7bde02d9489.png)
 
 다음으로 cert-manager CRD인 ClusterIssuer를 아래와 같이 구성하자. `< >` 필드는 직접 수정해야 한다. ClusterIssuer(또는 Issuer)에서 CA를 구성할 수 있다. 여기서는 ACME Let's Encrypt를 사용하였다.
 
@@ -456,7 +456,7 @@ kubectl apply -f cert-manager/clusterissuer-staging.yaml
 
 ## (4) Ingress
 
-![](https://velog.velcdn.com/images/yulmwu/post/2b90b901-217c-43a1-93d9-d08f94608ab0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/2b90b901-217c-43a1-93d9-d08f94608ab0.png)
 
 Ingress 매니페스트에서 변경할 부분은 `metadata.annotations`의 `cert-manager.io/cluster-issuer` 어노테이션과 `hosts`, `host` 필드이다.
 
@@ -497,19 +497,19 @@ kubectl apply -f cert-manager/ingress.yaml
 
 이제 `kubectl get certificate,certificaterequest,order,challenge -A` 명령어를 통해 cert-manager 관련 CRD 리소스 상태를 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b630fe14-8536-4f6a-8e76-7a32d806fd70/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/b630fe14-8536-4f6a-8e76-7a32d806fd70.png)
 
 필자는 DNS 네임 서버 변경 및 전파 시간으로 인해 Pending 상태가 오래 지속되었는데, 보통은 2~3분이면 Valid 상태로 된다. 중간에 `_acme-challenge` TXT 레코드가 추가되는데, 검증 후 바로 삭제된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e1a60fbe-5638-43a3-97c0-74d08e5e8a3f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/e1a60fbe-5638-43a3-97c0-74d08e5e8a3f.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/2d361ff6-7a82-42ac-ae1b-fb937f43e33c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/2d361ff6-7a82-42ac-ae1b-fb937f43e33c.png)
 
 ## (5) Testing
 
 이제 `demo.rlawnsdud.shop`으로 접속해보자. HTTP로 접속해도 Nginx에 의해 자동으로 HTTPS로 리다이렉트되는데, 스테이징(`acme-staging-v02`) 인증서라서 경고 메시지가 나타난다. (`curl -k` 옵션으로 무시 가능)
 
-![](https://velog.velcdn.com/images/yulmwu/post/32077031-b9d2-42d0-999a-4ee56fff38b8/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/32077031-b9d2-42d0-999a-4ee56fff38b8.png)
 
 스테이징 환경을 분리해둔 이유는 Let's Encrypt의 프로덕션 환경에서는 발급/실패 제한이 있고, 이를 반복하면 발급에 제한이 걸릴 수 있다.
 
@@ -544,17 +544,17 @@ kubectl -n default annotate ingress nlb-tls-ingress \
   cert-manager.io/cluster-issuer=letsencrypt-prod --overwrite
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/2d1dd230-1117-48bd-9a81-20d932ceb167/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/2d1dd230-1117-48bd-9a81-20d932ceb167.png)
 
 이제 다시 테스트해보자. 그러면 HTTPS TLS/SSL 인증서가 적용되어 경고 없이 응답되는 것을 확인해볼 수 있을 것이다. (이전과 같이 브라우저에서 접속하여 확인하면 좋겠지만, DNS NS 전파 시간이 너무 오래 걸려 curl로 대신하였다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/e9daa38c-fad7-4215-9922-702d8012a6d2/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/e9daa38c-fad7-4215-9922-702d8012a6d2.png)
 
 ```shell
 openssl s_client -connect demo.rlawnsdud.shop:443 -servername demo.rlawnsdud.shop -showcerts </dev/null
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/a9e39868-dfd9-4ec2-958d-dd14ed28acd8/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-09-kubernetes-cert-manager/a9e39868-dfd9-4ec2-958d-dd14ed28acd8.png)
 
 이렇게 Let's Encrypt ACME 인증서를 사용하는 모습을 볼 수 있고, 만료가 되기 전 자동으로 갱신 또한 진행된다.
 

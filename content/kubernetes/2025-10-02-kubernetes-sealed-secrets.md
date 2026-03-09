@@ -69,7 +69,7 @@ Bitnami에서 개발한 [Sealed Secretes](https://github.com/bitnami-labs/sealed
 
 때문에 Sealed Secrets Controller만이 가지고 있는 개인 키로만 복호화를 할 수 있고, 제공되는 공개 키를 통해 값을 암호화한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b8f8637a-f5e8-4c68-bcc4-2be4b533ed1e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-02-kubernetes-sealed-secrets/b8f8637a-f5e8-4c68-bcc4-2be4b533ed1e.png)
 
 Sealed Secrets에선 CRD와 Operator Pattern을 통해 자동화되기 때문에 간단하게 Helm을 통해 설치 및 CR 선언만 하면 된다.
 

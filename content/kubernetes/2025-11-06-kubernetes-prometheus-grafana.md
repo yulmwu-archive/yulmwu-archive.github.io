@@ -47,7 +47,7 @@ known unknowns, 즉 무슨 문제인지 알려져 있으나(known) 그 문제의
 - **Logs** — 애플리케이션에서 발생한 이벤트 기록을 통해 원인을 분석하고 추적하며 이러한 로그를 중앙 집중화함. Fluent Bit나 Loki 등이 이에 해당됨.
 - **Traces** — 애플리케이션의 Stack Trace처럼 인프라에서도 여러 서비스를 거치게 되는데, 이러한 특정 지점까지 도달하기 까지의 경로를 관찰하고 분석함. OpenTelemetry에 포함되기도 하고 Tempo와 같은 소프트웨어도 존재함.
 
-![](https://velog.velcdn.com/images/yulmwu/post/823059cd-ea01-40c7-8922-95c9931c2421/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/823059cd-ea01-40c7-8922-95c9931c2421.png)
 
 ## 0-3. Why Observability is Needed in Cloud Native?
 
@@ -65,7 +65,7 @@ known unknowns, 즉 무슨 문제인지 알려져 있으나(known) 그 문제의
 
 쿠버네티스에서 사용을 기준으로 한다면 Prometheus 아키텍처는 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4ed0dccc-f2a5-4d75-bbe3-86e8f8f191d7/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/4ed0dccc-f2a5-4d75-bbe3-86e8f8f191d7.png)
 
 ## 1-1. Service Discovery(SD)
 
@@ -113,7 +113,7 @@ Prometheus의 HTTP 서버로, 주요 기능은 구성된 스크랩 대상으로 
 
 **Exporter**는 애플리케이션이나 시스템이 직접 Prometheus Exposition Format(이하 PEF)이나 OpenMetrics 포맷의 metrics 엔드포인트(`/metrics` 등)를 노출하지 못하는 경우, Exporter를 중간에 두어 Exporter가 메트릭을 수집, 그리고 OpenMetrics(이하 PEF 포함) 포맷의 엔드포인트를 노출하여 Prometheus가 Pull 할 수 있도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/19f85a9f-6fea-4a61-95c5-be79632a5118/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/19f85a9f-6fea-4a61-95c5-be79632a5118.png)
 
 그러한 Exporter는 대상에 따라 대표적으로 노드의 메트릭을 수집하는 node-exporter(Linux/Unix 환경), windows-exporter(Windows 환경), cAdvisor(컨테이너), 그리고 DB의 메트릭을 수집하는 Exporter와 외부의 관점에서 가용성을 체크하기 위한 Blackbox Exporter 등이 있다.
 
@@ -129,7 +129,7 @@ Prometheus는 기본적으로 수집할 대상에 Pull을 통해 메트릭을 �
 
 때문에 많은 데이터가 짧은 시간에 처리되는 배치성 작업에도 유리할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/54004abc-e309-4564-906e-11b08fd9e0dd/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/54004abc-e309-4564-906e-11b08fd9e0dd.png)
 
 다만 Prometheus의 철학은 일정한 간격을 두고 대상을 Pull 하여 스크랩(수집)하는 Pull 모델이기 때문에 Pushgateway의 용도를 확실하게 하지 않고 남발할 경우 가용성 확인/유효성 관리의 어려움, 중복된 메트릭 등의 문제가 생길 수 있으니 Pushgateway는 임시적인(Ephemeral) 프로세스에 대한 예외적인 기능이라 생각하는 것이 좋다.
 
@@ -292,7 +292,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/ca30d6df-69ff-45de-b2bd-24ba826af4a0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/ca30d6df-69ff-45de-b2bd-24ba826af4a0.png)
 
 ```shell
 helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
@@ -303,11 +303,11 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
 
 Prometheus와 Grafana의 서비스는 NodePort로 설정하여 Prometheus Stack을 설치하도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1309dac1-9909-4c1d-bf6c-d8d77ad86ef0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/1309dac1-9909-4c1d-bf6c-d8d77ad86ef0.png)
 
 설치가 완료되었다면 아래의 명령어를 통해 Prometheus와 Grafana의 포트를 확인해보고 대시보드에 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dc06af26-f07e-4d3c-a252-634a523b2620/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/dc06af26-f07e-4d3c-a252-634a523b2620.png)
 
 필자는 minikube 환경을 사용하고 있기 때문에 아래와 같은 명령어로 터널링을 해주겠다.
 
@@ -316,9 +316,9 @@ minikube service kube-prometheus-stack-prometheus -n monitoring
 minikube service kube-prometheus-stack-grafana -n monitoring
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/bdbb456e-0142-4137-ad1d-bb3be63def2b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/bdbb456e-0142-4137-ad1d-bb3be63def2b.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5eabf56d-1503-4d4d-9aaa-cdf0527680c4/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/5eabf56d-1503-4d4d-9aaa-cdf0527680c4.png)
 
 첫번째 화면은 Prometheus에서 자체적으로 제공하는 UI로, 간단하게 PromQL 쿼리를 테스트 해볼 수 있다. 아래의 Grafana를 통해 더욱 더 자세하게 시각화를 해보겠다.
 
@@ -335,25 +335,25 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 
 로그인을 완료하였다면 아래와 같이 시작 화면이 나타나는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fafb564a-d48b-4571-9091-65b8f7535597/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/fafb564a-d48b-4571-9091-65b8f7535597.png)
 
 원래라면 Connections > Data Sources에서 데이터 소스를 추가해야 하지만 Prometheus Stack을 설치하면서 기본적으로 Prometheus와 연동되기 때문에 따로 설정해줄 필요는 없다.
 
 혹여나 Prometheus 데이터 소스가 없다면 추가하면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5c46fa85-24b0-4166-8f73-cb02dcac665a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/5c46fa85-24b0-4166-8f73-cb02dcac665a.png)
 
 다음으로, 왼쪽 사이드바 메뉴에서 Dashboards를 클릭, New Dashboard를 클릭한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c65ba6b7-87be-4cc7-b9bf-6efc3595487e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/c65ba6b7-87be-4cc7-b9bf-6efc3595487e.png)
 
 다음으로 Add Visualization, Prometheus 데이터 소스를 선택하면 대시보드에 패널을 추가할 수 있는 UI가 나타난다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a57be26c-2af6-48dc-89ad-f86988d574c2/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/a57be26c-2af6-48dc-89ad-f86988d574c2.png)
 
 이제 하단의 Queries 탭에서 Builder가 아닌 Code를 선택하여 PromQL을 직접 작성하도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a0c07d52-b8b4-4017-ae54-af65bfc5abb7/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/a0c07d52-b8b4-4017-ae54-af65bfc5abb7.png)
 
 그래고 아래의 PromQL을 추가하고 Run queries를 클릭해보자.
 
@@ -361,19 +361,19 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/97a741aa-a90a-487e-a857-b130bc1b3d31/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/97a741aa-a90a-487e-a857-b130bc1b3d31.png)
 
 그러면 위 사진과 같이 노드의 CPU 사용률이 그래프로 나타나는 것을 볼 수 있다. 상단 메뉴의 Table view를 클릭하면 Timestamp 별로 데이터가 나타나는 것을 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c25d08b4-cdf6-4b75-b662-960cf72683ef/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/c25d08b4-cdf6-4b75-b662-960cf72683ef.png)
 
 만약 그래프의 디자인을 변경하고 싶다면 오른쪽 패널(Visualization)에서 설정할 수 있다. 이는 상황에 따라 적절하게 사용하면 될 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b224f8b5-d6cb-4594-bbe2-7fc5275b8545/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/b224f8b5-d6cb-4594-bbe2-7fc5275b8545.png)
 
 대시보드 이름을 지정하고 저장하면 아래와 같이 방금 만들었던 패널(Visualization)이 나타나는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/72096800-7d1d-4436-b0fe-219084b861f4/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/72096800-7d1d-4436-b0fe-219084b861f4.png)
 
 이제 직접 2개의 패널(Node Memory Usage, Pod Count)을 추가하고 아래의 쿼리를 넣어보자. Add > Visualization를 통해 추가할 수 있다.
 
@@ -385,11 +385,11 @@ kubectl get secret -n monitoring kube-prometheus-stack-grafana \
 count(kube_pod_info)
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/84b188a8-c095-4557-8f43-d171201bc42c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/84b188a8-c095-4557-8f43-d171201bc42c.png)
 
 다음으로 Pod Count를 테스트해보기 위해 `kubectl run nginx --image=nginx` 명령어를 실행하여 파드를 하나 늘려보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d03ca5b2-fb31-4b2b-b74f-7a42ba5847d7/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/d03ca5b2-fb31-4b2b-b74f-7a42ba5847d7.png)
 
 그럼 `scrape_interval` 주기로 업데이트 되는 것을 볼 수 있다. 참고로 `scrape_interval`는 아래와 같은 명령어로 확인해볼 수 있다. (파드 이름이 다를 수 있음)
 
@@ -474,7 +474,7 @@ docker buildx build --platform linux/amd64,linux/arm64 \
 
 그리고 Express 앱을 로컬에서 실행하고 `/metrics` 엔드포인트에 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/94aaee39-93ac-46fa-8f8e-ff4554c4e6e4/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/94aaee39-93ac-46fa-8f8e-ff4554c4e6e4.png)
 
 그럼 OpenMetrics 포맷의 `/metrics` 엔드포인트가 생긴 것을 볼 수 있다. (실제 환경에선 Nginx와 같은 서비스로 해당 엔드포인트를 가리거나 다른 프라이빗한 서비스에 엔드포인트 만드는 형태로 운영하면 된다.)
 
@@ -556,8 +556,8 @@ http_requests_total{method="GET",route="/",status_code="200"} 4
 
 그리고 Prometheus Web UI에서 쿼리를 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f0946b39-de01-4cc7-963a-428b2bbf6179/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/f0946b39-de01-4cc7-963a-428b2bbf6179.png)
 
 그럼 사진과 같이 커스텀한 `http_requests_total`가 잘 표시되는 것을 확인할 수 있다. 마찬가지로 Grafana 대시보드에서도 패널을 추가하여 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b5e0240b-7546-4962-9b6c-b628b484b41f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-11-06-kubernetes-prometheus-grafana/b5e0240b-7546-4962-9b6c-b628b484b41f.png)

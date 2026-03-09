@@ -35,7 +35,7 @@ Policy as Code(PaC)는 보안/컴플라이언스 규칙이나 정책을 코드�
 
 ## I. PaC — Shift Left
 
-![](https://velog.velcdn.com/images/yulmwu/post/2f1d9de1-185f-4709-8337-a93ba2682b4b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-13-kubernetes-pac-with-gatekeeper-and-kyverno/2f1d9de1-185f-4709-8337-a93ba2682b4b.png)
 
 앞서 설명하였듯 **Shift Left**는 배포 이전에 PaC로 검사/검증 및 제한/차단을 진행하는 방식으로, CI/CD 파이프라인으로 보면 CI 단계에서 진행된다.
 
@@ -47,7 +47,7 @@ Kubernetes에서는 CI 단계를 포함하여 CD 초입인 API Server(Admission 
 
 ## II. PaC — Shift Right
 
-![](https://velog.velcdn.com/images/yulmwu/post/d7c6fa77-4783-4150-b342-16be440c5542/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-13-kubernetes-pac-with-gatekeeper-and-kyverno/d7c6fa77-4783-4150-b342-16be440c5542.png)
 
 반대로 **Shift Right** 방식은 운영 환경/런타임 중, 즉 배포 이후에 정책을 통해 리소스를 검증하고 제한한다. 이는 Shift Left에서는 발견되지 않는 운영 상의 정책 문제를 모니터링하여 검증하고 제한한다.
 
@@ -61,7 +61,7 @@ Kubernetes에서는 CI 단계를 포함하여 CD 초입인 API Server(Admission 
 
 Kubernetes에서 오브젝트나 리소스를 생성할 때는 모두 Kubernetes API Server를 거치게 된다. Kubernetes API 서버는 위와 같이 구성되어 있는데, 그 중 **Admission Controller**에서 정의한 정책에 맞는지 **검증(Validating)**하거나 요청을 **변조(Mutating)**한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8a180dce-f49e-41bd-a6ab-5ba413959370/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-13-kubernetes-pac-with-gatekeeper-and-kyverno/8a180dce-f49e-41bd-a6ab-5ba413959370.png)
 
 정확하게는 **1) Mutating Admission**, **2) Object Validation**, **3) Validating Admission** 순서로, 각각 사이드카 컨테이너 주입이나 기본값 설정처럼 요청을 변조(1)하거나 객체의 구조적 유효성 검증(2), 요청된 객체가 정책에 적합한지, 검증하고 허용이나 제한(거부) 여부를 결정(3)한다.
 
@@ -122,7 +122,7 @@ deny contains msg if {
 
 위 예제 코드는 [Rego Playground](https://play.openpolicyagent.org/)에서 간단하게 테스트해볼 수 있다. 아래와 같은 JSON 페이로드를 Input으로 넣어 테스트해보자. 그럼 Deny와 그 이유를 응답받게 될 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f349f7ab-ef03-4728-9626-071dc24648e2/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-13-kubernetes-pac-with-gatekeeper-and-kyverno/f349f7ab-ef03-4728-9626-071dc24648e2.png)
 
 ### Gatekeeper
 
@@ -136,7 +136,7 @@ deny contains msg if {
 
 OPA Gatekeeper의 아키텍처는 아래와 같다. [공식 아키텍처](https://kubernetes.io/blog/2019/08/06/opa-gatekeeper-policy-and-governance-for-kubernetes/)를 참조하여 살짝 변형하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1f912e7c-a041-44a1-b48d-b14dbff8ff82/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-13-kubernetes-pac-with-gatekeeper-and-kyverno/1f912e7c-a041-44a1-b48d-b14dbff8ff82.png)
 
 앞서 말하지는 않았지만, Shift Right 솔루션에 대해 **Audit Controller**를 제공한다. 이는 이미 존재하는 리소스에 대해 PaC 정책을 기반으로 조사하는 컨트롤러이다. 다만 이 포스팅에서 다루지는 않겠다.
 

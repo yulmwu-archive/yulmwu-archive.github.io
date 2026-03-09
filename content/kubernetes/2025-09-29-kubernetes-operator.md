@@ -31,7 +31,7 @@ is_private: false
 
 쿠버네티스에선 상태를 선언하고, 이러한 컨트롤러를 루프(Reconcile Loop)로 돌려 의도한 상태에 가깝게 만드는데, 이를 컨트롤러 패턴이라고 부른다.
 
-![Controller](https://velog.velcdn.com/images/yulmwu/post/1000a8ef-64d4-4521-a160-e205ccac2e36/image.png)
+![Controller](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/1000a8ef-64d4-4521-a160-e205ccac2e36.png)
 
 웬만한 서비스 환경이라면 이러한 네이티브 오브젝트를 사용하여 인프라를 운영할 수 있다.
 
@@ -63,7 +63,7 @@ Operator는 쿠버네티스의 컨트롤러를 확장하여 **CRD(Custom Resourc
 
 다르게 말하여 쿠버네티스에 포함되지 않는 운영 로직을 CRD 객체로 확장하여 선언하고, 컨트롤러 Reconcile Loop 모델을 사용자가 확장하여 운영을 자동화하는 것이다. (CRD를 바탕으로 생성되는 리소스를 **CR, Custom Resource**라 부른다)
 
-![](https://velog.velcdn.com/images/yulmwu/post/6d2084f7-17fe-4c49-895e-34dee27e4c8c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/6d2084f7-17fe-4c49-895e-34dee27e4c8c.png)
 
 CRD(Custom Resource Definition)와 컨트롤러는 포스팅 후반에서 Go 언어를 사용하여 제작 후 배포해보도록 하고, 예시의 CR(Custom Resource) 매니페스트는 아래와 같다.
 
@@ -84,7 +84,7 @@ spec:
 
 Prometheus는 쿠버네티스 모니터링 시스템으로, 리소스나 애플리케이션의 매트릭을 모니터링하고 관리하는 도구이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1a84cf35-dbd9-4ff4-8f61-63da66d71a75/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/1a84cf35-dbd9-4ff4-8f61-63da66d71a75.png)
 
 _출처: https://prometheus.io/docs/introduction/overview_
 
@@ -162,7 +162,7 @@ helm install kps prometheus-community/kube-prometheus-stack \
 
 그리고 `kubectl get all -n monitoring` 명령어를 통해 Prometheus 리소스를 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6a39daa5-d8a0-40aa-8fbf-659044458d26/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/6a39daa5-d8a0-40aa-8fbf-659044458d26.png)
 
 다음으로 Grafana로 접속해보자. Grafana는 Prometheus 등을 시각화 및 모니터링 할 수 있는 도구이다.
 
@@ -175,7 +175,7 @@ kubectl --namespace monitoring get secrets kps-grafana -o jsonpath="{.data.admin
 
 `port-forward` 명령어를 통해 접속해보자. 패스워드는 Secrets에 저장되어 있고, 기본 패스워드는 `prom-operator`이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ae2d963c-1ca8-4cd7-bed1-564d1f013762/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/ae2d963c-1ca8-4cd7-bed1-564d1f013762.png)
 
 접속 후 로그인을 해보면 위와 같이 나오는 것을 볼 수 있다. Prometheus와 Grafana에 대해 자세히 다루는 것은 아니므로 더 이상 다루진 않겠다.
 
@@ -227,7 +227,7 @@ spec:
 
 여기까지 만들었다면 아직 Grafana Prometheus 대시보드에 데이터가 없을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a0d50c84-067a-4440-b6f9-00add8c0621d/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/a0d50c84-067a-4440-b6f9-00add8c0621d.png)
 
 이제 `ServiceMonitor`나 `PodMonitor`와 같은 Prometheus CR을 만들어줘야 하는데, 아래와 같은 매니페스트 파일을 만들고 적용해보자.
 
@@ -261,11 +261,11 @@ kubectl apply -f service-monitor.yaml
 
 그리고 `kubectl get servicemonitor --all-namespaces` 명령어를 통해 CR이 잘 만들어졌는지 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b1e18bc3-4112-4bf0-aa3c-793530f355e0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/b1e18bc3-4112-4bf0-aa3c-793530f355e0.png)
 
 사진과 같이 default 네임스페이스에 `example-app`의 ServiceMonitor CR이 만들어진 것을 볼 수 있다. Grafana 대시보드에서도 마찬가지로 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/eee72260-0e7f-4ec1-9f5e-8f2a618e32ad/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-29-kubernetes-operator/eee72260-0e7f-4ec1-9f5e-8f2a618e32ad.png)
 
 여기서 핵심은 ServiceMonitor CR을 만들고 적용했을 때 Prometheus가 업데이트되었고 이를 통해 매트릭을 확인할 수 있었다는 것이다.
 

@@ -27,7 +27,7 @@ is_private: false
 
 쿠버네티스에선 크게 3가지 오토스케일링 기능이 있는데, 파드의 수를 수평적으로 오토스케일링하는 **HPA(Horizontal Pod AutoScaler)**과 파드의 CPU/메모리 리소스 요청과 제한을 수직적으로 오토스케일링하는 **VPA(Vertical Pod AutoScaler)**가 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4b75d5d1-7b21-4b43-bf36-9bfb7478ffe3/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/4b75d5d1-7b21-4b43-bf36-9bfb7478ffe3.png)
 
 그리고 마지막으로 클러스터의 노드를 수평적으로 늘리거나 줄여 오토스케일링하는 **CA(Cluster AutoScaler)**가 있다. Cluster AutoScaler는 주로 클라우드 환경에서 많이 사용되며, 실제 서비스에선 주로 HPA + CA 조합으로 사용한다.
 (노드의 수는 그대로인데 파드만 늘어나면 Pending 상태로 멈춰서 크게 의미가 없음)
@@ -45,7 +45,7 @@ is_private: false
 
 앞서 설명하였듯 HPA는 파드의 수(spec.replicas)를 조정하는 수평적 오토스케일링 기능이라 설명하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2f016ead-e1b3-4897-a9f2-438f6febdad3/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/2f016ead-e1b3-4897-a9f2-438f6febdad3.png)
 
 실습에 앞서 간단하게 동작 과정을 살펴보자. 일단 HPA는 오토스케일링 기준이나 관련 값을 지정하는 HorizontalPodAutoscaler 리소스(오브젝트)가 있고, 실질적인 오토스케일링은 HPA Controller가 담당한다.
 
@@ -225,7 +225,7 @@ spec:
     type: NodePort
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/808b7673-55b2-43ea-bcd0-cb38198c161a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/808b7673-55b2-43ea-bcd0-cb38198c161a.png)
 
 잘 만들어졌다. 이제 HPA를 만들고 파드에 부하를 줘서 오토스케일링이 잘 되는지 확인해보겠다.
 
@@ -285,7 +285,7 @@ Metrics 타입은 Resource, 타겟 타입은 Utilization로 해두었고 50%를 
 
 적용해보고 `kubectl get hpa` 명령어를 통해 잘 작동하는지 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7e4e9976-6cd2-4f24-ad19-ace5377e0380/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/7e4e9976-6cd2-4f24-ad19-ace5377e0380.png)
 
 ## (4) HPA Testing
 
@@ -311,11 +311,11 @@ $DesiredReplicas = ceil(1 \times 200 \div 50) = 4$
 
 직접 확인해보자. 만들어둔 파드에 exec로 접속하여 stress-ng로 부하를 주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/364f0117-9a7a-44fd-96c0-96a9433c9cac/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/364f0117-9a7a-44fd-96c0-96a9433c9cac.png)
 
 그리고 `watch -n 1 ...` 명령어를 통해 파드와 HPA를 모니터링해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2639da93-85f0-46aa-9645-bbfbf103bdf6/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/2639da93-85f0-46aa-9645-bbfbf103bdf6.png)
 
 이런식으로 스케일 아웃이 잘 되는 것을 볼 수 있다. 그런데 예상한건 4개의 파드가 존재해야 하지만, 실제론 5+α개의 파드가 만들어진걸 볼 수 있다.
 
@@ -323,7 +323,7 @@ $DesiredReplicas = ceil(1 \times 200 \div 50) = 4$
 
 그리고 시간이 지나면 아래와 같이 스케일 인이 되면서 파드가 다시 1개로 유지되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e999642f-aabc-46c1-a017-1953b524c10e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-06-kubernetes-hpa/e999642f-aabc-46c1-a017-1953b524c10e.png)
 
 이상으로 HPA에 대해 간단히 알아보았다. 추후 VPA나 CA(Cluster AutoScaler)에 대해서도 다뤄보도록 하겠다.
 

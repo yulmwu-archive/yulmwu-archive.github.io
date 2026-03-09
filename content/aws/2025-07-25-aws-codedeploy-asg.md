@@ -35,7 +35,7 @@ https://github.com/eocndp/aws-codedeploy-example-asg
 
 # 1. Architecture
 
-![](https://velog.velcdn.com/images/yulmwu/post/fd9d24e5-449b-46d4-9fbc-5da98c6a7c96/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/fd9d24e5-449b-46d4-9fbc-5da98c6a7c96.png)
 
 아키텍처는 위와 같다. CodeDeploy에 대한 큰 차이는 없고, 오토스케일링과 로드밸런싱이 적용됐다는 차이, 그리고 조금 더 응용되어 VPC 구성이 살짝 더 복잡해졌다는 점이다.
 
@@ -53,7 +53,7 @@ https://github.com/eocndp/aws-codedeploy-example-asg
 
 VPC를 만들고 아키텍처의 CIDR을 바탕으로 서브넷을 만든다. 참고로 프리티어에서 주로 사용하는 EC2 인스턴스 타입인 `t2.micro`는 `ap-northeast-2a`와 `ap-northeast-2c` AZ만 지원한다. 떄문에 `a`, `c` AZ를 선택해주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4feda640-dbca-447d-a3eb-29de2b496278/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/4feda640-dbca-447d-a3eb-29de2b496278.png)
 
 잘 만들어졌다.
 
@@ -90,11 +90,11 @@ npm -v
 pm2 -v
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/58a0e874-b0e7-4cde-b25d-6f12cb917a17/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/58a0e874-b0e7-4cde-b25d-6f12cb917a17.png)
 
 다음으로 이 EC2의 AMI를 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a086b227-3bce-4497-b18b-225afe2f6030/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/a086b227-3bce-4497-b18b-225afe2f6030.png)
 
 ## EC2 Bastion Host (Option)
 
@@ -102,47 +102,47 @@ AMI를 생성하는 동안 추후 로그 확인이나 디버깅 등을 위해 Ba
 
 Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 바란다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ab30af34-e26c-494b-aa98-c938d2898f1b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/ab30af34-e26c-494b-aa98-c938d2898f1b.png)
 
 만들어둔 VPC의 퍼블릭 서브넷에 만들고 퍼블릭 IP를 할당한다.
 
 그리고 SSH로 접속한 뒤 AMI를 만들때 생성하였던 키페어 파일을 옮겨놓도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d8d86e62-930a-4708-823b-3885dcfc8770/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/d8d86e62-930a-4708-823b-3885dcfc8770.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/76a53353-e24b-405f-9d94-6648caf8ccf4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/76a53353-e24b-405f-9d94-6648caf8ccf4.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/48e889a3-c2a2-475e-b357-cb3ea6bb3b24/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/48e889a3-c2a2-475e-b357-cb3ea6bb3b24.png)
 
 ## Launch Template
 
 그리고 오토스케일링 그룹에 사용할 시작 템플릿을 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a8ebee93-a468-400e-bef6-9e66307a837e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/a8ebee93-a468-400e-bef6-9e66307a837e.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/4430dbf7-c70f-4436-9741-f97c27327806/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/4430dbf7-c70f-4436-9741-f97c27327806.png)
 
 별다른 설정은 하지 않는다. 아래 고급 세부 정보에서 IAM 설정은 붙여주도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7370dc28-8e00-41c4-a41f-7cf075fb3c9c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/7370dc28-8e00-41c4-a41f-7cf075fb3c9c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c9105107-bd12-4d88-be8f-1a2d3bfcb394/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/c9105107-bd12-4d88-be8f-1a2d3bfcb394.png)
 
 ## Auto Scaling Group
 
 다음으로 오토스케일링 그룹을 설정해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d5a3895b-5f2b-4365-8f70-d6f8e588a0bd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/d5a3895b-5f2b-4365-8f70-d6f8e588a0bd.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/4a79879e-afc6-4a44-9690-1e86ce685e7a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/4a79879e-afc6-4a44-9690-1e86ce685e7a.png)
 
 그리고 로드밸런싱은 아직 만들지 않았으니 선택하진 않는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d8703e48-c742-4e87-81f7-08c4a0adc009/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/d8703e48-c742-4e87-81f7-08c4a0adc009.png)
 
 나머지는 그대로 냅두거나 적절하게 선택하고, ASG를 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3d9c2a62-5421-4d1c-9c37-e70defecc584/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/3d9c2a62-5421-4d1c-9c37-e70defecc584.png)
 
 만들면 새로운 인스턴스가 생성될 것이다.
 
@@ -152,45 +152,45 @@ Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 �
 
 먼저 대상 그룹을 하나 만들어주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4ad0834c-9da0-41ec-8ebc-820d7af586b1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/4ad0834c-9da0-41ec-8ebc-820d7af586b1.png)
 
 그리고 ASG에 대상 그룹을 붙인다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2232ca52-596a-4162-92e5-325b9d0fae8f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/2232ca52-596a-4162-92e5-325b9d0fae8f.png)
 
 다음으로 ALB를 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3b741b58-2673-46db-8b64-22c552802d93/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/3b741b58-2673-46db-8b64-22c552802d93.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ec08fb8e-da32-4634-aa3b-f79bf561dfc7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/ec08fb8e-da32-4634-aa3b-f79bf561dfc7.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a2f40453-37ca-45af-9d2d-26feb9e1956f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/a2f40453-37ca-45af-9d2d-26feb9e1956f.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/04d3adb8-9767-4983-af17-0855d94f90a2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/04d3adb8-9767-4983-af17-0855d94f90a2.png)
 
 이제 로드밸런서까지 만들어졌으나 Health Check에서 실패할 것이다. 당연히 아직 코드를 올리진 않았기 때문.
 
-![](https://velog.velcdn.com/images/yulmwu/post/725ffe5d-5a84-4af4-8127-0ada60abea6d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/725ffe5d-5a84-4af4-8127-0ada60abea6d.png)
 
 ## CodeDeploy
 
 이제 CodeDeploy 세팅을 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e3b1888b-fc46-462f-b26a-f454ff77de03/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/e3b1888b-fc46-462f-b26a-f454ff77de03.png)
 
 애플리케이션을 만드는데 전 포스팅과 마찬가지로 EC2/온프레미스를 선택한다.
 
 다음으로 배포 그룹을 만들고 IAM은 전에 만들어둔 IAM으로 연결해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/00bc08a3-d28d-46f1-9291-1a15e714f677/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/00bc08a3-d28d-46f1-9291-1a15e714f677.png)
 
 그리고 배포 방식은 Blue/Green 방식을 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/37322f2f-425e-4632-8b59-8973e99476d1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/37322f2f-425e-4632-8b59-8973e99476d1.png)
 
 그리고 오토스케일링 그룹을 선택한다. 이러면 업데이트 시 오토스케일링 단위로 Blue, Green으로 나뉘고 업데이트되며 업데이트 후엔 자동으로 Green 쪽으로 트래픽이 전환된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8ea28f70-8b1b-4ec8-9e1f-56ed6ce06a6d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/8ea28f70-8b1b-4ec8-9e1f-56ed6ce06a6d.png)
 
 로드밸런서의 대상 그룹도 선택해준다.
 
@@ -214,35 +214,35 @@ Bastion Host에 대해선 블로그에서 다룬 글이 있으니 참고하길 �
 
 이제 깃허브에 Push하게 된다면 아래와 같이 Actions가 작동하면서 배포가 진행될 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/92774e27-3bf8-49de-8f12-537020070a35/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/92774e27-3bf8-49de-8f12-537020070a35.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/64d04942-6fd3-45ff-be0e-fd712edbd6ce/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/64d04942-6fd3-45ff-be0e-fd712edbd6ce.png)
 
 CodeDeploy에서 그 과정을 확인할 수 있으며, 아래와 같이 인스턴스와 오토스케일링 그룹이 새롭게 만들어지는 것을 볼 수 있다. (In Place에선 볼 수 없음)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c6636e61-5498-4899-9e2b-c782edd5bfd9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/c6636e61-5498-4899-9e2b-c782edd5bfd9.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/c651d368-a0cc-4a17-9de1-2c6c7bc0cbde/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/c651d368-a0cc-4a17-9de1-2c6c7bc0cbde.png)
 
 또한 CodeDeploy에서 Lifecycle 이벤트에 대한 과정도 볼 수 있으며, In Place에선 없던 AllowTraffic과 AfterAllowTraffic이 보이는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8546f330-5f7e-4dc1-860d-464a6adc6563/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/8546f330-5f7e-4dc1-860d-464a6adc6563.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/1fb115d7-75d4-4a67-9654-a48ff281b7a5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/1fb115d7-75d4-4a67-9654-a48ff281b7a5.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/87161e0e-ec5a-4aa8-980c-cba2363fa57d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/87161e0e-ec5a-4aa8-980c-cba2363fa57d.png)
 
 배포가 끝났다면 ALB의 DNS에 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/79710022-5f87-4c13-b8ca-f770d6198d89/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/79710022-5f87-4c13-b8ca-f770d6198d89.png)
 
 잘 배포된 것을 볼 수 있다. 이제 자동화 배포 설정이 끝이 났다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/76557b8f-2806-41c7-b795-dbee8eccc18e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/76557b8f-2806-41c7-b795-dbee8eccc18e.png)
 
 위와 같이 코드를 수정한 뒤 다시 Push해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c893887a-7bd6-4f83-8e05-ee9e4962fb2a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/c893887a-7bd6-4f83-8e05-ee9e4962fb2a.png)
 
 잘 작동하는 것을 볼 수 있다. 끝...
 
@@ -250,7 +250,7 @@ CodeDeploy에서 그 과정을 확인할 수 있으며, 아래와 같이 인스�
 
 ## Error #1 - IAM
 
-![](https://velog.velcdn.com/images/yulmwu/post/1f46b13f-574c-4f56-bffc-f103c73ae8a5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/1f46b13f-574c-4f56-bffc-f103c73ae8a5.png)
 
 CodeDeploy에서 배포 시 위와 같은 에러가 발생할 수 있다.
 
@@ -261,11 +261,11 @@ CodeDeploy에서 배포 시 위와 같은 에러가 발생할 수 있다.
 
 찾아보니 추가적인 IAM 정책이 필요하다고 한다. 아래와 같이 IAM 정책을 추가한뒤 다시 배포를 실행하면 잘 작동한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/82353d48-8d30-4c26-8b29-b883a1ddd077/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/82353d48-8d30-4c26-8b29-b883a1ddd077.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/2d129468-8e1e-400e-82b2-2803684d52a5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/2d129468-8e1e-400e-82b2-2803684d52a5.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/affb32cf-626e-47e0-9b0f-b7c6e5cf91db/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-07-25-aws-codedeploy-asg/affb32cf-626e-47e0-9b0f-b7c6e5cf91db.png)
 
 대충 보니 오래 전 부터 있던 오류같은데 왜 고쳐지지 않는지는 의문이다.
 

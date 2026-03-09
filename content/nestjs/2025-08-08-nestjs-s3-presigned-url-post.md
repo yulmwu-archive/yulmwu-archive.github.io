@@ -25,15 +25,15 @@ is_private: false
 
 저번 포스팅에서 Presigned URL을 통해 S3에 업로드할 수 있도록 해보았다. 대충 요약하자면 Presigned URL을 사용하지 않았을 경우 아래와 같은 구조를 구현해야 했다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/642dbc3f-5652-43b3-9992-b7cfb073f90e/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/642dbc3f-5652-43b3-9992-b7cfb073f90e.png)
 
 그런데 이러면 서버를 거쳐 파일을 업로드하기 때문에 비효율적일 수 있다. 그래서 Presigned URL을 사용하게 되면 임시적으로 업로드 권한이 담긴 URL을 발급받고, 클라이언트는 직접 그 URL에 업로드하는 방식이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/751e3d28-868f-4963-a460-59855a76a235/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/751e3d28-868f-4963-a460-59855a76a235.png)
 
 그런데 문제가 있다. 버킷에서 직접적으로 파일의 크기 등을 체크하여 거부하거나 하는 기능은 제공하지 않는다. 더군다나 서버를 거치지 않고 직접 업로드하기 때문에 큰 문제가 될 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3d26b589-31af-44a8-9f52-5f45cc6545dc/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/3d26b589-31af-44a8-9f52-5f45cc6545dc.png)
 
 출처: [AWS re:Post - S3 PUT file size limit](https://repost.aws/questions/QUlsWSYCIkSne0QW8yGEg6DQ/s3-put-file-size-limit)
 
@@ -45,7 +45,7 @@ is_private: false
 
 두번째는 애초에 불가능하고, 먼저 첫번째 방법을 사용하면 아래와 같이 사용할 수 있을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f43d70c5-e024-444e-9a30-099d1784380d/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/f43d70c5-e024-444e-9a30-099d1784380d.png)
 
 S3에 업로드하게 되면 연결된 람다(또는 Lambda@Edge)가 파일의 사이즈를 체크해보고, 제한을 넘는다 싶으면 거부하거나 파일(객체)를 삭제하는 방식이다.
 
@@ -53,7 +53,7 @@ S3에 업로드하게 되면 연결된 람다(또는 Lambda@Edge)가 파일의 �
 
 그래서 3번 방식인 POST 방식의 Presigned URL을 사용하는 방법이 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7a32c15e-c8a4-445a-b907-698578a06c3e/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/7a32c15e-c8a4-445a-b907-698578a06c3e.png)
 
 원래 S3 Presigned URL를 통해 파일을 업로드하려면 HTTP PUT 방식을 써서 업로드를 하게 된다.
 
@@ -152,25 +152,25 @@ https://github.com/yulmwu/0725/tree/main/backend/src/modules/upload
 
 저번처럼 Postman을 사용하여 간단히 테스트해보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2159a213-8421-45f2-9028-02fe4b9bce0c/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/2159a213-8421-45f2-9028-02fe4b9bce0c.png)
 
 아직 S3엔 아무것도 없다. API를 호출하여 Presigned URL을 발급 받아보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e5d12666-187f-4f71-9485-e9d89b22f863/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/e5d12666-187f-4f71-9485-e9d89b22f863.png)
 
 대충 저런 값들이 반환되는데, 그 중 `fields` 값들을 멀티파트 페이로드에 넣으면 된다. URL엔 S3 엔드포인트를 넣는다.
 
 그리고 중요한데, `form-data`에 `file` 키와 파일 타입으로 데이터를 보낸다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/809f9638-274a-4b49-9110-c92e5ea621df/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/809f9638-274a-4b49-9110-c92e5ea621df.png)
 
 그럼 204와 함께 아래와 같이 성공적으로 S3에 올라가진걸 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b72f39ff-385c-46f5-84ad-61b8aa51c057/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/b72f39ff-385c-46f5-84ad-61b8aa51c057.png)
 
 예를 들어 파일 크기가 1MB(테스트를 위해 줄였다)를 넘는 이미지를 넣고 요청을 보내보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f20b8df7-5be9-4678-89ef-bc13e3b941c0/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-08-nestjs-s3-presigned-url-post/f20b8df7-5be9-4678-89ef-bc13e3b941c0.png)
 
 그럼 사진과 같이 파일 크기가 제한을 넘었다고 에러를 띄우게 된다.
 

@@ -79,13 +79,13 @@ FailedScheduling, Too many pods. 라고 한다.
 
 https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html
 
-![](https://velog.velcdn.com/images/yulmwu/post/502271a0-bd79-47b1-9521-4e7f6c2d7290/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-20-kubernetes-eks-max-pods/502271a0-bd79-47b1-9521-4e7f6c2d7290.png)
 
 EC2 노드 인스턴스 타입 별로 스케줄링이 가능한 파드의 수가 정해져 있는 것이다.
 
 [eni-max-pods.txt](https://github.com/awslabs/amazon-eks-ami/blob/main/templates/shared/runtime/eni-max-pods.txt) 내용에 따르면 t2.micro의 스케줄링 가능한 최대 파드 수는 4개라고 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b6e40986-a1b2-432e-a531-83ad14e80956/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-20-kubernetes-eks-max-pods/b6e40986-a1b2-432e-a531-83ad14e80956.png)
 
 이유는 인스턴스 타입 별로 붙을 수 있는 ENI 수의 제한이 있고, 파드 또한 ENI에 연결되어 프라이빗 IP를 가지기 때문이다.
 

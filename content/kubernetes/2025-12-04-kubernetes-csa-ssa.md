@@ -34,7 +34,7 @@ is_private: false
 그럴 경우 만약 어떠한 필드를 삭제하려고 할 때, 쿠버네티스는 그 삭제 의도를 알 수 없다. 예시로 다른 주체*(심지어 쿠버네티스 자체도 포함된다)*가 자동으로 추가한 필드인데, 이것이 과연 적용하려는 매니페스트에 포함되어 있지 않다고해서 "필드를 삭제해라" 라는 확신이 없는 것이다.
 _(여기서 kubectl의 apply, label, scale 등은 각자 다른 주체이다.)_
 
-![](https://velog.velcdn.com/images/yulmwu/post/2c3b17ee-e289-4386-a2b6-f9a51c5be688/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-04-kubernetes-csa-ssa/2c3b17ee-e289-4386-a2b6-f9a51c5be688.png)
 
 예시로 파드를 만들고 `kubectl get pod/my-pod -o yaml` 명령어를 입력해보면 한 가지 특이한 필드를 확인해볼 수 있다.
 

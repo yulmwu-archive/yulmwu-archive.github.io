@@ -19,7 +19,7 @@ is_private: false
 
 # 0. Overview
 
-![](https://velog.velcdn.com/images/yulmwu/post/43bc04d1-a919-432a-ab5d-c61bf4debcae/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/43bc04d1-a919-432a-ab5d-c61bf4debcae.png)
 
 필자는 프리티어 계정을 사용하며 최대한 돈이 나가지 않도록 노력하고 있다.
 
@@ -27,16 +27,16 @@ is_private: false
 
 마침 ECS Fargate를 사용하며 좋은 성적을 위해 고가용성 등의 요소를 곁들여서 제작하였다. 그 문제의 아키텍처가 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/bbfd6270-a0f5-4a00-8622-bc1fd8b7c733/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/bbfd6270-a0f5-4a00-8622-bc1fd8b7c733.png)
 
 사실 ECS Fargate에 대한 요금은 어느정도 생각을 하고 있었다.
 그런데 문제는 켜두지도 않은 EC2 요금이 나왔다는 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8a290fc3-030d-4cbf-abb6-eb09f7af84fe/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/8a290fc3-030d-4cbf-abb6-eb09f7af84fe.png)
 
 범인은 NAT Gateway였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9413961f-8b7a-4d81-9c6f-fdab561e6e20/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/9413961f-8b7a-4d81-9c6f-fdab561e6e20.png)
 
 왜 VPC 항목이 아닌 EC2에 포함되는건진 솔직히 잘 모르겠다만 아무튼 저것 때문에 요금의 절반이 청구된 것이다.
 
@@ -49,7 +49,7 @@ is_private: false
 
 그래서 일단 서비스는 해야하고, 돈이 아깝기도 해서 가용성이나 보안은 옆지 고양이한테 줘버리고 아래와 같이 바꿨다. (각 ECS 컨테이너에 Public IP 부여하는 식으로)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d7f033e3-760c-4235-9595-ba6c86b32483/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/d7f033e3-760c-4235-9595-ba6c86b32483.png)
 
 그리고 Fargate도 요금을 줄이기 위해 최소한의 성능과 스팟 요금으로 변경해뒀는데, 그것도 전엔 꽤나 높은 성능과 일반 요금, 그리고 오토스케일링까지 해둬서 그정도로 나오지 않았나 싶다.
 
@@ -57,19 +57,19 @@ Fargate는 프리티어가 아니란걸 알고 있었긴 했으니 여기에 대
 
 # 1. Contact AWS Support Center
 
-![](https://velog.velcdn.com/images/yulmwu/post/df8502b2-c542-47ea-a479-63be457cb3d4/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/df8502b2-c542-47ea-a479-63be457cb3d4.png)
 
 일단 지원센터에 들어가 사례를 생성하도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7f929086-ee54-40af-a3fc-bb267c6908d5/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/7f929086-ee54-40af-a3fc-bb267c6908d5.png)
 
 그리고 필자는 (살짝의 호들갑이 추가된) 글을 번역기로 돌려서 적었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f17850f9-72a9-4641-b73a-0f6a26e3bad6/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/f17850f9-72a9-4641-b73a-0f6a26e3bad6.png)
 
 내용을 적어주고, 관련 이미지 2개도 첨부하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e69dc713-fdfa-40cf-b48d-4a3bd555d025/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/e69dc713-fdfa-40cf-b48d-4a3bd555d025.png)
 
 이제 답장을 기다려보겠다.
 
@@ -77,11 +77,11 @@ Fargate는 프리티어가 아니란걸 알고 있었긴 했으니 여기에 대
 
 정확히 1시간 뒤 답장이 왔다. 그 내용엔 먼저 관련된 서비스들을 삭제하라는 내용였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/30f791c5-31d5-4374-ac91-2dbda951001e/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/30f791c5-31d5-4374-ac91-2dbda951001e.png)
 
 DynamoDB의 경우 자료가 남아있어 지우긴 꺼려졌지만 지워달라니 대충 백업하고 지웠다. 나머지도 다 지웠고, 다음으로 더욱 세부적인 정보를 달라고 하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7a89fa4a-735e-44b1-8a4e-c1859f35bd91/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/7a89fa4a-735e-44b1-8a4e-c1859f35bd91.png)
 
 항목에 맞게 내용을 작성해서 답장하였다. 먼저 느낀것은 미국 업체 답지 않게 답변이 빨랐다는 것과(한국 시간대인데도) 싸가지 없는 답장이 아니라는 것이다. 역시 대기업은 다르구나 생각을 하기도 하였다.
 
@@ -91,7 +91,7 @@ DynamoDB의 경우 자료가 남아있어 지우긴 꺼려졌지만 지워달라
 
 첫번째 답변에 응답을 한 뒤 몇분 후 답장이 왔다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e21e3190-6779-4514-817c-dbc022b7de0d/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/e21e3190-6779-4514-817c-dbc022b7de0d.png)
 
 요약: 기다려라
 
@@ -99,7 +99,7 @@ DynamoDB의 경우 자료가 남아있어 지우긴 꺼려졌지만 지워달라
 
 몇시간 정도 기다리니 이런 답변이 도착했다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5a348011-9605-4445-9b03-23d1d9097da2/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2025-07-16-refund-aws/5a348011-9605-4445-9b03-23d1d9097da2.png)
 
 NAT Gateway 비용과 ECS Fargate 비용이 환불된 듯 하다.
 

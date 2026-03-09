@@ -23,7 +23,7 @@ is_private: false
 
 MSA에서 신경 쓸 구성 요소 또한 여러가지가 있겠지만, 그 중 서비스 디스커버리(Service Discovery) 및 서비스 메시(Service Mesh)는 마이크로 서비스 간 네트워킹에 있어 핵심이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c7dd438e-06e6-4adc-8ba9-6a1e2a666f86/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-13-kubernetes-istio-envoy/c7dd438e-06e6-4adc-8ba9-6a1e2a666f86.png)
 
 쿠버네티스에선 기본적으로 서비스 디스커버리엔 CoreDNS, 네트워킹에 있어 kube-proxy 및 NetworkPolicy 등의 서비스를 사용할 순 있다.
 
@@ -37,7 +37,7 @@ MSA에서 신경 쓸 구성 요소 또한 여러가지가 있겠지만, 그 중 
 
 먼저 서비스 메시의 동작 과정을 살펴보자. AWS VPC Lattice와 같은 경우는 예외지만, 서비스 메시 패턴은 대부분 사이드카(Sidecar) 프록시 패턴을 사용한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f32e711d-d36e-4c0b-82f8-34bea142354f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-13-kubernetes-istio-envoy/f32e711d-d36e-4c0b-82f8-34bea142354f.png)
 
 사이드카 프록시는 쿠버네티스 파드에서 함께 실행되는 별도의 컨테이너로 동작하며, 애플리케이션의 네트워킹 기능을 대신 처리하여 관련 정책이나 트래픽 제어, mTLS나 모니터링 등의 기능을 제공한다.
 
@@ -45,7 +45,7 @@ MSA에서 신경 쓸 구성 요소 또한 여러가지가 있겠지만, 그 중 
 
 Istio는 이러한 Envoy 사이드카 프록시를 관리하고 제어하는 컨트롤 플레인(Control Plane)으로, 앞서 설명한 사이드카 프록시의 기능 외에 모니터링 등의 세부적인 기능도 제공한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/479775cc-d061-48b7-9bb6-c609e02d50de/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-13-kubernetes-istio-envoy/479775cc-d061-48b7-9bb6-c609e02d50de.png)
 
 Istio 컨트롤 플레인 내부적으론 istiod를 통해 제어된다. (Pilot, Mixer, Citadel, Galley 등으로 구분되어 있었으나 istiod로 간소화되었다)
 
@@ -73,7 +73,7 @@ Istio에서 제공하는 쿠버네티스 CRD인 VirtualService, DestinationRule 
 
 예제로 살펴볼 쿠버네티스 아키텍처는 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d564662e-1936-4c51-9ea9-54589076a18c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-13-kubernetes-istio-envoy/d564662e-1936-4c51-9ea9-54589076a18c.png)
 
 기본적으로 Istio Gateway API Controller를 사용하고, 그 앞단에 NodePort를 통해 테스트해보겠다.
 
@@ -292,7 +292,7 @@ spec:
 
 적용 후 생성된 파드를 선택하여 describe하면 아래와 같이 Istio Envoy 사이드카 프록시가 자동으로 인젝션 된 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ee4c45da-07da-44cb-9b8f-798e1a50336f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-13-kubernetes-istio-envoy/ee4c45da-07da-44cb-9b8f-798e1a50336f.png)
 
 ## (3) Gateway, HTTPRoute
 
@@ -411,7 +411,7 @@ kubectl apply -n demo -f httproute-otherapp.yaml
 
 그럼 이제 기본적인 라우팅 설정이 끝났다. 포스팅에선 간단하게 NodePort를 통해 외부에서 접속할 수 있으므로 노드의 IP와 포트를 사용하여 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/141d569a-9ffd-47eb-b1a9-29ef9059c611/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-13-kubernetes-istio-envoy/141d569a-9ffd-47eb-b1a9-29ef9059c611.png)
 
 먼저 HTTPRoute에 선언해둔대로 `x-canary` 헤더와 `x-mesh` 헤더가 추가된 것을 볼 수 있다. (요청, 응답 둘 다 적용)
 

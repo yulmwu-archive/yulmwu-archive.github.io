@@ -498,7 +498,7 @@ make docker-build IMG=docker.io/rlawnsdud/mycrd-operator:v0.1.0 # 본인의 레�
 make docker-push  IMG=docker.io/rlawnsdud/mycrd-operator:v0.1.0
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/39b38a14-5d57-4c6c-9058-3cfb407b06e0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-01-kubernetes-operator-go/39b38a14-5d57-4c6c-9058-3cfb407b06e0.png)
 
 그리고 아래의 Makefile에 포함된 명령어로 클러스터에 배포해보자.
 

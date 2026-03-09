@@ -23,7 +23,7 @@ ArgoCD에 대해선 아래의 포스팅을 참고하길 바라며, 따로 설명
 
 https://velog.io/@yulmwu/kubernetes-gitops-argocd
 
-![](https://velog.velcdn.com/images/yulmwu/post/7248b32c-9fa4-4d97-801f-e6db7e49794f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-06-kubernetes-argocd-ci/7248b32c-9fa4-4d97-801f-e6db7e49794f.png)
 
 이 포스팅에선 실제로 운영하는 클러스터에 배포하는 CD(ArgoCD가 그걸 대신 해주는 것이다)가 아닌 배포 전 Helm 차트 등에 문제가 있는지, Sync가 잘 되는지, 그리고 애플리케이션이 잘 동작하는지 Health Check 등을 수행하는 **CI(Continuous integration)**를 구축해보겠다.
 
@@ -31,7 +31,7 @@ https://velog.io/@yulmwu/kubernetes-gitops-argocd
 
 ## 0-1. Architecture Diagram
 
-![](https://velog.velcdn.com/images/yulmwu/post/e4a5fc35-f91c-4875-a1c4-009f9c0a1cb6/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-06-kubernetes-argocd-ci/e4a5fc35-f91c-4875-a1c4-009f9c0a1cb6.png)
 
 아키텍처에 있는 흐름을 해석하면 크게 아래와 같다.
 
@@ -224,7 +224,7 @@ source:
 
 # 2. Practice — Github Actions Workflows
 
-![](https://velog.velcdn.com/images/yulmwu/post/b0c7ccad-8c33-4fae-b4f7-a160ead3d346/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-06-kubernetes-argocd-ci/b0c7ccad-8c33-4fae-b4f7-a160ead3d346.png)
 
 이제 Helm Chart를 만들었으니, 이를 Github Actions에서 Kind 클러스터를 만들고 CI를 구축해보자. 그 흐름은 `0. Overview` 목차에서 다뤘으니 생략하겠다.
 
@@ -358,14 +358,14 @@ ArgoCD Application CRD를 적용한다. 필자는 아래와 같이 적용했지�
 
 테스트 방법은 간단하다. 트리거에 구성한대로 `main` 브랜치에 Push 하거나 PR을 날려보면 된다. 그럼 아래와 같이 Workflows가 실행되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1c6a793f-40f7-41cc-b571-0829ce8ee13d/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-06-kubernetes-argocd-ci/1c6a793f-40f7-41cc-b571-0829ce8ee13d.png)
 
 몇 분 정도 기다려서 잘 동작하는지 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ee81e8f5-3b74-4bf7-9662-be2407514fdd/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-06-kubernetes-argocd-ci/ee81e8f5-3b74-4bf7-9662-be2407514fdd.png)
 
 잘 되는 모습을 볼 수 있다. 여기서 `Wait for ArgoCD ...`를 확인해보면
 
-![](https://velog.velcdn.com/images/yulmwu/post/93d8b16c-ffbc-4826-8908-7f22deb50012/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-12-06-kubernetes-argocd-ci/93d8b16c-ffbc-4826-8908-7f22deb50012.png)
 
 이렇게 3번째 시도, 11초만에 Sync와 Healthy까지 확인이 되는 모습을 볼 수 있는데, 만약 리소스가 많아 오래 걸릴 경우 적절히 스크립트를 수정하면 된다.

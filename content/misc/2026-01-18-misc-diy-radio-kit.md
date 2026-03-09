@@ -4,7 +4,7 @@ description: '다만 낭만은 있음.'
 slug: '2026-01-18-misc-diy-radio-kit'
 author: yulmwu
 date: 2026-01-18T13:51:16.486Z
-updated_at: 2026-03-02T04:30:07.900Z
+updated_at: 2026-03-08T04:57:37.920Z
 categories: ['Misc']
 tags: ['일상']
 series:
@@ -25,7 +25,7 @@ is_private: false
 
 주구장창 DevSecOps 공부만 하다가는 인생 자체가 질릴 것 같아서 놓았던 취미를 다시 잡아보려던 참에, 알리익스프레스를 둘러보다가 재밌는 키트를 발견했습니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/33bc09a8-cc8a-4126-9598-a0dcbf3f81ef/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/33bc09a8-cc8a-4126-9598-a0dcbf3f81ef.png)
 
 무려 소형 라디오 키트(부품팩)을 3천원이라는 풋돈에 팔고있었고, FM/AM 모두 수신이 가능하다는 말에 홀라당 구매해버렸습니다. 물론 파츠의 퀄리티는 기대하지도 않았긴 합니다..
 
@@ -39,17 +39,17 @@ is_private: false
 
 아래는 저의 데스크탑입니다. 깔끔한걸 좋아하지만 데스크탑 만큼은 항상 어지럽네요. 항상 치워도 어지러워지는게 인생과 같다날까요.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1ef9ff47-3e1f-476c-9cfb-d2a9ec41a2a1/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/1ef9ff47-3e1f-476c-9cfb-d2a9ec41a2a1.png)
 
 # 2. 파츠 분류
 
 PCB는 대충 이렇게 생겼습니다. 판매 글을 처음 보았을땐 자본주의 사상에 찌들어 파츠만 들어있고 PCB는 직접 애칭해서 만들어야하나.. 생각했었습니다만 지금은 2020년대라는 것을 생각하였습니다. PCB 공정 자체가 저렴해지고 캐드로 써킷이나 PCB를 설계하면 커스텀으로 제작해주는 업체도 많더라구요.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f447351e-6ce3-4723-b7e6-fe2d83cb52e6/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/f447351e-6ce3-4723-b7e6-fe2d83cb52e6.png)
 
 그리고 파츠들은 아래와 같습니다. 뭔가를 만들기 전 파츠는 항상 정리해두는 것이 바람직합니다. 작업 중 휴먼에러를 방지하는 목적도 있고, 무엇보다 깔끔하니깐요.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cc221364-f390-461a-a456-9426981d14dc/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/cc221364-f390-461a-a456-9426981d14dc.png)
 
 파츠들의 퀄리티는 당연히 좋지 않습니다. 세라믹 커패스터엔 값이 쓰여있지 않은 것들도 꽤나 있었고, 당연히 탄소 피막 저항이였습니다. 보통 오디오 쪽에선 노이즈 방지와 정밀도를 생각하여 금속 피막 저항을 사용하는데, 총합 3천원이니 그러려니합니다.
 
@@ -57,7 +57,7 @@ PCB는 대충 이렇게 생겼습니다. 판매 글을 처음 보았을땐 자�
 
 물론 PCB만 보고도 충분히 실장하고 배선할 수 있고, 회로도는 디버깅 용도로만 써도 될 정도입니다. 리뷰를 보니 설명서의 내용이 부실하다고 하는데, 아마 파츠 리스트 정도만 있었지 않았나 생각합니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8a9ccc33-9c14-4830-a53b-6a9b3016b927/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/8a9ccc33-9c14-4830-a53b-6a9b3016b927.png)
 
 그리고 파츠 몇개 다른데, 예를 들어 IC1 9088의 7번 핀이 C14(181= 0.18nF 또는 180pF) 커패시터에 연결되어 있다고 하는데, 그 자리에 161(= 0.16nF 또는 160pF) 세라믹 커패시터를 실장해야 했었습니다. 물론 미미한 차이라 최종적으론 큰 차이가 없겠지만, 다시 한번 이게 3천원이라는 것을 생각해야 했었죠.
 
@@ -67,13 +67,13 @@ PCB는 대충 이렇게 생겼습니다. 판매 글을 처음 보았을땐 자�
 
 상품 리뷰를 보니 IC 칩 파츠가 있는데, 이게 SMD 타입이라 솔더링하기 어려웠다고 하더라구요. (자세히는 안봤으나 CD9088로 추정) 물론 저는 짬밥이라는게 있으니 페이스트(플럭스)를 써서 어렵지 않게 솔더링했습니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7d600833-a2a7-4109-948b-879d3d803c2c/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/7d600833-a2a7-4109-948b-879d3d803c2c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ff1354f0-f665-431a-a7be-bab692f52710/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/ff1354f0-f665-431a-a7be-bab692f52710.png)
 
 팁을 드리자면, 솔더링 시 IC 칩이 흔들릴 수 있는데 페이스트(플럭스)로 고정해두면 어렵지 않게 가능합니다. 사진은 못찍었는데, 1번 핀과 16번 핀을 먼저 솔더링하시면 쉽게 가능합니다. 인두기 팁은 사선으로 된 그걸로 쓰시면 더욱 좋구요. (뾰족한거)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d740c2c3-dc03-4272-bddb-2ada1d34ca22/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/d740c2c3-dc03-4272-bddb-2ada1d34ca22.png)
 
 밤 11시에 작업한건지라 솔더링 상태가 좋진 않지만, 합선 없고 냉납 없고 전기만 잘 통하면 장땡입니다. 팁을 드리자면 페이스트(플럭스)를 바른 패턴 부분에 인두기 팁을 1~2초 정도 댄 상태에서 납을 가져다 대는 것입니다. 원래 솔더링이 그런 원리로 하는거긴 합니다.
 
@@ -85,27 +85,27 @@ PCB는 대충 이렇게 생겼습니다. 판매 글을 처음 보았을땐 자�
 
 PCB를 뒤집어보면 아래와 같이 생겼습니다. 즉 양면 모두 패턴이 있는게 아니라 뒷면만 있는거죠. 총합 3천원이라는 것을 항상 생각하고 있어야 합니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9050eb20-9cd7-4952-91ef-b4ecba4b7102/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/9050eb20-9cd7-4952-91ef-b4ecba4b7102.png)
 
 DIP 파츠는 만 6세 이하의 어린 아이도 실장할 수 있습니다. 극성만 잘 보고 눈만 좋으면 되죠. 슬슬 노안이 찾아와서 PCB에 적혀있는 쪼매난 글씨가 잘 안보이는 듯 합니다... ;;
 
-![](https://velog.velcdn.com/images/yulmwu/post/4c231a99-8c8b-47d9-a593-5d703dc9b699/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/4c231a99-8c8b-47d9-a593-5d703dc9b699.png)
 
 DIP 실장 시 위 사진처럼 리드(다리)를 살짝 굽히면 뒤집어도 파츠가 떨어지지 않습니다. 너무 굽히면 합선이나 보기 싫을 수 있으니 주의하시구요. 리드 자를땐 잡고 자르거나 날아가지 않게 주의하시길 바랍니다. 본인도 모르게 침대로 날아가는 순간 잠 못잡니다.
 
 DIP 부품의 실장 순서는 높이가 가장 낮은 파츠 순서대로 실장합니다. 즉 저항 > IC/TR > 세라믹 커패시터 > 전해 커패시터 > 그 외 바리콘/가변저항 등등 순서입니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/bbd8f4f7-d391-4e84-b703-024e5b03705f/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/bbd8f4f7-d391-4e84-b703-024e5b03705f.png)
 
 중간에 저항은 색 띠를 읽어도 되지만, 인간은 도구를 사용하는 동물이기 때문에 멀티미터를 이용하였습니다. 색 띠 읽다가 눈 나빠집니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/26a33998-3762-4d64-b866-635b40522d16/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/26a33998-3762-4d64-b866-635b40522d16.png)
 
 어찌저찌해서 아래와 같이 전부 실장하였습니다. 요즘에 나오는 오디오 기기들은 SMD 파츠로 도배한 PCB만 있어서 낭만이 없는데, 이렇게 요즘엔 거의 안쓰는 바리콘(가변 커패시터)까지 쓰는건 낭만 한도초과죠.
 
 아래 사진 상 보이는 금색 파츠가 바리콘(가변 커패시터)입니다. 요즘은 전자식으로 동작해서 잘 안쓰는 파츠지만, 옛날 라디오나 오디오 기기 등을 분해해보면 흔히 보이는 파츠입니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/08bfaf44-61bc-4278-84c8-4db659acafea/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/08bfaf44-61bc-4278-84c8-4db659acafea.png)
 
 그리고 구리 코일로 말아져있는 인덕터인데 실장할 때 조심해야 합니다. 리드 선이 짧아서 뒤집으면 떨어지는데, 그렇다고 그냥 만진 상태로 솔더링하면 화상입거든요. 뭔가로 고정해서 솔더링하시길 바랍니다. (경험담)
 
@@ -117,21 +117,21 @@ TDA2822M IC 칩과 TA7642 트랜지스터는 소켓을 따로 구매하여 실�
 
 모든 파츠가 잘 실장되었다면 냉납이 없는지, 합선은 없는지 등등을 확인하고 배선을 해줍니다. 여담으로 저렇게 얇은 스피커는 정말 오랜만에 봅니다. 소리도 정겨운데, 소리나는 장난감에 붙어있는 그 스피커입니다. 8옴짜리 라네요.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9e4c147c-183e-4de0-b0a4-9be678889960/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/9e4c147c-183e-4de0-b0a4-9be678889960.png)
 
 그리고 코일 페라이트 코어 자석을 빼먹었습니다. 나중에 AM 모드가 동작을 안하길래 뭐지 했다가 빼먹은걸 뒤늦게 알아차렸습니다. 고정이 안되니 글루건으로 대충 고정해뒀구요. 전기/전자 다룰 때 글루건이 생각보다 요물인데, 절연체에다가 열과 떼어낼때만 조심하면 완벽한 접착제입니다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3fe860ec-d922-489e-8ef1-fbca27ee8faa/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/3fe860ec-d922-489e-8ef1-fbca27ee8faa.png)
 
 ---
 
 그리고 조립 도중에 재밌는걸 봤습니다. 나서 머리가 부러졌는데, 중국산의 대단함을 느꼈습니다. 나사 머리가 저렇게 부서진건 처음 보는 듯..
 
-![](https://velog.velcdn.com/images/yulmwu/post/212409b8-7e40-4432-8d86-f5aa083e3312/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/212409b8-7e40-4432-8d86-f5aa083e3312.png)
 
 # 6. Tiny Radio ~~
 
-![](https://velog.velcdn.com/images/yulmwu/post/409d82ff-5c16-4910-8e0a-6189acc96538/image.png)
+![](https://mirror-cdn.swua.kr/images/misc/2026-01-18-misc-diy-radio-kit/409d82ff-5c16-4910-8e0a-6189acc96538.png)
 
 조립하고 나니 굉장히 귀엽네요. 개인적으로 이런 잡동사니를 좋아합니다. 낭만있다고 해야죠. 물론 성능은 매우 구립니다.
 
@@ -143,7 +143,7 @@ FM 방송은 잘 잡히는데, 바리콘 범위가 너무 넓어서 개미가 �
 
 아래는 동작 영상입니다. (FM) 처음 잡혔던 방송에서 나오는 노래는 다비치의 팡파레 였습니다. 요즘 다비치 커버 곡들이 많이 나오던데, 역시 오리지널은 따라가지 못하는 것 같습니다. 확실히 둘 모두 노래 실력으로 깡패임..
 
-![](https://youtu.be/6dCv_VikUxA?si=GDf_AlRfNYRf17da)
+!youtube[6dCv_VikUxA?si=GDf_AlRfNYRf17da]
 
 집 안에다가 조명이나 장비들이 많아서 수신 상태가 양호하진 않네요. 물론 노이즈 쉴딩이나 퀄리티 있는 부품이 아닌 것도 있지만 이게 3천원이라는 것을 생각해야 합니다. 3천원이면 솔더링 연습만 하고 버릴 용도로도 괜찮은 듯 싶구요.
 

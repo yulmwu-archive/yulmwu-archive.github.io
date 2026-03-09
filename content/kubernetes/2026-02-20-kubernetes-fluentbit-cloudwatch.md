@@ -4,7 +4,7 @@ description: 'FluentBit 및 CloudWatch를 통한 AWS Native 로깅 구성하기 
 slug: '2026-02-20-kubernetes-fluentbit-cloudwatch'
 author: yulmwu
 date: 2026-02-20T03:58:14.655Z
-updated_at: 2026-03-08T04:08:28.342Z
+updated_at: 2026-03-08T23:50:09.209Z
 categories: ['Kubernetes']
 tags: ['aws', 'eks', 'kubernetes', 'project/smctf']
 series:
@@ -31,7 +31,7 @@ is_private: false
 
 > AWS Native로 성능 모니터링 자체는 어렵지 않다. 단순히 AWS Console에서 CloudWatch Metrics를 확인하는 것만으로도 CPU/메모리 사용량, 네트워크/디스크 IO 등의 지표는 어느 정도 파악이 가능하다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/e117cc52-537a-4b77-9f02-74a9f49a4b68/image.png)
+> ![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/e117cc52-537a-4b77-9f02-74a9f49a4b68.png)
 >
 > _(해당 사진은 CloudWatch Metrics 참고용으로 첨부하였다. 포스팅 내용과는 무관하다.)_
 
@@ -79,7 +79,7 @@ _(참고: [https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/control-plane-
 
 작은 모놀리식 아키텍처에선 로깅에 대해 큰 문제가 없다. 단일 애플리케이션에서 파일로 로그를 남기고, Log Rotation 등을 애플리케이션에서 구현하거나 별도의 도구로 관리한다면 로그 관리에 큰 어려움이 없었을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cd0ad73f-f0db-416c-9241-27f0e810a8ef/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/cd0ad73f-f0db-416c-9241-27f0e810a8ef.png)
 
 하지만 인프라가 커지고 MSA와 Stateless한 컨테이너화된 애플리케이션, 분산된 환경에선 파일로 남는 로그는 관리하는 것이 매우 어렵다.
 
@@ -98,7 +98,7 @@ Fluentd는 노드에 설치된 Fluentd Agent에서 Downstream으로 Direct로 �
 
 Fluentd는 Input, Filtering, Output을 포함한 여러 Phase를 유연하고도 다룰 수 있고, 여러 플러그인을 통해 Downstream 백엔드로 필터링/가공된 로그를 Forward 할 수 있도록 설계되었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e9fc21a2-4db0-42a8-a149-8b963d97295b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/e9fc21a2-4db0-42a8-a149-8b963d97295b.png)
 
 로그를 어느 Source에서 읽을지, 어떻게 필터링하고 어떤 태그를 붙여 어느 백엔드 Downstream으로 내보낼지 등을 세부적으로 지정할 수 있으며, Buffer도 단순한 Queue 수준이 아니라 Chunk 단위로 Flush 조건이나 Retry 정책 등을 세부적으로 다룰 수 있다.
 
@@ -131,7 +131,7 @@ Ouput 플러그인 뿐만 아니라 Kafka Topic으로 부터 메시지를 컨슈
 
 이와 같이 Fluentd는 크게 본다면 Input, Filter/Buffer, Output 순으로 Phase를 거치며 각 Phase엔 그에 맞는 플러그인이 상당수 존재한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/05bb6fc1-ab17-41a0-b703-e0071722bfa2/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/05bb6fc1-ab17-41a0-b703-e0071722bfa2.png)
 
 이때 Filter와 Buffer는 필수가 아니며, 필요에 따라 필터링 또는 버퍼링 없이 Output으로 넘길 수 있다.
 
@@ -177,7 +177,7 @@ Chunk는 append, queued, flushing, committed 상태를 가지며 각각의 상�
 
 Buffer는 Output 플러그인 내에 포함되며 적절한 Backpressure 대처와 Retry 정책 등을 백엔드 Downstream 별로 설정할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a0f61211-9759-42dc-8e84-496c32016364/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/a0f61211-9759-42dc-8e84-496c32016364.png)
 
 사실 필자가 이에 대해 장황하게 설명하려고 하였으나, 이 글의 취지와 범위가 맞지 않다고 판단하여 할많하않을 시전하겠다. 잘 작성된 자료를 첨부하겠다.
 
@@ -193,7 +193,7 @@ Buffer는 Output 플러그인 내에 포함되며 적절한 Backpressure 대처�
 
 이러한 문제를 개선하기 위해 Fluentd Aggregator 중앙 집중식 서버를 구축할 수 있고, 이 서버에서 Fluentd Agent에서 사용하였던 파이프라인과 플러그인 모두 그대로 지원한
 
-![](https://velog.velcdn.com/images/yulmwu/post/be9d9db8-dab3-4486-b5b4-45d39bdc1d99/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/be9d9db8-dab3-4486-b5b4-45d39bdc1d99.png)
 
 위 다이어그램과 같이 다양한 소스와 백엔드가 있고 복잡한 관계를 가진다면 Fluentd Aggregator 도입은 좋은 선택일 수 있다.
 
@@ -217,7 +217,7 @@ Fluentd은 매우 강력하고, 많은 플러그인을 지원하지만 그 대�
 
 경우에 따라 중앙 서버가 아닌 Edge 서버/장비나 임베디드 시스템에도 도입해야할 경우 Ruby로 작성된 Fluentd Agent를 구동하기엔 무거울 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/63fdc66f-27fb-4157-8b3a-39c3e8329d56/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/63fdc66f-27fb-4157-8b3a-39c3e8329d56.png)
 
 이러한 이유로 플러그인과 생태계가 매우 풍부한 Fluentd를 중앙 Aggregator 서버로 두고, 각 노드에 배치되는 로그 수집 및 Downstream Forwarding Agent를 Fluentd가 아닌 더 가벼운 **FluentBit**를 사용하도록 하는 것이 Best Practice이다.
 
@@ -248,7 +248,7 @@ Pod는 수시로 생성되고 사라지며 노드의 수가 매우 많아지고,
 
 필요시 Forwarding Backend를 S3 Bucket으로 구성하거나 CloudWatch Logs를 S3 Bucket으로 Export하여 아카이빙 할 수도 있을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2fc29566-56dd-4e2d-8dc6-f43e62143ddc/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/2fc29566-56dd-4e2d-8dc6-f43e62143ddc.png)
 
 # 3. FluentBit 도입하기
 
@@ -513,10 +513,10 @@ IRSA에 대한 Terraform IaC는 아래의 레포지토리를 참조하면 좋을
 
 # 4. 동작 확인
 
-![](https://velog.velcdn.com/images/yulmwu/post/a60c1fe4-82ad-4633-b02b-42d9bdb2d49b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/a60c1fe4-82ad-4633-b02b-42d9bdb2d49b.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a05444db-d08a-4675-8143-4585b53ad38f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/a05444db-d08a-4675-8143-4585b53ad38f.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ef986157-2f4e-4ba3-8afa-69815defd3ca/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-02-20-kubernetes-fluentbit-cloudwatch/ef986157-2f4e-4ba3-8afa-69815defd3ca.png)
 
 위와 같이 로그의 Raw 문자열과 파싱된 값, Kubernetes 메타데이터 등 세부적인 내용이 포함되어 기록되는 모습을 볼 수 있다.

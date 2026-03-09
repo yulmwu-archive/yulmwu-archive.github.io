@@ -96,7 +96,7 @@ AWS에서 서버를 배포할 땐 주로 **EC2(Elastic Cloud Computer)**라는 �
 
 앞서 말했듯이 전통적으로 OS부터 관리하는 것이 **IaaS(Infrastructure as a Service)**라면 서버리스는 **FaaS(Function as a Service)** 아키텍쳐에 가깝다. (함수에 대해선 곧 설명할 예정이다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d9002182-acaa-4cce-8ec5-c03ecf4e3f47/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d9002182-acaa-4cce-8ec5-c03ecf4e3f47.png)
 출처: https://www.redhat.com/en/topics/cloud-computing/iaas-vs-paas-vs-saas
 
 > **PaaS(Platform as a Service)**와 **FaaS(Function as a Service)**는 얼핏 보기엔 비슷해보일 순 있으나, **PaaS**는 플랫폼(NodeJS, Python 등)을 제공해주고, 그 위에 배포할 수 있도록 한다. (대표적으로 AWS ECS, EKS Fargate)
@@ -175,7 +175,7 @@ AWS에서 서버를 배포할 땐 주로 **EC2(Elastic Cloud Computer)**라는 �
 서버리스와 람다에 대해 다룰 때 빠질 수 없는 아키텍쳐 구조가 있다.
 먼저 전통적인 서버의 아키텍쳐인 **모놀리식 아키텍쳐**를 살펴보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9d1f8aa8-49c3-4226-a48e-21969cddec82/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/9d1f8aa8-49c3-4226-a48e-21969cddec82.png)
 
 실제 모놀리식 아키텍쳐가 이렇다는건 아니다. 이는 MVC(Model-View-Controller 패턴인데, 모놀리식 아키텍쳐에서 주로 사용되는 백엔드 어플리케이션 패턴이다.
 
@@ -187,7 +187,7 @@ AWS에서 서버를 배포할 땐 주로 **EC2(Elastic Cloud Computer)**라는 �
 
 그럼 **마이크로서비스 아키텍쳐** 방식을 보도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/111d76ff-763c-4374-9813-758fbc34a075/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/111d76ff-763c-4374-9813-758fbc34a075.png)
 
 백엔드 맨 앞단에 API들을 통합해주는 API Gateway가 존재하고, 그 뒤에 하나하나가 서비스인 람다 함수들이 자잘하게 모여있다.
 
@@ -273,7 +273,7 @@ REST API를 통해 적절한 CRUD를 구현하고, 인증 시스템까지 있으
 
 이 프로젝트에서 사용할 AWS 아키텍쳐는 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4ae3a790-9aff-404b-b763-03c0b6e5de9f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4ae3a790-9aff-404b-b763-03c0b6e5de9f.png)
 
 이제 위 아키텍쳐를 참고하여 개별적으로 어떤 역할을 하고, 또 어떻게 동작하는지 등에 대해 알아보도록 하자.
 
@@ -288,7 +288,7 @@ REST API를 통해 적절한 CRUD를 구현하고, 인증 시스템까지 있으
 
 먼저 람다에 이벤트, 즉 요청이 들어오면 람다는 실행되며 종료되기 까지 아래와 같은 3단계를 거친다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0cad4a3d-c10d-41fe-b153-1428c4791847/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/0cad4a3d-c10d-41fe-b153-1428c4791847.png)
 
 각 단계를 살펴보도록 하자.
 
@@ -359,11 +359,11 @@ export const handler = async (): Promise<APIGatewayProxyResultV2> => {
 여기서 1, 2, 3번 단계에 해당되는 과정을 바로 **Cold Start**라고 한다.
 즉 처음부터 환경을 다시 만들고 세팅을 한다는 의미인데, 문제는 이 과정이 꽤나 시간이 소요된다는 점이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dcb80db8-376e-420d-b81f-4e478c6e361c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/dcb80db8-376e-420d-b81f-4e478c6e361c.png)
 
 이 Cold Start가 FaaS 기반 서버리스의 큰 단점 중 하나이다. 서비스의 속도는 곧 사용자의 경험(UX)와 직결되는 문제이기 때문이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ae959845-ed52-4d5f-bacb-4d13af12b743/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ae959845-ed52-4d5f-bacb-4d13af12b743.png)
 
 위 사진은 람다의 실행했을 때의 로그이다. `INIT_START`가 환경을 생성하고 초기화 하는 단계인데, 사진과 같이 약 `300ms`의 시간이 소요된다.
 
@@ -389,7 +389,7 @@ export const handler = async (event) => {
 
 때문에 람다에선 같은 요청(이벤트)에 대해 `handler()` 코드만 실행하면 굳이 처음부터 다시 환경을 만들 필요가 없어지므로 불필요한 오버헤드가 줄어들게 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b37cb8fb-a620-4567-9301-e1fe9cb49965/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b37cb8fb-a620-4567-9301-e1fe9cb49965.png)
 
 위 사진은 실제 Warm Start로 작동하였던 예시이다.
 두번째 `START`에 대해선 보고에서 Init Duration이 없는 것을 볼 수 있는데, 즉 초기화를 진행하지 않고 `handler()` 함수만 실행했다는 의미로 해석된다.
@@ -412,14 +412,14 @@ export const handler = async (event) => {
 
 이 코드는 얼핏 보기엔 람다에서 실행하면 항상 1이 반환될 것으로 볼 수 있다. 하지만 실제로 단시간에 2번을 실행해보면 아래와 같은 결과를 얻을 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4fd36d30-77d4-459d-a680-aafd29c40bd3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4fd36d30-77d4-459d-a680-aafd29c40bd3.png)
 
 위와 같이 Warm Start 현상이 발생하여 `a` 변수에 대해 상태 유지가 되고, 때문에 2로 증가한 것을 확인할 수 있다.
 
 만약 새롭게 Deploy하여 환경을 다시 만든다면 어떨까?
 (람다에선 Deploy 시 처음부터 초기화하도록 함)
 
-![](https://velog.velcdn.com/images/yulmwu/post/37dd7a7f-af51-4421-9255-a00cf99b12db/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/37dd7a7f-af51-4421-9255-a00cf99b12db.png)
 
 위와 같이 `a` 변수가 초기화 되어 다시 1로 출력되는 것을 확인할 수 있다.
 
@@ -438,17 +438,17 @@ export const handler = async (event) => {
 이후 처리가 끝나 해당 람다가 Idle 상태가 된다면 새로운 이벤트를 받을 수 있다.
 이 기간에서 실행되면 Warm Start로 실행될 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b441eebc-30f8-4cad-9203-ff279bcf1007/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b441eebc-30f8-4cad-9203-ff279bcf1007.png)
 
 하지만 이렇게 람다 하나만을 기다리며 동시성을 처리하는 것은 매우 비효율적인데, 그래서 람다는 위와 같이 직렬적인 방식(Sequential)이 아닌 병렬적인 방식(Concurrent)을 사용할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/89a3f353-c378-4c8a-a232-a7730d3fc8ab/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/89a3f353-c378-4c8a-a232-a7730d3fc8ab.png)
 
 동시성(Concurrent)이 설정된 람다에선, 만약 이벤트를 처리중이라 다른 이벤트를 받을 수 없다면 새로운 환경을 새로 생성한다.
 
 이에 대해선 람다에서 동시성 제한을 둘 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/99dc31b2-5d74-4c9e-b99e-4a75365be19e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/99dc31b2-5d74-4c9e-b99e-4a75365be19e.png)
 
 위 사진에선 "예약되지 않은 계정 동시성"이라는 문장을 볼 수 있는데, AWS에선 계정의 리전 별로 동시성의 최대 한도를 1000으로 제한하고 있다.
 
@@ -464,7 +464,7 @@ export const handler = async (event) => {
 >
 > 이 계정만 그런건지, 아니면 모든 계정이 기본적으로 10으로 설정된 것인지는 모르겠지만 이는 AWS에 요청을 통해 증가시킬 수 있다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/e50da935-1beb-4545-bf80-7ee63b303f3f/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e50da935-1beb-4545-bf80-7ee63b303f3f.png)
 
 ### Lambda Cold Start Prevention
 
@@ -483,7 +483,7 @@ AWS엔 EventBridge라는 서비스가 있는데, 이 서비스는 어떠한 다�
 
 이 중 스케줄러를 사용하여 주기적으로 Ping 등의 요청을 보내는 것을 통해 람다의 Warm Start로 실행될 수 있는 환경을 유지한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3261d244-968e-45ad-b627-71e38cd8a45a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/3261d244-968e-45ad-b627-71e38cd8a45a.png)
 
 물론 약간의 비용이 발생할 순 있으나 그 비용은 미미하고, 또 성능 상 크게 문제가 될만하진 않기 때문에 꽤나 자주 이용하는 편이다.
 
@@ -502,7 +502,7 @@ AWS엔 EventBridge라는 서비스가 있는데, 이 서비스는 어떠한 다�
 원리는 간단한데, 그냥 람다의 환경을 주기적으로 띄워주는 것이다.
 프로비저닝된 동시성 설정에서 몇개의 환경을 띄워줄지를 정하고, 이에 따라 추가적인 요금이 발생한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/45abe63c-f9a4-452b-bb24-af760fc5dc90/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/45abe63c-f9a4-452b-bb24-af760fc5dc90.png)
 
 > Provisioned Concurrency의 요금이 더 비싼데, 굳이 왜 이걸 사용하려는 것일까 의문이 들 수 있다.
 >
@@ -567,17 +567,17 @@ https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
 만약 여러 기능들을 구현하여 MSA 아키텍쳐를 유지하고, 여러 람다 함수들이 있다고 가정해보자.
 각 람다 함수엔 호출가능한 HTTP 요청이 가능한 함수 URL를 제공하는데, 그럼 아래의 아키텍쳐를 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/606bccf3-309f-46c1-99ac-c2f0b2c5b335/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/606bccf3-309f-46c1-99ac-c2f0b2c5b335.png)
 
 위 아키텍쳐에선 람다 함수마다 함수 URL을 가지고 있고, 클라이언트 입장에선 각 람다 함수(서비스 또는 기능) 별로 요청을 보낼 URL을 알고있어야 하니, 이러한 구조는 매우 비효율적이다.
 
 또한 이러한 MSA 아키텍쳐에선 각 서비스(람다 함수)는 독립적이고 유연하며 특정 기능만을 담당하는게 좋은데, 예를 들어 JWT 인증 등의 경우 위와 같은 아키텍쳐에선 모든 람다에 하나하나 인증과 관련된 로직을 추가해야된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d268f09d-2d4a-42e6-a9ba-ca9c0ebc3a1c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d268f09d-2d4a-42e6-a9ba-ca9c0ebc3a1c.png)
 
 위와 같은 불편한 점으로 인해, MSA 아키텍쳐에선 여러 마이크로 서비스를 통합하는 인터페이스(또는 User Interface=UI)를 맨 앞단에 두게 되는데(일종의 프록시임), AWS에선 **API Gateway**를 사용하여 람다들을 통합하고 하나의 리소스(URL)로 제공한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6686c302-63c3-4446-9db6-b95be17c9084/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6686c302-63c3-4446-9db6-b95be17c9084.png)
 
 더 자세히 말하자면, 클라이언트와 람다 사이의 프록시 역할은 한다는 표현이 더욱 정확하다.
 
@@ -596,7 +596,7 @@ SOP는 풀네임에서 알 수 있듯이, 같은 오리진에서만 리소스를
 
 여기서 오리진(Origin)은 프로토콜, 호스트 또는 도메인, 포트를 묶어서 부르는 용어로, 리소스의 출처라고 표현하기도 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/aad63521-34a1-4c0e-b63e-654c9c11fe62/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/aad63521-34a1-4c0e-b63e-654c9c11fe62.png)
 
 아무래도 같은 오리진(출처) 내에서의 리소스 공유가 가장 안전하고, 외부의 리소스를 가져오는 것은 보안 상 문제가 될 수 있기 때문이다.
 
@@ -614,7 +614,7 @@ CORS의 기본적인 동작 과정은 아래와 같다.
 
 아래의 두 가지 예시를 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8c2becc4-fd98-47a6-84eb-a1c00b7cda05/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8c2becc4-fd98-47a6-84eb-a1c00b7cda05.png)
 
 첫번째 예시는 서버에 접근하는데, 클라이언트의 오리진은 `https://example-bar.com`이다. 일단 서버에 요청을 보내는데, 그 응답으로 `Access-Control-Allow-Origin: https://example-bar.com` 헤더가 포함된 응답을 받게 된다.
 
@@ -622,7 +622,7 @@ CORS의 기본적인 동작 과정은 아래와 같다.
 
 하지만 만약 아래와 같이 `Access-Control-Allow-Origin` 헤더에 적힌 오리진이 클라이언트의 오리진이 아니라면 어떨까?
 
-![](https://velog.velcdn.com/images/yulmwu/post/364f512c-480f-4d34-9c02-ca8567b55330/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/364f512c-480f-4d34-9c02-ca8567b55330.png)
 
 요청을 하는 클라이언트의 오리진은 `https://example-bar.com`인데, 서버는 응답으로 `Access-Control-Allow-Origin: https://example-foo.com` 헤더를 포함하여 보내왔다.
 
@@ -632,7 +632,7 @@ CORS의 기본적인 동작 과정은 아래와 같다.
 
 특히 인증 정보가 포함되어 있는, 즉 JWT 토큰 등이 포함된 `Authentication` 헤더나 쿠키가 포함된 요청을 보낼 땐 더욱 까다롭다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c643168c-e7ab-47cd-9dc1-c12cb064ab33/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/c643168c-e7ab-47cd-9dc1-c12cb064ab33.png)
 
 위와 같이 먼저 클라이언트 입장에선 예를 들어 axios HTTP 통신 라이브러리를 사용한다고 치면 `withCredentials: true` 옵션을 활성화해야 `Authentication` 헤더나 쿠키가 전송된다.
 
@@ -673,7 +673,7 @@ AWS에세 제공하는 서버리스 기반의 데이터베이스엔 크게 2가�
 
 또한 기본 키를 제외하면 테이블의 속성을 미리 정의 해둘 필요가 없으므로, RDBMS와 달리 유연하게 데이터를 처리할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e3f6043b-e875-4cc2-8946-8c14014c0283/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e3f6043b-e875-4cc2-8946-8c14014c0283.png)
 
 위 사진처럼 각 아이템별로 속성에 대한 스키마를 정의할 필요 없이 유연하게 데이터를 저장하고 관리할 수 있다.
 
@@ -762,7 +762,7 @@ JWT이나 세션(Session) 방식 모두 로그인 후, 그 로그인 상태를 �
 
 즉 세션 방식의 흐름은 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5a20a187-afa1-47cb-aa80-b4a83619042f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/5a20a187-afa1-47cb-aa80-b4a83619042f.png)
 
 위 사진 자료에서도 볼 수 있듯이 `POST /posts` 엔드포인트를 요청하여 글을 작성하려 하는데, 클라이언트는 세션 아이디를 쿠키에 담아 요청한다.
 
@@ -774,7 +774,7 @@ JWT이나 세션(Session) 방식 모두 로그인 후, 그 로그인 상태를 �
 
 JWT은 **JSON Web Token**의 약자이다. 즉 JSON 객체에 인증에 필요한 데이터(페이로드)를 담은 후, 그 페이로드를 비밀키로 암호화하여 서명하고 검증한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/916f0e5b-3bc5-40ef-b004-6fedd5f4751a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/916f0e5b-3bc5-40ef-b004-6fedd5f4751a.png)
 
 위와 같이 **헤더(Header)**엔 서명에 사용할 암호화 알고리즘(대부분의 경우 HS256)과 `"type": "JWT"` 고정 필드가 있다.
 
@@ -788,7 +788,7 @@ JWT은 **JSON Web Token**의 약자이다. 즉 JSON 객체에 인증에 필요�
 
 이렇게 인증을 위한 문자열(토큰) 안에 기본적인 유저의 정보가 포함되어 있으니, 세션 방식과는 다르게 유저 정보를 세션 아이디 데이터베이스에서 가져오는 오버헤드가 발생하지 않는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1277f78c-dbb8-4d3a-b413-66428e77d725/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/1277f78c-dbb8-4d3a-b413-66428e77d725.png)
 
 위와 같이 로그인을 하면 JWT 토큰을 반환하는데, 클라이언트는 이 토큰을 적당한 곳에 저장한다. SPA(Single Page Application)의 경우 대부분 변수에 저장하여 클라이언트도 해당 사용자에 대해 간략히 알 수 있게 하고, 페이지가 새로고침 되면 변수가 초기화되니 보안 상으로도 비교적 안전하게 지킬 수 있다.
 
@@ -827,7 +827,7 @@ JWT엔 일반적으로 2가지의 토큰이 존재하는데, 여태 설명했던
 
 아래의 자료를 참고하며 설명하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d06287b1-5470-4d12-995f-fa9e0ec239e5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d06287b1-5470-4d12-995f-fa9e0ec239e5.png)
 
 위 자료와 같이 클라이언트에서 요청을 보냈는데 권한이 없다면서 실패하는 경우(또는 토큰이 만료됐다거나), 또는 JWT 엑세스 토큰에 명시되어있는 만료 시간(`exp`)을 초과하였을 경우 클라이언트는 HTTPOnly 쿠키에 저장된 리프레시 토큰을 가지고 `POST /refresh` 엔드포인트에 요청을 하여 새로운 엑세스 토큰을 받아온다.
 
@@ -884,12 +884,12 @@ S3에 대해선 여기까지만 알아보고, 중요한건 S3엔 정적 웹 호�
 
 아래 자료를 보도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a30b5149-a78e-4af9-a705-634f20a880be/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a30b5149-a78e-4af9-a705-634f20a880be.png)
 
 서버는 미국에 하나 밖에 없는데, 클라이언트의 위치는 세계 곳곳에서 접근한다.
 그러면 물리적으로 떨어져 있을수록 전송의 속도가 느려질 수 밖에 없는데, 그것을 보완하기 위함이 CDN 서비스이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0bd6c522-7995-4053-8f7a-7c155049f81c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/0bd6c522-7995-4053-8f7a-7c155049f81c.png)
 
 위와 같이 사전에 미리 메인 서버에 대해 캐싱을 해두고, 다른 캐시 서버에 분산해둠으로써 빠르게 데이터를 전송할 수 있다.
 
@@ -903,7 +903,7 @@ CloudFront에선 캐시 서버를 **엣지 로케이션(Edge Location)**이라 �
 
 또한 CDN을 목적으로 하는 것이 아닌, 오리진을 하나로 통합하는 것으로도 사용이 가능하다. (여러 오리진을 사용하는 것이 가능함)
 
-![](https://velog.velcdn.com/images/yulmwu/post/f39d3f20-d44a-48e3-8c89-6c4b74e58784/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f39d3f20-d44a-48e3-8c89-6c4b74e58784.png)
 
 > 추가적으로, 람다와 연계하여 CloudFront에 람다 함수를 배포하여 CDN 처럼 사용할 수 있는데, 이를 Lambda@Edge라 부른다. 쉽게 설명하자면 그냥 CloudFront의 엣지 로케이션에서 돌아가는 람다이다.
 >
@@ -992,38 +992,38 @@ Resources: # 리소스 목록
 
 이런식으로 작성하면 되며, 실제로 테스트해보자. AWS > CloudFormation으로 들어가 "스택 생성"을 클릭한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a0621a93-ca81-4d4c-a0d2-01c3b4eadcb7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a0621a93-ca81-4d4c-a0d2-01c3b4eadcb7.png)
 
 우리는 간단히 템플릿 코드로 테스트만 해볼 예정임으로, "템플릿 파일 업로드"를 클릭하고, 위 템플릿 코드를 YAML로 작성하여 업로드해보자.
 
 (인프라 컴포즈를 통해 시각적으로 편집할 수 도 있고, 이미 만들어둔 인프라를 IaC 생성기를 통해 템플릿 코드로 만들 수 도 있다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/0725263a-d537-4d89-9761-e770846b6df5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/0725263a-d537-4d89-9761-e770846b6df5.png)
 
 다음으로 스택 이름을 지정하고, 스택 옵션 구성도 그대로 냅둔다.
 (인프라를 만드는 도중 에러가 발생했을 때 어떻게 롤백할지 등을 정할 수 있는데, 대부분 기본값으로 냅두면 된다.)
 
 다음을 클릭하여 완료하면, 아래와 같이 CREATE_IN_PROGRESS로 뜨면서 생성이 되기 시작한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a7ca180b-7553-4ae5-96ca-4ac39f6192a9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a7ca180b-7553-4ae5-96ca-4ac39f6192a9.png)
 
 이후 약간의 시간이 흐르고 새로고침 해보면, 위 코드를 그대로 사용했을 시 당연히 에러가 떠야한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7269f3d5-af57-4824-8af4-ea20957af300/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/7269f3d5-af57-4824-8af4-ea20957af300.png)
 
 버킷의 이름은 유일해야 하는데, `test1234`과 같이 흔한 이름을 사용하였기 때문이다. 중복되지 않은 고유한 버킷 이름을 지정하고, AWS Console에선 템플릿을 직접 수정하는 기능은 제공하지 않으니 일단 삭제 후 다시 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6eb55ea7-40a3-4c46-900a-da5a125678c5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6eb55ea7-40a3-4c46-900a-da5a125678c5.png)
 
 이렇게 고유한 이름을 넣어주게 되면 성공적으로 생성이 된다. S3 버킷이 잘 생성되었는지 실제로 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ef9f4c76-ff51-4ec8-aa2c-d29fc6c3f7e1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ef9f4c76-ff51-4ec8-aa2c-d29fc6c3f7e1.png)
 
 잘 생성되었다. 추가적으로 CloudFormation를 통해 생성되었지만, 특정 리소스가 직접 수정됐을 경우 스택 드리프트(Stack Drift)라 하여 탐지가 가능하다. 자세한건 다루지 않는다.
 
 아래는 인프라 컴포즈 화면인데, 잘 쓰이지는 않는 듯 하고, 여기서도 직접 코드를 작성해보는 식으로 진행할 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ea88d5f2-dee6-48a3-8fab-a25a15f9ba4a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ea88d5f2-dee6-48a3-8fab-a25a15f9ba4a.png)
 
 ### SAM(Serverless Application Model)
 
@@ -1133,13 +1133,13 @@ resource "aws_s3_bucket" "my_bucket" {
 
 이게 무슨말이냐면, 예를 들어 아래와 같은 시나리오를 생각해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4e7aa7a7-7a4f-498b-92fd-c3303ab66544/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4e7aa7a7-7a4f-498b-92fd-c3303ab66544.png)
 
 만약 어느 코드를 수정했으면, 그 코드를 빌드하고, 배포하며 테스팅까지 한 뒤 문제가 없다면 배포하는 형태인데, 이정도도 많이 생략된 것이고 실제 실무에선 버전 관리, 코드 리뷰, 모니터링 등의 더욱 복잡한 과정(파이프라인)을 거친다.
 
 그러한 복잡한 작업을 자동화 시킨것이 바로 CI/CD이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/21d7466f-232c-42b1-979c-56e88c31e208/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/21d7466f-232c-42b1-979c-56e88c31e208.png)
 
 CI/CD에서 **CI**, 즉 지속적 통합은 코드를 빌드하고 테스팅해보면서 문제를 발견하는 과정이고, CI을 통과하면 통합된 코드를 자동으로 배포한다. (**CD**)
 
@@ -1209,13 +1209,13 @@ jobs:
 
 모든 스텝들이 실행되면 그 결과를 보고하는데, Github Actions에서 확인할 수 도 있고, Slack이나 Discord 등에 웹훅을 연동하여 결과를 보고할 수 도 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/29991ebe-6bee-465a-915e-f48e1f1fb137/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/29991ebe-6bee-465a-915e-f48e1f1fb137.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/fa6ce9f2-4fe7-48a3-b718-ac21f6414ab5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/fa6ce9f2-4fe7-48a3-b718-ac21f6414ab5.png)
 
 또한 위 예제에서 볼 수 있듯이 Step은 `uses`를 통해 다른 개발자가 만들어둔 워크플로우를 사용할 수 도 있는데, 이는 마켓플레이스에서 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3a727781-1cb4-41ad-a97e-6294d168d9e9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/3a727781-1cb4-41ad-a97e-6294d168d9e9.png)
 
 추가적으로 Github Actions는 첫 스텝으로 `actions/checkout@v3`(또는 `v4`)를 사용하여 레포지토리의 소스코드를 다운받는다.
 
@@ -1238,7 +1238,7 @@ jobs:
                   ls -al
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/b0e2785e-5b3c-4359-bafa-b9545259da78/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b0e2785e-5b3c-4359-bafa-b9545259da78.png)
 
 그럼 이렇게 성공적으로 실행되는데, Checkout 이후 레포지토리의 소스 코드가 다운된다.
 
@@ -1956,7 +1956,7 @@ const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((att
 >
 > Cognito에서 발급해주는 엑세스 토큰을 base64로 디코딩해보면 알 수 있다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/60fa7b4c-3eac-4607-aa0b-82729aa09f47/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/60fa7b4c-3eac-4607-aa0b-82729aa09f47.png)
 
 그리고 이 속성을 API를 호출한 클라이언트에게 반환하면 함수가 마무리된다.
 
@@ -1986,7 +1986,7 @@ const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((att
 
 먼저 AWS Console에 들어가자. 그리고 검색 > Lambda을 찾아서 들어가고, "함수 생성" 버튼을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c9de36fd-45b4-4d89-b38a-27d9cec92956/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/c9de36fd-45b4-4d89-b38a-27d9cec92956.png)
 
 그럼 위와 같이 람다 함수를 생성할 수 있는 화면이 나타난다. 여기에 중복되지 않은 적당한 이름을 입력하고 런타임을 선택하자.
 
@@ -1994,12 +1994,12 @@ const userAttributes = Object.fromEntries((result.UserAttributes ?? []).map((att
 
 그 아래에 권한을 부여할 수 있는데, 람다 함수는 CloudFront라는 모니터링 서비스에 로깅을 함으로 기본적으로 CloudFront에 대한 권한이 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6d01905a-d165-4b9a-b5c4-13ffc3fe7f6e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6d01905a-d165-4b9a-b5c4-13ffc3fe7f6e.png)
 
 권한은 추후 DynamoDB를 사용할 때 다시 다뤄보기로 하고, "함수 생성" 버튼을 클릭한다.
 그럼 잠시 후 람다 함수가 만들어지는데, 아래와 같은 화면이 나타날 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/949e1679-4f78-42cf-a7b4-4a644964e1c8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/949e1679-4f78-42cf-a7b4-4a644964e1c8.png)
 
 여기서 이벤트 트리거를 선택할 수 도 있고, 코드를 직접 편집하거나 모니터링, 또는 람다 함수에 대한 권한 등을 설정할 수 있다.
 
@@ -2037,11 +2037,11 @@ export const handler = async (event) => {
 }
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/328307a5-b6c6-4161-b7c7-bd664ca26c57/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/328307a5-b6c6-4161-b7c7-bd664ca26c57.png)
 
 그런 다음 Deploy 버튼을 클릭하여 코드를 배포한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d85c805a-7367-4243-89f5-77676ab77954/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d85c805a-7367-4243-89f5-77676ab77954.png)
 
 이제 람다 함수가 잘 작동하는지 테스트를 해보자. Deploy 버튼 아래의 Test 버튼을 클릭하면 테스트를 할 수 있다.
 
@@ -2055,15 +2055,15 @@ Test 버튼 클릭 > Create New Test Event 클릭 후 Event JSON에 아래의 �
 
 그리고 Invoke 버튼을 클릭하면 테스트가 진행된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/46751d41-0e30-489a-a63f-afeb30b44020/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/46751d41-0e30-489a-a63f-afeb30b44020.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/aee2ead0-138a-4b9f-b078-8950ebe67503/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/aee2ead0-138a-4b9f-b078-8950ebe67503.png)
 
 위와 같이 두 값을 더한 결과가 상태 코드 200과 함께 반환되며, `console.log`를 통한 로깅도 INFO로 날 나타난다.
 
 이러한 로그는 CloudWatch에서도 확인할 수 있다. CloudWatch > 로그 그룹 > `/aws/lambda/람다함수이름`을 클릭하고, 최신 로그 스트림을 클릭하면 아래와 같이 로그를 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/00f86b7b-ce11-4399-8a89-09d35d56e186/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/00f86b7b-ce11-4399-8a89-09d35d56e186.png)
 
 ## 6-2. With API Gateway
 
@@ -2073,11 +2073,11 @@ Test 버튼 클릭 > Create New Test Event 클릭 후 Event JSON에 아래의 �
 
 API Gateway에 들어가 "API 생성" 버튼을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/28408c23-2f39-408e-99fe-cd6389b04d74/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/28408c23-2f39-408e-99fe-cd6389b04d74.png)
 
 들어가보면 HTTP API 구축이 있는데, 클릭하여 아래의 페이지로 넘어가자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/68105cde-84b2-42e1-ad97-b100c5eaafc3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/68105cde-84b2-42e1-ad97-b100c5eaafc3.png)
 
 이 화면에서 직접 통합을 하여 람다와 연동할 수 있는데, 아직은 생략하고 이름만 적은 후 다음 버튼을 클릭하자.
 
@@ -2087,42 +2087,42 @@ API Gateway에 들어가 "API 생성" 버튼을 클릭하자.
 
 default 스테이지는 기본 루트(`/`) 경로에 배포하는 것으로, 아직은 스테이지 설정을 하지 않아도 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e393103c-472b-4d7d-9498-1d3b9119da1b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e393103c-472b-4d7d-9498-1d3b9119da1b.png)
 
 다음 버튼 클릭 후, 생성 버튼을 클릭하면 API Gateway가 생성된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1a3daf22-a4b4-40b1-a304-5cc305c24264/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/1a3daf22-a4b4-40b1-a304-5cc305c24264.png)
 
 이제 라우팅, 즉 경로 설정을 해줘야 하는데 Develop 메뉴의 Routes에 들어가 "생성"을 클릭해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c9979f4f-b0b7-44ad-ad8b-2e6a9da8b1da/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/c9979f4f-b0b7-44ad-ad8b-2e6a9da8b1da.png)
 
 그럼 메서드와 경로(엔드포인트)를 선택하고 작성할 수 있는 화면이 나타나는데, 아까 만들어둔 두 값을 더하는 함수는 Body에 값을 제공하기 때문에 적절하게 POST 메서드를 선택하고, 경로(엔드포인트)는 `/hello`로 설정해두었다.
 
 경로엔 `*` 등의 와일드카드나 `/{id}` 등의 동적 파라미터를 지정할 수 도 있다. (그 값은 람다 함수의 `event` 파라미터에서 확인할 수 있음.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/bb5b7490-cd0a-45b6-9eea-21052b633ea3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/bb5b7490-cd0a-45b6-9eea-21052b633ea3.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/6e595506-91d2-4021-9d8e-d5fe984c1d37/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6e595506-91d2-4021-9d8e-d5fe984c1d37.png)
 
 생성해보면 경로가 생기는데, 이제 여기에 람다 함수를 붙여줘야 한다.
 AWS API Gateway에서 경로에 람다를 붙여주는걸 통합(Integrations)이라 한다.
 
 Develop > Integrations 탭으로 가서 `POST /hello`를 선택하고 "통합 생성 및 연결"을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c185bd08-56e1-4dce-9ff3-78d4721d0f42/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/c185bd08-56e1-4dce-9ff3-78d4721d0f42.png)
 
 그럼 "통합 대상"을 정할 수 있는데, 람다를 클릭하고 통합 세부 정보에 람다 함수를 넣자. (ARN 입력 가능)
 
-![](https://velog.velcdn.com/images/yulmwu/post/e589d449-1fbd-4a13-a30b-ee9e667937e8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e589d449-1fbd-4a13-a30b-ee9e667937e8.png)
 
 그리고 생성하기 버튼을 클릭하면 생성이 되는걸 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ecfbb63e-17a0-4e80-b193-6c09addf17e2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ecfbb63e-17a0-4e80-b193-6c09addf17e2.png)
 
 마지막으로 스테이지 배포까지 하고 나면 `POST /hello`에 대한 API가 구축되는 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1a74af60-edf8-4d96-8569-196ec4d1ee51/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/1a74af60-edf8-4d96-8569-196ec4d1ee51.png)
 
 ### Testing with Postman
 
@@ -2136,17 +2136,17 @@ VSCode의 Thunder Client나 REST Client 등의 HTTP 클라이언트를 사용해
 
 그리고 New Request를 클릭하여 API 요청을 보낼 화면을 띄우고, 요청 방식을 GET에서 POST로 변경하고 API Gateway의 대시보드에서 "기본 엔드포인트" 또는 "스테이지 URL 호출"에서 URL을 찾아 Postman에 입력하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2be62b45-e404-4611-893f-6db11ee32ef9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/2be62b45-e404-4611-893f-6db11ee32ef9.png)
 
 그리고 Send 버튼을 누르면 404 Not Found가 뜰텐데, 우리가 `/`에 대한 경로를 지정하지 않았기 때문이다.
 
 우리가 지정했던 `/hello` 엔드포인트를 URL에 추가하고 실행해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/05992cf6-82d7-4193-bebc-a4d02a0c9a95/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/05992cf6-82d7-4193-bebc-a4d02a0c9a95.png)
 
 역시 에러가 뜨는데, 우리가 함수에 핸들링했던 에러가 나타난다. Body에 값이 없다는 뜻이니 Body 탭에 데이터를 입력하고 보내보자. (형식은 Raw > JSON을 선택한다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/7318e902-e05c-4eed-b140-11c8bd48163f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/7318e902-e05c-4eed-b140-11c8bd48163f.png)
 
 그럼 위와 같이 성공적으로 결과 값이 나타난다.
 
@@ -2158,18 +2158,18 @@ VSCode의 Thunder Client나 REST Client 등의 HTTP 클라이언트를 사용해
 
 AWS Cognito에 들어가보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/648a9638-04bd-4fa8-b651-cfd7ce3ad0dc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/648a9638-04bd-4fa8-b651-cfd7ce3ad0dc.png)
 
 다음으로 사용자 풀(유저 풀) > 사용자 풀 생성을 클릭하여 유저 풀을 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a38d4e2c-451f-4642-85bf-99f9641062cd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a38d4e2c-451f-4642-85bf-99f9641062cd.png)
 
 먼저 애플리케이션 리소스 설정에선 크게 "기존 웹 애플리케이션"과 "단일 페이지 애플리케이션(SPA)"을 선택할 수 있는데, 후자는 백엔드 없이 클라이언트에서 Cognito에 접근할 때 사용되므로 "기존 웹 애플리케이션"을 선택하자.
 
 다음으로 애플리케이션의 이름을 정하고 로그인 옵션을 설정한다.
 (애플리케이션은 백엔드나 프론트엔드에서 Cognito 클라이언트에 접근하기 위한 것으로, 유저 풀은 별도로 존재한다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/cd8c65e9-5db7-4614-9cf4-8eabc6993dd3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/cd8c65e9-5db7-4614-9cf4-8eabc6993dd3.png)
 
 어떠한 방식으로 유저를 식별할 지 선택할 수 있는데, 여기선 사용자 이름을 선택한다.
 
@@ -2177,7 +2177,7 @@ AWS Cognito에 들어가보자.
 
 그러면 유저 풀에 클라이언트가 사용할 애플리케이션이 만들어진다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4f6e233c-731a-4567-bcb1-6c04f162a3f9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4f6e233c-731a-4567-bcb1-6c04f162a3f9.png)
 
 위 화면에서 "로그인 페이지 보기"를 선택하면 AWS에서 기본적으로 제공하는 로그인/회원가입 페이지가 나타나는데, 이는 설정을 통해 비활성화 할 수 있다.
 
@@ -2185,23 +2185,23 @@ AWS Cognito에 들어가보자.
 
 코드를 배포하여 API를 구현하기 전, 유저가 잘 생성될지 테스트를 위해 AWS에서 제공하는 회원가입 페이지에서 회원가입을 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6adcfb33-70ed-437f-ac03-4c74dd6e596c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6adcfb33-70ed-437f-ac03-4c74dd6e596c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/095c37de-89d4-4dc4-b2ce-aaec1064226e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/095c37de-89d4-4dc4-b2ce-aaec1064226e.png)
 
 그러면 이메일 인증을 하라고 하는데, 아까 가입에 필요한 필수 속성에서 이메일을 선택하였기 때문이다. (아까 설정에서 전화번호를 선택할 수 도 있다.)
 
 다만 이에 대해선 요금이 부과될 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b5301821-a37f-40ff-b44e-c691205f09c0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b5301821-a37f-40ff-b44e-c691205f09c0.png)
 
 이메일 인증 후 확인해보면 위와 같이 가입이 됐다고 나오며, AWS 유저 풀로 들어가보면 방금 생성했던 유저가 나타나는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5dff2007-aa5f-43cf-8902-6fb44b7053e4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/5dff2007-aa5f-43cf-8902-6fb44b7053e4.png)
 
 하지만 이렇게만 생성하면 엑세스 토큰과 리프레시 토큰이 나타나지 않는데, 이는 아까 설명했던 코드처럼 AWS SDK를 사용하여 가져올 수 있다.
 
-> ![](https://velog.velcdn.com/images/yulmwu/post/2fd7825a-bc5f-4cae-956f-94f2226ad74c/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/2fd7825a-bc5f-4cae-956f-94f2226ad74c.png)
 >
 > 그리고 Cognito엔 플랜이 있는데, 기본적으로 에센셜(Essentials) 플랜으로 제공된다.
 >
@@ -2219,13 +2219,13 @@ AWS Cognito에 들어가보자.
 
 API Gateway에서 Cognito와 연동을 하게 되면 이 인증을 자동으로 검증해주고 디코딩하여 `event.requestContext.authorizer?.jwt?.claims` 등의 코드를 사용하여 이에 대해 접근할 수 있다. (위 코드는 JWT 토큰의 클레임을 확인함.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/3f1c74e5-1dc8-4e0c-93b1-08249c8f1e31/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/3f1c74e5-1dc8-4e0c-93b1-08249c8f1e31.png)
 
 API Gateway에서 Authorization 항목에서 Cognito와 연동할 수 있다.
 
 "권한 부여자 생성 및 연결"을 클릭해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e93471cb-85c7-4695-9554-45436a989606/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e93471cb-85c7-4695-9554-45436a989606.png)
 
 람다로 직접 인증 로직을 작성할 수 도 있으나, Cognito를 사용하여 JWT 인증이 필요하니 JWT를 선택해둔다.
 
@@ -2239,9 +2239,9 @@ https://cognito-idp.[Region].amazonaws.com/[User_Pool_ID]
 
 그리고 대상엔 Cognito 앱 클라이언트의 ID를 입력한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/af25c3b6-e39a-4d49-99a5-c2d4c89bb795/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/af25c3b6-e39a-4d49-99a5-c2d4c89bb795.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/fa5459af-c222-4e06-ad99-e3f9e4b57e9b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/fa5459af-c222-4e06-ad99-e3f9e4b57e9b.png)
 
 그럼 Cognito 권한 부여자가 생겼고, 나중에 이를 돌려쓸 수 있게 된다.
 이 작업은 이후 Serverless Framework에서 다시 IaC로 작성해볼 예정이다.
@@ -2254,11 +2254,11 @@ https://cognito-idp.[Region].amazonaws.com/[User_Pool_ID]
 >
 > 필자는 이 파트에서 만들고 삭제할 예정이지만, 다른 리소스 이름(`Posts_Test` 등)을 사용해도 괜찮다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ac84548d-69ef-4e4a-ab08-3bb6eea89a54/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ac84548d-69ef-4e4a-ab08-3bb6eea89a54.png)
 
 AWS Console에서 DynamoDB에 접속한 후 Posts 테이블을 만들자. Posts 테이블의 파티션 키(기본 키)는 `id`이며, `String` 타입이다. (정렬 키는 이 포스팅에선 설명하지 않는다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/b09853ad-0c04-4cdc-81ba-36f12f93d429/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b09853ad-0c04-4cdc-81ba-36f12f93d429.png)
 
 그 뒤 DynamoDB의 용량이나 성능 등의 세부 정보를 설정할 수 있으나, 일단 기본값으로 냅두고 만들겠다.
 
@@ -2285,7 +2285,7 @@ const getNextId = async (): Promise<number> => {
 
 위 코드를 보면 알 수 있듯이 Counter 테이블의 `post`라는 키를 가진 아이템을 생성해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/045e8106-4b18-40c8-9bee-52bc88894014/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/045e8106-4b18-40c8-9bee-52bc88894014.png)
 
 `value` 속성이 없어도 알아서 만들어주지만 예시를 위해 설정을 해두자.
 
@@ -2293,21 +2293,21 @@ const getNextId = async (): Promise<number> => {
 
 이제 DynamoDB를 만들었다면 람다에서 DynamoDB에 접근할 IAM 권한이 필요하다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b3752157-5541-49be-9ac3-e1ec8cf9d290/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b3752157-5541-49be-9ac3-e1ec8cf9d290.png)
 
 람다 함수를 보면 기본적으로 CloudWatch에 대한 권한만 존재한다. (`Allow: logs:CreateLogStream`, `Allow: logs:PutLogEvents`, 로그 그룹 생성은 모든 리소스(서비스)에서 생성할 수 있음)
 
 람다 함수 별로 IAM 역할을 각자 만들거나 하나의 IAM 역할을 돌려쓸 수 있는데, 이 포스팅에선 각 람다 별 IAM 역할을 만드는게 아닌 하나의 IAM 역할을 돌려 쓸 예정이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/65bd3714-7529-4554-aa9e-834d48d83658/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/65bd3714-7529-4554-aa9e-834d48d83658.png)
 
 IAM 역할로 들어가 설정을 해보자. 권한 정책에 있는 정책을 클릭해보면 아래와 같은 화면이 나타난다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/ce26b8da-b510-4ba0-b9f6-ce8bd8213b40/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ce26b8da-b510-4ba0-b9f6-ce8bd8213b40.png)
 
 여기서 "이 정책에 정의된 권한"에서 편집을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/921995c7-08d0-4671-8a14-ba1a1fe3e6de/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/921995c7-08d0-4671-8a14-ba1a1fe3e6de.png)
 
 그럼 위와 같이 JSON 형태의 IAM 정책이 나타나는데, 어떤 리소스에 대해 어떠한 정책 Allow할지 선택할 수 있으며, 일단 아래와 같은 정책을 허용하도록 설정해보자.
 
@@ -2349,11 +2349,11 @@ arn:aws:dynamodb:[Region]:[Account_ID]:table/[Table_Name]
 
 알맞은 ARN을 기입하고 아래와 같이 JSON의 `Statement` 필드 안에 입력하고 "다음" 버튼을 누르자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b77d81e1-4f70-41bc-b976-0e7abee9ec32/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/b77d81e1-4f70-41bc-b976-0e7abee9ec32.png)
 
 에러가 없는지 확인하고, 아래와 같이 나온다면 성공한 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8db91fdf-bf46-4ee4-8434-7b3274f2bb4c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8db91fdf-bf46-4ee4-8434-7b3274f2bb4c.png)
 
 변경 사항 저장을 클릭하여 권한을 저장하자. 그리고 DynamoDB에 대한 읽기/쓰기 권한을 테스트하기 위해 아래의 람다 함수 코드를 람다에 넣고 수정한 뒤 테스트해보자.
 
@@ -2401,15 +2401,15 @@ export const handler = async () => {
 
 아까 생성해두었던 `POST /hello`에 연결된 람다에 수정해두었고, Postman을 이용하여 테스트를 해보았다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3d3a4b7e-2755-470d-b8b4-1b86f049c82e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/3d3a4b7e-2755-470d-b8b4-1b86f049c82e.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a6e46630-4a75-41d8-8fe0-7b0ec745b591/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a6e46630-4a75-41d8-8fe0-7b0ec745b591.png)
 
 위와 같이 실행 결과도 잘 출력되며, DynamoDB에서 확인해보아도 성공적으로 생성되고 가져오는 것 까지 되는 모습을 볼 수 있다.
 
 만약 ARN을 잘못 설정하였거나 권한 문제가 있다면 CloudWatch에 아래와 같은 에러가 찍힐 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/359663ff-e534-4467-8dd9-53db38bc9d15/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/359663ff-e534-4467-8dd9-53db38bc9d15.png)
 
 이러한 권한 설정도 아래에서 설명할 Serverless Framework를 사용하여 쉽게 설정할 수 있다.
 
@@ -2423,7 +2423,7 @@ export const handler = async () => {
 
 Serverless Framework의 설치 방법은 생략한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8c569063-44dc-465a-8571-17625afc0624/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8c569063-44dc-465a-8571-17625afc0624.png)
 
 AWS 아키텍쳐를 소개할 때 사용했었던 자료인데, 위 자료에서 "Serverless Framework"로 그룹되어 있는 서비스가 우리가 Serverless Framework로 인프라를 구축하고 배포 할 서비스다.
 
@@ -2440,7 +2440,7 @@ AWS 아키텍쳐를 소개할 때 사용했었던 자료인데, 위 자료에서
 
 `/functions`, `/utils` 등의 디렉토리와 `package.json` 파일 등이 있는 위치에 `serverless.yaml`을 만들자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a0846bce-b08c-4e39-a5c3-dfa37e3be1cd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a0846bce-b08c-4e39-a5c3-dfa37e3be1cd.png)
 
 ### Provider Property
 
@@ -2771,21 +2771,21 @@ package:
 
 만약 위 기능을 사용하지 않았다면 아래와 같이 모든 람다 함수들이 한번에 같이 올라갔을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0f5ac42f-30d7-4599-9b55-e33b4cd21f8c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/0f5ac42f-30d7-4599-9b55-e33b4cd21f8c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/f3b1463b-d853-4e87-b659-98b6787b7e65/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f3b1463b-d853-4e87-b659-98b6787b7e65.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/cd625c8f-16c9-467e-a8c5-75f55c695490/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/cd625c8f-16c9-467e-a8c5-75f55c695490.png)
 
 보다시피 각 함수 별 용량도 크고 불필요한 다른 람다 함수의 코드까지 올라가게 된다.
 
 하지만 `individually: true`로 활성화하면 아래와 같이 줄어든 용량과 불필요한 파일이 올라가지 않았음을 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fafcd3cc-e03b-4bf7-9107-fd006f80e909/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/fafcd3cc-e03b-4bf7-9107-fd006f80e909.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a28871b9-3644-4aab-b722-0f64ac263cba/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a28871b9-3644-4aab-b722-0f64ac263cba.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/1ffd109e-3102-4f65-a568-0709b1abd856/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/1ffd109e-3102-4f65-a568-0709b1abd856.png)
 
 코드 사이즈가 1769349바이트(약 1.8MB) -> 152586바이트(약 153KB)로 10배 이상 줄어든걸 확인할 수 있다.
 (람다 함수의 파일 개수에 비례함)
@@ -2810,7 +2810,7 @@ prune:
 
 위와 같이 작성해두면 마지막 버전 1개만 냅두고 나머지는 전부 지워준다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d3c4a01b-198f-43f2-b535-344bcf2d1f43/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d3c4a01b-198f-43f2-b535-344bcf2d1f43.png)
 
 이제 Serverless Framework에 대한 내용은 끝이 났다. 이대로 `serverless deploy`를 통해 수동으로 배포할 수 도 있으나, Github Actions를 통해 깃허브에 push 할 시 자동으로 실행되어 배포할 수 있게 해보겠다.
 
@@ -2863,7 +2863,7 @@ jobs:
 
 이때 환경 변수가 사용되는데, 환경 변수는 깃허브 레포지토리 설정에서 설정해줄 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fa71355e-b207-42d2-9d8b-5549306ac707/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/fa71355e-b207-42d2-9d8b-5549306ac707.png)
 
 설정에서 Security > Secrets and variables 탭에 들어가 설정할 수 있다.
 
@@ -2875,7 +2875,7 @@ New repository secrets 버튼을 클릭하여 환경 변수를 만들 수 있는
 
 IAM 엑세스 키 생성에 대해선 다루지 않는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/5f022ec2-4e07-41bf-afcd-cb489a4ad2c3/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/5f022ec2-4e07-41bf-afcd-cb489a4ad2c3.png)
 
 ### (2) Setup NodeJS and Install Dependencies
 
@@ -2926,7 +2926,7 @@ IAM 엑세스 키 생성에 대해선 다루지 않는다.
 
 그럼 Github Actions 작성이 끝났고, Github에 push 하면 자동으로 배포가 될 것 이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/93928eac-671d-4b20-ba93-838abc2ace00/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/93928eac-671d-4b20-ba93-838abc2ace00.png)
 
 약 2분 10초 정도가 소요되는 것을 확인할 수 있다. 이 파트에서 사용했던 Github Actions 워크플로우 파일 역시 깃허브 레포지토리에서 확인할 수 있다.
 
@@ -2941,7 +2941,7 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/serverless.yaml
 > 하지만 CSR과 비교적 서버리스에서 SSR을 구현하기엔 다소 복잡하다.
 > 특히 JWT 토큰을 사용하여 더욱 더 복잡해지는데, 다음과 같은 기본적인 아키텍쳐를 사용해볼 수 있다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/8aa4b27f-a93c-4b22-a5f1-c8a142a6839c/image.png)
+> ![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8aa4b27f-a93c-4b22-a5f1-c8a142a6839c.png)
 >
 > 일단 React를 사용한다고 가정하였을 때, NextJS 프레임워크를 사용하여 라우팅 및 SSR을 구현하고 이를 SST로 인프라를 구축하고 배포한다.
 >
@@ -2972,11 +2972,11 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/serverless.yaml
 
 또한 백엔드 API처럼 Serverless Framework를 사용하지 않고 Github Actions만 사용하였는데, 간단한 예제라 CloudFront와 S3 인프라를 만들고 Github Actions에서 AWS CLI로 S3에 배포만 하는게 더 괜찮다고 생각하였기 때문이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8f18b105-c54e-4917-aaf3-055ec639cbc7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8f18b105-c54e-4917-aaf3-055ec639cbc7.png)
 
 그래서 Github 레포지토리에 가보면 두개의 Actions가 작동 중이며, 각 Actions는 `/backend`와 `/frontend`에서 변동 사항이 있을 때 작동한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1079b48d-4ca5-4282-af7a-4e1051b4a5a5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/1079b48d-4ca5-4282-af7a-4e1051b4a5a5.png)
 
 또한 프론트엔드 코드에서 `API_URL`에 필자의 API Gateway 주소를 입력해뒀는데, 실제로 시도해보려면 이 주소를 본인의 주소로 바꿔서 사용하길 바란다.
 
@@ -2988,38 +2988,38 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/serverless.yaml
 
 버킷 이름은 고유해야 되니 직접 시도해본다면 다른 이름을 선택하도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9b199394-e564-463e-bf5d-92a467af425d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/9b199394-e564-463e-bf5d-92a467af425d.png)
 
 > 버킷 이름에서 `actions`는 필자의 오타이다. 원래는 `acinside`를 사용하려 하였다...
 
 다음으로 ACL(Access Control List)을 설정할 수 있는데, 우리는 나중에 CloudFront를 통해서만 접근할 예정이니 ACL은 사용하지 않는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7f8defa8-0b96-42a1-ae19-e2f9172e318d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/7f8defa8-0b96-42a1-ae19-e2f9172e318d.png)
 
 다음으로 퍼블릭 엑세스는 차단한다. 나중에 CloudFront를 사용하여 S3에 접근할 것이기 때문에 차단해도 괜찮다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dc31ab06-8ea9-4b7d-a73c-8b020939d94d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/dc31ab06-8ea9-4b7d-a73c-8b020939d94d.png)
 
 나머지 옵션은 그대로 냅두고, 버킷이 만들어지면 빌드된 `/dist` 디렉토리의 파일들을 업로드하자. AWS CLI를 사용해도 되지만, 간단하게 AWS Console을 통해 업로드할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/668c4a2e-b0de-422b-83c9-70345c98ca72/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/668c4a2e-b0de-422b-83c9-70345c98ca72.png)
 
 그리고 버킷 설정에서 정적 웹 호스팅 옵션을 켜둬야한다.
 그래야 웹으로 해당 버킷에 업로드해둔 사이트에 접속할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4e95ffa6-36f7-42ef-9a94-da75ccdbdeaf/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4e95ffa6-36f7-42ef-9a94-da75ccdbdeaf.png)
 
 버킷 속성 > 맨 아래의 정적 웹 호스팅 항목에서 설정할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/802a6cd8-947b-4c5c-aab9-298ece7cd85e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/802a6cd8-947b-4c5c-aab9-298ece7cd85e.png)
 
 그럼 위와 같이 인덱스 문서와 오류 문서를 입력하라고 나오는데, 우리는 리액트에서 `react-router-dom`을 사용하여 클라이언트 측에서 라우팅하게 작성하였으니 둘 다 `index.html`을 입력한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4fe04be8-2b0a-4802-91f8-42c2ea858cb0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4fe04be8-2b0a-4802-91f8-42c2ea858cb0.png)
 
 그럼 S3가 해당 파일들로 웹 호스팅을 해주고 URL을 제공해주는데, 퍼블릭 엑세스를 차단해뒀기 때문에 에러가 떠야한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e567c1a4-12ff-45b3-88b1-94256c818ae7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e567c1a4-12ff-45b3-88b1-94256c818ae7.png)
 
 우리의 목적은 CloudFront를 사용한 CDN 서비스까지 적용할 예정이기 때문에 CloudFront 배포(Distribution) 설정으로 넘어가자.
 
@@ -3031,39 +3031,39 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/serverless.yaml
 
 오리진은 아까 만들어둔 S3 버킷으로 설정한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2451de6e-478d-44fa-9451-e501b24dd8c9/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/2451de6e-478d-44fa-9451-e501b24dd8c9.png)
 
 그리고 "원본 엑세스" 항목엔 "원본 엑세스 제어 설정(권장)"을 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/de5b52e2-a61b-475e-8b98-18db6e4f31f1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/de5b52e2-a61b-475e-8b98-18db6e4f31f1.png)
 
 그럼 OAC(Origin Access Control)를 설정할 수 있는데 OAC를 사용하여 IAM 설정을 통해 CloudFront만이 S3에 접근할 수 있도록 할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6bd504e8-b478-4953-83d2-9191451903f7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6bd504e8-b478-4953-83d2-9191451903f7.png)
 
 OAC를 만드는데 기본 설정을 유지하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9970f9cf-80f9-4636-a9df-b53dc3012b0d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/9970f9cf-80f9-4636-a9df-b53dc3012b0d.png)
 
 그럼 버킷 정책을 업데이트해야 된다고 하는데, CloudFront 설정이 끝나면 버킷 정책을 수정해주도록 하자.
 
 다음으로 뷰어 프로토콜 설정은 Redirect HTTP to HTTPS를 선택해주자. 그럼 CloudFront가 http를 사용한 URL을 https로 넘겨준다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/79d49da3-305b-40a5-a9b8-8a549f7dd517/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/79d49da3-305b-40a5-a9b8-8a549f7dd517.png)
 
 그 외에 DDoS, XSS, SQL 인젝션 등의 공격을 방어할 수 있는 AWS 서비스인 WAF(Web Application Firewall) 등을 설정할 수 있으나, 요금이 부과되는 옵션이기 때문에 이 포스팅에선 설정하지 않는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/74a0d02e-88f4-42fc-83ba-a18e8944a254/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/74a0d02e-88f4-42fc-83ba-a18e8944a254.png)
 
 나머지는 그대로 두고, 기본값 루트 객체에서 `index.html`을 입력해주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/964074c4-7afa-4800-844c-df90ea5edd07/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/964074c4-7afa-4800-844c-df90ea5edd07.png)
 
 그러면 루트(`/`)에 접속했을 때 자동으로 `index.html`을 띄워준다.
 
 이제 생성 버튼을 눌러 CloudFront 배포를 만들어주자. 그러면 아래와 같은 메세지가 나올 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f7ab3157-6fb5-4469-8a1f-209639dff196/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f7ab3157-6fb5-4469-8a1f-209639dff196.png)
 
 "정책 복사"를 누르면 아래와 같은 IAM 설정이 복사된다.
 
@@ -3087,21 +3087,21 @@ OAC를 만드는데 기본 설정을 유지하자.
 
 아까 S3로 돌아가 "권한" 탭의 버킷 정책 항목에서 편집 버튼을 눌러보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/36ca244f-33bc-4c42-a645-e4058ec83e1f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/36ca244f-33bc-4c42-a645-e4058ec83e1f.png)
 
 그리고 복사했던 정책을 붙여넣기 하고 변경 사항 저장을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/eeb78a40-99d8-4640-9805-cf673337187e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/eeb78a40-99d8-4640-9805-cf673337187e.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/2ed18c9d-adf8-4f35-abfc-6e7479ceeca0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/2ed18c9d-adf8-4f35-abfc-6e7479ceeca0.png)
 
 마지막으로 CloudFront의 배포 도메인 이름의 URL을 복사하고 들어가면 성공적으로 배포된 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/40a816ee-0e89-4229-89e2-a9705128aed5/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/40a816ee-0e89-4229-89e2-a9705128aed5.png)
 
 배포엔 성공하였으나, 아래와 같이 에러가 뜰것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/1b8ac716-91f0-4105-8c14-2c24e7d84f27/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/1b8ac716-91f0-4105-8c14-2c24e7d84f27.png)
 
 두가지 이유가 있는데,
 
@@ -3113,19 +3113,19 @@ OAC를 만드는데 기본 설정을 유지하자.
 수정은 새로 업로드하거나 CLI 등을 사용하여 수정하자.
 S3에 다시 배포하였다면 CloudFront에서 캐시 무효화를 해줘야할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4cb44e3e-fdb8-446f-87dc-bfe4f974cfc7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4cb44e3e-fdb8-446f-87dc-bfe4f974cfc7.png)
 
 그럼 다음으로 2번째 경우인 CORS 에러가 발생한다. API Gateway CORS 설정에서 방금 만들었던 CloudFront 오리진을 허용하지 않아서인데, 우리는 Serverless Framework와 Github Actions를 사용하여 설정 자동화를 해뒀기 때문에 아래와 같이 `serverless.yaml`의 `allowedOrigins` 속성만 바꿔주면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f3c43854-d99e-42e2-9cec-5aed1b005610/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f3c43854-d99e-42e2-9cec-5aed1b005610.png)
 
 그리고 push하고 배포가 완료되기 까지 기다리면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f782911b-a017-4165-b66d-dbdbdc59da8f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f782911b-a017-4165-b66d-dbdbdc59da8f.png)
 
 그리고 다시 들어가보면 정상적으로 작동하는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7b883885-9304-4d57-8013-cdd2adf5d1d0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/7b883885-9304-4d57-8013-cdd2adf5d1d0.png)
 
 > 글 작성일(2025-06-29) 기준 프론트엔드에 회원가입 기능을 만들지 않았는데, `POST /auth/signup` 엔드포인트로 직접 요청을 해보거나 AWS Console로 Cognito 계정을 만들 수 있다.
 
@@ -3225,11 +3225,11 @@ AWS CLI 옵션 중 `sync`는 로컬 파일과 비교하여 변경된 부분만 �
 
 그럼 두개의 워크플로우가 성공적으로 실행되는 것을 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7f54be91-764a-4b3c-9dc1-63080f51d73d/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/7f54be91-764a-4b3c-9dc1-63080f51d73d.png)
 
 CloudFront 캐싱 무효화까지 잘 되는 모습이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/241fe75c-4779-4467-9943-4c32830dd1d0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/241fe75c-4779-4467-9943-4c32830dd1d0.png)
 
 ---
 
@@ -3237,13 +3237,13 @@ CloudFront 캐싱 무효화까지 잘 되는 모습이다.
 
 배포하였던 프론트엔드 사이트를 사용하여 간단한 로그인과 게시글 CRUD를 테스트 해볼 수 있었지만 제대로 API 테스트를 위해 Postman을 사용하여 테스트해보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f91f67fd-a601-4132-a71a-cc9454f7bd4c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f91f67fd-a601-4132-a71a-cc9454f7bd4c.png)
 
 Postman을 실행하여 새로운 컬렉션을 만들고, 우클릭 후 New Request로 요청을 생성한다.
 
 편의를 위해 Base URL을 환경 변수로 만들고 사용하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c3b2c113-f46c-4196-abde-f194d0588c54/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/c3b2c113-f46c-4196-abde-f194d0588c54.png)
 
 엔드포인트 설명에 대해선 아래의 링크에서 자세히 볼 수 있다.
 
@@ -3253,73 +3253,73 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/README.md
 
 ### `POST /auth/signup`
 
-![](https://velog.velcdn.com/images/yulmwu/post/dc544107-bc7c-4933-8173-13c2290257c8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/dc544107-bc7c-4933-8173-13c2290257c8.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/8e4c7e04-3477-4408-b304-79807bac4969/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8e4c7e04-3477-4408-b304-79807bac4969.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/f4e0bfdc-9c82-4dfb-a6b7-840a85658f85/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/f4e0bfdc-9c82-4dfb-a6b7-840a85658f85.png)
 
 ### `POST /auth/confirmEmail`
 
-![](https://velog.velcdn.com/images/yulmwu/post/04364615-67c5-4f3a-8f76-f1fe1f9fe0c8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/04364615-67c5-4f3a-8f76-f1fe1f9fe0c8.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/6026718b-07fc-43cc-9b3d-091d3f390fb1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/6026718b-07fc-43cc-9b3d-091d3f390fb1.png)
 
 ### `POST /auth/resendEmail`
 
-![](https://velog.velcdn.com/images/yulmwu/post/fcb8a6c9-9888-4b60-b78f-e94c9edfadd7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/fcb8a6c9-9888-4b60-b78f-e94c9edfadd7.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d891ec6b-b32c-4c2f-8e27-1ae4bd3bc5a8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d891ec6b-b32c-4c2f-8e27-1ae4bd3bc5a8.png)
 
 ### `POST /auth/login`
 
-![](https://velog.velcdn.com/images/yulmwu/post/741907ea-ffc2-48b3-8022-f2c4c14f6c1a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/741907ea-ffc2-48b3-8022-f2c4c14f6c1a.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/afe0f9a4-a143-4ed6-853a-2674ba19d1aa/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/afe0f9a4-a143-4ed6-853a-2674ba19d1aa.png)
 
 ### `POST /auth/refresh`
 
-![](https://velog.velcdn.com/images/yulmwu/post/0247298d-6c98-4c2a-a41b-8be3d8d8ffdd/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/0247298d-6c98-4c2a-a41b-8be3d8d8ffdd.png)
 
 ### `POST /auth/logout`
 
-![](https://velog.velcdn.com/images/yulmwu/post/34d75b1c-a237-406a-a853-533a333e79fe/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/34d75b1c-a237-406a-a853-533a333e79fe.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/11366727-21b4-48e8-9219-c14fee7df1f0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/11366727-21b4-48e8-9219-c14fee7df1f0.png)
 
 ## Post CRUD API
 
 ### `GET /posts` (Get All Posts)
 
-![](https://velog.velcdn.com/images/yulmwu/post/a9b74f40-3f23-4a8c-82b3-8b9e2208445a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/a9b74f40-3f23-4a8c-82b3-8b9e2208445a.png)
 
 ### `GET /posts/{id}` (Get Specific Post)
 
-![](https://velog.velcdn.com/images/yulmwu/post/8f6f7358-8c7b-4256-8275-e531d72548b7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/8f6f7358-8c7b-4256-8275-e531d72548b7.png)
 
 ### `POST /posts` (Create Post)
 
-![](https://velog.velcdn.com/images/yulmwu/post/682364e2-b254-412d-b919-bc62f444e1eb/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/682364e2-b254-412d-b919-bc62f444e1eb.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/64a369d9-37e3-484f-a156-6ccba186d889/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/64a369d9-37e3-484f-a156-6ccba186d889.png)
 
 ### `PUT /posts/{id}` (Update Specific Post)
 
-![](https://velog.velcdn.com/images/yulmwu/post/e9d0c85f-550e-4ac3-8ea6-8b7cba77a8f2/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e9d0c85f-550e-4ac3-8ea6-8b7cba77a8f2.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/e1370778-2558-4fd0-8eab-825d6027ca27/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e1370778-2558-4fd0-8eab-825d6027ca27.png)
 
 ### `DELETE /posts/{id}` (Delete Specific Post)
 
-![](https://velog.velcdn.com/images/yulmwu/post/835f6bc1-0aaf-4860-8b70-6ee55cf0c6a6/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/835f6bc1-0aaf-4860-8b70-6ee55cf0c6a6.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/45caae6c-3321-4174-ae95-211df47aa9d4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/45caae6c-3321-4174-ae95-211df47aa9d4.png)
 
 ## Users API
 
 ### `GET /myinfo`
 
-![](https://velog.velcdn.com/images/yulmwu/post/5963ad69-7756-4e94-85b8-0bbf424fab30/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/5963ad69-7756-4e94-85b8-0bbf424fab30.png)
 
 ---
 
@@ -3331,11 +3331,11 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/README.md
 
 특히 서버리스를 베이스로 한 아키텍쳐이기 때문에 그 가정은 아래와 같이 정하며, 한달을 기준으로 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dd1b2e2a-053e-42dc-a1a1-cec5f95f178f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/dd1b2e2a-053e-42dc-a1a1-cec5f95f178f.png)
 
 그리고 지금까지 만들어온 아키텍쳐는 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4ae3a790-9aff-404b-b763-03c0b6e5de9f/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/4ae3a790-9aff-404b-b763-03c0b6e5de9f.png)
 
 이를 바탕으로 AWS Pricing Calculator를 사용하여 요금을 계산해보겠다.
 
@@ -3347,29 +3347,29 @@ https://github.com/eocndp/aws-lambda-example/blob/main/backend/README.md
 
 먼저 람다에 대한 설정은 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/2a56d98b-6c6a-4373-851a-a5202a01541a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/2a56d98b-6c6a-4373-851a-a5202a01541a.png)
 
 총 요청 수를 6,300,000건으로 생각하였고, 요청 당 실행 시간은 1000ms(1초)로 생각하였다.
 
 메모리는 128MB에 x86 아키텍쳐 기준으로 아래와 같은 요금이 부과된다고 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7ae22340-9332-4112-955e-c1fd126ac89a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/7ae22340-9332-4112-955e-c1fd126ac89a.png)
 
 글 작성일 기준 환율로 생각하면 한화 2만원 정도이다.
 
 ## API Gateway
 
-![](https://velog.velcdn.com/images/yulmwu/post/40a800ab-d0a1-47b3-8e7b-501a3a778c50/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/40a800ab-d0a1-47b3-8e7b-501a3a778c50.png)
 
 API Gateway도 사용량을 기준으로 한다. 요청 수와 요청의 크기로 계산되는데, 6,300,000건의 요청과 요청 당 약 크기는 약 20KB라고 생각하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c8388c23-fa69-4b05-9d01-5bc8202d9ad4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/c8388c23-fa69-4b05-9d01-5bc8202d9ad4.png)
 
 7.75달러, 한화 약 만원 정도의 요금이 발생하였다.
 
 ## Cognito
 
-![](https://velog.velcdn.com/images/yulmwu/post/11a704c1-2149-4de5-82ef-29d513048ca0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/11a704c1-2149-4de5-82ef-29d513048ca0.png)
 
 Cognito에선 MAU를 바탕으로 요금을 계산한다.
 
@@ -3378,7 +3378,7 @@ Cognito에선 MAU를 바탕으로 요금을 계산한다.
 다만 MAU는 처음에 가정해뒀던 시나리오를 바탕으로 작성하였다.
 MAU는 회원가입, 로그인, 토큰 리프레시 등의 작업이 한번이라도 발생하면 1 MAU로 가정한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/07e8c62e-de8b-4a49-a761-f9a431c2d0c0/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/07e8c62e-de8b-4a49-a761-f9a431c2d0c0.png)
 
 Cognito는 첫 10,000 MAU는 무료로 제공해주는데, 때문에 Lite 기준으로 10,000 MAU만 계산되어 55달러, 한화 약 7만 4천원 정도가 나온다.
 
@@ -3394,7 +3394,7 @@ DynamoDB는 크게 읽기/쓰기 작업과 스토리지 용량에 따라 요금�
 
 읽기에 대해선 아래와 같이 설정하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/38244053-5b0e-42f1-a05c-078cef091692/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/38244053-5b0e-42f1-a05c-078cef091692.png)
 
 여기서 Eventually consistent reads와 Strongly consistent reads 개념이 등장하는데, 전자는 데이터베이스에 데이터가 쓰여질 시 바로 그 결과값이 보여지지 않을 수 있다.
 
@@ -3406,17 +3406,17 @@ DynamoDB는 내부적으로 여러 곳에 분산하고 복제하기 때문이다
 
 다음으로 Write에 대한 비용은 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/14430bf0-ab39-47bc-a476-3a52b6b047b1/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/14430bf0-ab39-47bc-a476-3a52b6b047b1.png)
 
 쓰기량은 전체의 10%, 트랜잭션 비율도 0%로 설정해뒀으며 평균 아이템 사이즈도 마찬가지로 1KB로 설정하였다.
 
 마지막으로 스토리지 용량의 경우 DynamoDB의 총 용량을 의미하는데, 게시글이 10만개, 댓글이 50만개라고 가정하면 (100,000 + 500,000) x 1KB = 약 600MB, 여유잡아 1GB라고 설정하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9a73fc71-185f-4715-bd6f-3c2a73799255/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/9a73fc71-185f-4715-bd6f-3c2a73799255.png)
 
 테이블 클래스는 전부 스탠다드로 하였는데, 자주 접근하지 않는 아이템은 스탠다드 IA에 저장하는 것이 스토리지 면에서 효율적이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/53e9180c-58f0-4783-ac6c-c0404132b37c/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/53e9180c-58f0-4783-ac6c-c0404132b37c.png)
 
 그럼 DynamoDB에 대해선 0.79달러, 한화 약 1100원 정도로 매우 저렴한 것을 볼 수 있다.
 
@@ -3432,13 +3432,13 @@ DynamoDB는 내부적으로 여러 곳에 분산하고 복제하기 때문이다
 
 캐시 해트율이 90%라면 미스는 10%, 즉 2,000,000건의 요청으로 적어주겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e4affcf8-e4f0-4423-8e06-7bc8cfe6f410/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/e4affcf8-e4f0-4423-8e06-7bc8cfe6f410.png)
 
 그리고 리소스 저장 비용은 단순히 웹 페이지 소스코드만 저장하기 때문에 더욱 적은 용량이겠지만, 1GB로 잡아주었다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d1184b2b-b319-4e4b-a42a-5179a8a0f377/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d1184b2b-b319-4e4b-a42a-5179a8a0f377.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ab4c67f2-0aac-4536-bd7d-8a510817593a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/ab4c67f2-0aac-4536-bd7d-8a510817593a.png)
 
 이렇게 했을 때 요금은 0.73달러, 한화 약 천원 정도로 매우 저렴하다.
 
@@ -3455,14 +3455,14 @@ CloudFront는 데이터 전송 용량과 HTTPS 요청 수를 기준으로 비용
 그리고 국가는 간단하게 대한민국, 일본으로 나눠서 계산하였다.
 (참고로 그러한 국가별 요금은 [AWS 공식 문서](https://aws.amazon.com/ko/cloudfront/pricing/)에서 확인할 수 있다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/0582ba3b-8637-4f5c-8af6-d090363a1d60/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/0582ba3b-8637-4f5c-8af6-d090363a1d60.png)
 
 - 서울(대한민국)
   => Data transfer out to internet: 90% = 1.8TB, Number of requests = 18,000,000
 - 일본
   => Data transfer out to internet: 10% = 0.2TB, Number of requests = 2,000,000
 
-![](https://velog.velcdn.com/images/yulmwu/post/d876a1e8-ace1-476a-aec1-63395febf11e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/d876a1e8-ace1-476a-aec1-63395febf11e.png)
 
 그럼 대략 268.53달러, 한화 36만 5천원 정도가 나온것을 볼 수 있다.
 원래 CDN 서비스가 비용이 꽤나 나가는 서비스이기도 하고 CloudFront는 요금이 복잡하기 때문에 실제론 더 나가거나 덜 나갈 수 도 있다.
@@ -3474,13 +3474,13 @@ CloudFront는 데이터 전송 용량과 HTTPS 요청 수를 기준으로 비용
 
 아래는 S3만 사용했을 때 인터넷으로 나가는 데이터 전송 요금이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/edbc3f7d-0a03-4a11-9ba3-d473ba43b0fa/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/edbc3f7d-0a03-4a11-9ba3-d473ba43b0fa.png)
 
 ## Total Cost of Ownership
 
 그래서 TOC(Total Cost of Ownership), 총 비용은 우리가 가정했던 시나리오를 기준으로 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fb6c123b-2597-4cbc-b88c-8f38305c90fe/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/fb6c123b-2597-4cbc-b88c-8f38305c90fe.png)
 
 총 347.18달러, 한화 약 47만 2,506원이 지불된다는 것을 예측할 수 있다.
 (비중의 대부분을 CloudFront가 차지했다.)
@@ -3491,7 +3491,7 @@ CloudFront는 데이터 전송 용량과 HTTPS 요청 수를 기준으로 비용
 
 만약 API 백엔드 요금만 계산한다면 77.93달러, 약 10만 5천원 정도가 과금된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/98d7c6d9-d9a2-4b00-b6b9-d8da2e999f63/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-06-22-aws-serverless/98d7c6d9-d9a2-4b00-b6b9-d8da2e999f63.png)
 
 물론 기능을 자세히 구현하지 않고 Cognito와 간단한 CRUD API 구현만 해뒀기 때문에 이정도로 저렴하지만, 실제 서비스에서도 요청된 수 + 실행 시간 만큼 과금되기 때문에 스타트업이나 확장성 등이 중요한 서비스에선 서버리스가 유리하게 작용된다는 것이 핵심이다.
 

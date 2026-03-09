@@ -29,7 +29,7 @@ Kubernetes에서 전통적으로 파드 오토스케일링을 위해 [**VPA** �
 
 이러한 문제를 쉽게 해결하기 위해 **KEDA(Kubernetes Event-driven Autoscaling)**를 사용해볼 수 있다. KEDA는 앞서 언급한 다양한 이벤트 소스에서 직접 메트릭을 수집하고, 이를 External Metric 형태로 만들어 이를 바탕으로 HPA가 동작할 수 있도록 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/bc81b9d0-6526-4d8d-9a37-e59d8603ef7a/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/bc81b9d0-6526-4d8d-9a37-e59d8603ef7a.png)
 
 자세한 동작 과정은 위와 같다. 복잡하지는 않은데, 방금 말했 듯 KEDA Operator가 이벤트 소스를 (대부분) Polling하거나 Watch 하여 메트릭을 수집하고, 이를 바탕으로 **HPA**를 생성하여 파드(워크로드) 스케일링을 진행한다. (자체적으로 External Metrics API를 구성한다.)
 
@@ -47,7 +47,7 @@ Kubernetes에서 전통적으로 파드 오토스케일링을 위해 [**VPA** �
 
 예제로 살표볼 아키텍처는 아래와 같다. 이렇게 메시지/이벤트 큐나 데이터 스트리밍 플랫폼의 메트릭을 기반으로 오토스케일링 한다는 것은 대부분 컨슈머 파드를 오토스케일링 한다는 의미인데, 컨슈머를 구현하는 것은 이 포스팅의 범위를 벗어나기 때문에 생략하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d8e27b17-82ed-4c71-8873-d5ae6f7ac16f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/d8e27b17-82ed-4c71-8873-d5ae6f7ac16f.png)
 
 ## (1) AWS SQS Queue
 
@@ -66,11 +66,11 @@ SQS_QUEUE_URL=$(aws sqs get-queue-url \
 
 ---
 
-![](https://velog.velcdn.com/images/yulmwu/post/07af3613-4983-4720-8e78-9a1d86b990e8/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/07af3613-4983-4720-8e78-9a1d86b990e8.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/aed4ff16-8a35-48c7-a8dc-cd5dd65f6fdd/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/aed4ff16-8a35-48c7-a8dc-cd5dd65f6fdd.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/2d2c7a86-d72d-4a66-85fd-85b19d1db943/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/2d2c7a86-d72d-4a66-85fd-85b19d1db943.png)
 
 부가적인 옵션들은 모두 기본 값으로 두고, DLQ 또한 구성하지 않았다. SQS에 대한 주제가 아니기 때문에 큐만 깡통으로 만들어주자. (`https://sqs.ap-northeast-2.amazonaws.com/986129558966/keda-demo-queue`)
 
@@ -258,7 +258,7 @@ kubectl -n keda logs keda-operator-...
 
 만약 성공적으로 잘 설치되었다면 아래와 같이 에러 메시지가 나타나지 않아야 한다. AWS STS 관련 에러나 Access Denied가 발생한다면 IRSA가 제대로 적용되지 않았다는 의미이니 빠진 부분이 없나 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8446bf74-81ec-4168-a982-b1022b8b2c19/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/8446bf74-81ec-4168-a982-b1022b8b2c19.png)
 
 ## (6) Testing
 
@@ -270,7 +270,7 @@ for i in $(seq 1 30); do
 done
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/74f7f208-c7c1-4c6d-a0e2-3656972c0a97/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/74f7f208-c7c1-4c6d-a0e2-3656972c0a97.png)
 
 그러면 위와 같이 곧바로 파드가 생성되는 것을 볼 수 있다. Prometheus 등을 거치지 않고 SQS 메트릭을 직접 Polling하기 때문에 매우 빠르게 적용되는 것을 볼 수 있다. 현재는 `maxReplicaCount: 5`로 제한을 걸어뒀기 때문에 5개의 파드가 생성되었는데, 이론상 아래의 공식을 따르기 때문에 총 6개의 파드가 생성되어야 할 것이다.
 
@@ -281,16 +281,16 @@ ceil(30 / 5) = 6
 
 이를 확인해보기 위해 `maxReplicaCount`를 10으로 늘려보자. 단, `t3.medium` 인스턴스의 최대 파드 수 제한으로 Too Many Pods가 발생할 수 있다. 하지만 이론상 6개의 파드가 생성되어야 하기 때문에 그냥 진행하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/98641cf4-f7a6-4ba3-bfe1-a24a505c476e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/98641cf4-f7a6-4ba3-bfe1-a24a505c476e.png)
 
 ```shell
 kubectl apply -f sqs/scaled-object.yaml
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/8a13da5b-1519-4423-b94c-d310d9c47352/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/8a13da5b-1519-4423-b94c-d310d9c47352.png)
 
 그러면 위와 같이 총 6개의 파드가 생성되는 것을 볼 수 있다. 마지막으로 메시지를 전부 삭제(Purge)하여 Scale to Zero가 동작하는지 확인해보자. 실제 운영 환경에선 메시지가 성공적으로 컨슈밍 되었다고 가정하는 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d95e52f8-401c-43d5-bdae-4cb811d5dd4c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2026-01-10-kubernetes-keda/d95e52f8-401c-43d5-bdae-4cb811d5dd4c.png)
 
 그럼 위와 같이 모든 파드가 종료되는 것을 확인해볼 수 있다. 지금까지 KEDA를 사용하여 AWS SQS 큐 메시지 수 기반의 오토스케일링을 실습해보았는데, 다음엔 SQS 큐가 아닌 Kafka(MSK)를 기반으로 KEDA를 구성하는 방법을 포스팅해보겠다.

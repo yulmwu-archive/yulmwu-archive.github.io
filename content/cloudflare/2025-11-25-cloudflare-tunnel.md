@@ -4,7 +4,7 @@ description: 'Cloudflare Tunnel을 통한 포트 포워딩이나 Public IP 없�
 slug: '2025-11-25-cloudflare-tunnel'
 author: yulmwu
 date: 2025-11-25T12:54:10.291Z
-updated_at: 2026-03-08T01:48:47.690Z
+updated_at: 2026-03-08T12:23:14.081Z
 categories: ['Cloudflare']
 tags: ['Cloudflare']
 series:
@@ -41,7 +41,7 @@ Cloudflare에서 제공하는 Tunnel 서비스는 내부 네트워크의 서버�
 
 즉 서버의 아웃바운드를 Cloudflare Tunnel에 연결하여 인터넷 노출을 Cloudflare로 대신한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/73d2402f-e342-4af1-a78e-e3bd8d23deb4/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/73d2402f-e342-4af1-a78e-e3bd8d23deb4.png)
 
 얼핏 보기엔 리버스 프록시처럼 보일 수 있으나 리버스 프록시와는 목적과 동작 과정이 다르다.
 
@@ -61,25 +61,25 @@ Cloudflare에서 들어온 요청/응답만 cloudflared를 통해 전달되기 �
 
 이후 간단한 서버를 localhost로 올리고 cloudflared를 설치하여 Tunnel을 통해 인터넷 노출이 가능하도록 해보겠다. 즉 이에 대한 다이어그램은 아래와 같다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a47a3dd2-844e-4936-a7b4-3d92bd9e05b4/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/a47a3dd2-844e-4936-a7b4-3d92bd9e05b4.png)
 
 ## 2-1. Cloudflare DNS
 
 필자는 가비아에서 구매해둔 테스트용 도메인이 있기 때문에 그걸 사용하도록 하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/41794fed-7c8b-4ce0-ba8c-79586bc0013d/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/41794fed-7c8b-4ce0-ba8c-79586bc0013d.png)
 
 만약 도메인을 등록한적이 없다면 위와 같이 도메인을 등록하라고 안내한다. 구매한 도메인을 입력하하고 넘어가보면 아래와 같이 2개의 Cloudflare NS를 제공해주는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7d6b01a6-2e15-44d3-abd8-ac07ed101c1b/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/7d6b01a6-2e15-44d3-abd8-ac07ed101c1b.png)
 
 이를 아래와 같이 NS를 수정하면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7a215a4c-4be5-4837-b235-8c88b45c723e/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/7a215a4c-4be5-4837-b235-8c88b45c723e.png)
 
 수정 사항을 전파하는데 시간이 오래걸릴 수 있으니 기다리도록 하자. 등록이 완료되었다면 "Check nameservers now" 버튼을 클릭하여 등록이 됐는지 확인하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/23dc8b58-2895-4ca9-b53f-af6948b7a4e5/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/23dc8b58-2895-4ca9-b53f-af6948b7a4e5.png)
 
 확인이 되었다면 위와 같은 화면이 나타난다. 필자는 1~2시간 정도 걸린 것 같다.
 
@@ -87,13 +87,13 @@ Cloudflare에서 들어온 요청/응답만 cloudflared를 통해 전달되기 �
 
 아래와 같이 Public Subnet에 NAT Gateway, Private Subnet에 EC2 인스턴스를 프로비저닝 하겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/977a9788-e99f-4264-8da3-6c872364c43d/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/977a9788-e99f-4264-8da3-6c872364c43d.png)
 
 EC2 보안그룹에서 허용할 인바운드 규칙은 없다. 다만 아웃바운드에서 cloudflared 트래픽이 나갈 HTTPS는 열어둬야 하는데, 보안그룹 기본 값이 모든 아웃바운드 트래픽이 허용(`0.0.0.0/0`)되니 상관하지 않아도 된다.
 
 Public IP와 IGW가 없으니 외부에서 SSH로 접근할 수 없는데, 필자는 [Bastion Host](https://velog.io/@yulmwu/ec2-bastion-host) EC2 인스턴스를 하나 만들어서 접속하도록 하였다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/368238d4-488e-444a-aeb4-bbd320ff174e/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/368238d4-488e-444a-aeb4-bbd320ff174e.png)
 
 그리고 Nginx를 설치하자.
 
@@ -117,23 +117,23 @@ Accept-Ranges: bytes
 
 이제 Cloudflare Tunnel 데몬인 cloudflared를 설치해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/50df1b15-f0f1-40e4-8e96-fbf44dd424f1/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/50df1b15-f0f1-40e4-8e96-fbf44dd424f1.png)
 
 Cloudflare Zero Trust 탭에 들어가면 위와 같이 나타날 것이다. 여기서 왼쪽 사이드바에 Networks > Connectors로 들어간다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b9b6ea47-465b-403d-bb1b-18bf9e0b04c8/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/b9b6ea47-465b-403d-bb1b-18bf9e0b04c8.png)
 
 Create a tunnel을 클릭하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f18f835e-13a3-4290-9b61-e0eb1819ee1f/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/f18f835e-13a3-4290-9b61-e0eb1819ee1f.png)
 
 Cloudflared를 선택한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3c78f3a7-2c7c-4d22-aee1-1705d9522f80/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/3c78f3a7-2c7c-4d22-aee1-1705d9522f80.png)
 
 이름을 입력하고 Save Tunnel을 클릭한다. 그러면 아래와 같이 설치 명령어가 나오는데, 아래에 인증 명령어까지 나오게 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c136e701-13de-4d7f-bd12-fca714bfccf6/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/c136e701-13de-4d7f-bd12-fca714bfccf6.png)
 
 _OS 및 아키텍처를 선택하라고 한다면 Linux/Debian 및 64-bit를 선택한다._
 
@@ -150,21 +150,21 @@ sudo apt-get update && sudo apt-get install cloudflared
 sudo cloudflared service install eyJhIjoiY2FkNDYxYzQ1YzY1M...
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/e68b88c3-4dd7-47cd-b2c8-27e5e098163d/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/e68b88c3-4dd7-47cd-b2c8-27e5e098163d.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/9fe8854f-79cb-4d0d-9422-5cf872fedb3a/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/9fe8854f-79cb-4d0d-9422-5cf872fedb3a.png)
 
 그럼 위와 같이 Connectors에 추가된 것을 볼 수 있다. 그리고 연결할 Nginx 앱의 주소(`http://localhost:80`)와 연결한 도메인을 선택하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c2b00045-513c-47fb-9d31-bc8ce9247359/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/c2b00045-513c-47fb-9d31-bc8ce9247359.png)
 
 그리고 Complete Setup을 클릭한다. 조금만 기다려보면 아래와 같이 Health 상태가 된 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/11065040-826d-479c-9e41-0de0c288653a/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/11065040-826d-479c-9e41-0de0c288653a.png)
 
 그리고 필자 기준으로 `test.rlawnsdud.shop` 도메인으로 접속해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/408e111c-cc94-4a17-874d-4c112d2e3302/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/408e111c-cc94-4a17-874d-4c112d2e3302.png)
 
 그럼 사진과 같이 정상적으로 접속되는 것을 볼 수 있다. 앞서 말했 듯 여기에 Warp이나 AuthN 서비스(Zero Trust Access 등)를 연동해서 쓰는 것이 좋을 것이다.
 
@@ -172,6 +172,6 @@ sudo cloudflared service install eyJhIjoiY2FkNDYxYzQ1YzY1M...
 
 만약 서버나 cloudflared가 정상적으로 동작하지 않는다면 아래와 같이 DOWN으로 표시되며 접속되지 않을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/74791c62-aa3c-4865-bba0-eafe4668d81a/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/74791c62-aa3c-4865-bba0-eafe4668d81a.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/ff0c02d8-1edf-457d-ad22-2b16efc9a170/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-11-25-cloudflare-tunnel/ff0c02d8-1edf-457d-ad22-2b16efc9a170.png)

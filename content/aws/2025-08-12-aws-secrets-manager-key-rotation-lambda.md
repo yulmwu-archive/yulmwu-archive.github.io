@@ -33,7 +33,7 @@ AWS에선 RDS, DocumentDB, ElastiCache 등의 데이터베이스 자격증명이
 
 어떤식으로 아키텍처를 구성할건지, 람다 내부적으론 어떻게 동작하는지 간단하게 알아보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d0d9cae7-dc85-457e-b97f-674afde5b45a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/d0d9cae7-dc85-457e-b97f-674afde5b45a.png)
 
 사진과 같이 Secrets Manager에서 교체 설정을 할 때 주기(스케쥴)와 키를 교체하는 람다 함수를 선택할 수 있다.
 
@@ -206,39 +206,39 @@ https://gist.github.com/yulmwu/91babc11d363d3cd36f68252018dd8c0
 
 Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/51b57f3d-80fd-4ab7-828b-ab40cc670c9b/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/51b57f3d-80fd-4ab7-828b-ab40cc670c9b.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/6ace9433-04b2-4a5c-a153-6d0130b3f094/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/6ace9433-04b2-4a5c-a153-6d0130b3f094.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/61a6d038-25a8-4445-968d-179fcfb542b8/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/61a6d038-25a8-4445-968d-179fcfb542b8.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/3d9238a2-49da-4fe3-97a2-2ed03f434cc4/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/3d9238a2-49da-4fe3-97a2-2ed03f434cc4.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/0b59b281-cf88-4891-b306-2314fa0ff193/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/0b59b281-cf88-4891-b306-2314fa0ff193.png)
 
 교체 구성은 다 만들고 해보겠다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/6c69425c-b82c-4496-914f-53c468370d96/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/6c69425c-b82c-4496-914f-53c468370d96.png)
 
 이렇게 만들어두자. 그리고 보안 암호 값 검색을 눌러 통해 확인을 해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/620cc8f4-dd7e-4664-bfe1-175b964c0000/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/620cc8f4-dd7e-4664-bfe1-175b964c0000.png)
 
 ## (2) Lambda
 
 다음으로 로테이션 키를 설정하기 위한 람다 함수를 하나 만들어보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3c374dd6-656b-4cf9-909e-e3f76ca28fcc/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/3c374dd6-656b-4cf9-909e-e3f76ca28fcc.png)
 
 그리고 코드를 간단하게 올리고 배포하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/bc565f0f-24f4-4eb4-9410-6d166f69890a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/bc565f0f-24f4-4eb4-9410-6d166f69890a.png)
 
 이제 IAM 설정이 필요하다.
 
 먼저 람다 함수가 Secrets Manager 관련 리소스를 다루기 위한 IAM 설정이 필요하다. 정책을 따로 만들어도 되고 기존의 실행 정책에 포함시켜도 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a29d6d71-fc6c-4827-8bed-588c404ec551/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/a29d6d71-fc6c-4827-8bed-588c404ec551.png)
 
 ```yaml
 {
@@ -257,9 +257,9 @@ Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
 이런식으로 Secrets Manager 관련 권한을 추가해주었다. 그리고 람다 함수에 리소스 기반 정책을 하나 더 추가해줘야 한다. (Secrets Manager가 람다 함수를 실행할 수 있도록)
 
-![](https://velog.velcdn.com/images/yulmwu/post/22c5d3ad-105c-4969-b91e-1a76aadfdebf/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/22c5d3ad-105c-4969-b91e-1a76aadfdebf.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/024f848e-6329-4e97-9667-8d7add34e160/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/024f848e-6329-4e97-9667-8d7add34e160.png)
 
 이렇게 설정해주자. `secretsmanager.amazonaws.com`(Secrets Manager)가 이 람다 함수를 호출할 수 있도록 명시하는 것이다.
 
@@ -267,24 +267,24 @@ Secrets Manager 시크릿 만드는건 간단히 넘어가겠다.
 
 그리고 최종적으로 키 로테이션 설정을 해보자. 다시 Secrets Manager로 돌아가, 교체 메뉴로 가보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7c1bcf91-3fae-44a6-9840-0c85fafb4c54/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/7c1bcf91-3fae-44a6-9840-0c85fafb4c54.png)
 
 기본적으로 비활성화되어 있는데, 교체 편집을 눌러 활성화하고 만든 람다 함수를 넣도록 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/23c35d30-2ab8-4aa2-85e0-996437a0661a/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/23c35d30-2ab8-4aa2-85e0-996437a0661a.png)
 
 사진처럼 구성할 수 있는데, 간격은 4시간으로 설정해주었다. (`cron`, `rate` 등의 표현식으로 설정할 수 있으나 간격을 간단하게 설정해줄 수 도 있다)
 (최소 주기가 4시간으로 제한됨)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5bda1056-b7cd-4bb7-b590-c8019dd74b8e/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/5bda1056-b7cd-4bb7-b590-c8019dd74b8e.png)
 
 # 4. Testing
 
 4시간 이후 잘 되는지 확인해봐도 되지만, 보안 암호 즉시 교체를 클릭해서 바로 확인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d149422c-7044-43b2-a950-7a3c857d27e7/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/d149422c-7044-43b2-a950-7a3c857d27e7.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/b5e8c614-f94b-403e-86d7-90eb200dc651/image.png)
+![](https://mirror-cdn.swua.kr/images/aws/2025-08-12-aws-secrets-manager-key-rotation-lambda/b5e8c614-f94b-403e-86d7-90eb200dc651.png)
 
 람다 함수도 잘 실행되고, 값도 랜덤하게 바뀌었다.
 

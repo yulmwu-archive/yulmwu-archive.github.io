@@ -27,7 +27,7 @@ Probe에 대해 배워보기 전 알아야할 중요 개념이 있다. 바로 �
 
 기본적으로 파드는 아래와 같은 라이프사이클 단계(Phase)를 가진다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/7a0455dd-108d-4e89-b0e4-63948f3b0317/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-26-kubernetes-pod-probe/7a0455dd-108d-4e89-b0e4-63948f3b0317.png)
 
 각 단계를 자세히 살펴보면 아래와 같다.
 
@@ -131,7 +131,7 @@ Probe는 쿠버네티스에서 kubelet에 의해 특정 주기를 가지고 파�
 
 Readiness Probe는 컨테이너가 요청을 처리할 준비가 되어있는지 여부를 확인한다. 만약 Readiness Probe가 실패된다면 서비스 엔드포인트에서 파드 IP가 제거되어 트래픽을 받을 수 없게 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/3ce60faa-0359-4825-b606-0c7e44f5132b/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-26-kubernetes-pod-probe/3ce60faa-0359-4825-b606-0c7e44f5132b.png)
 
 여기서 Readiness Probe에서 Health Check를 실패한다면 Ready Condition이 False가 되고, 그럼 서비스 엔드포인트에서 파드의 IP가 제거되어 트래픽을 받을 수 없게 된다.
 
@@ -139,7 +139,7 @@ Readiness Probe는 컨테이너가 요청을 처리할 준비가 되어있는지
 
 만약 Readiness Probe에서 Health Check를 성공했을 경우 아래와 같이 엔드포인트가 연결되어 트래픽을 받을 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/56cb0147-073c-4f21-a609-08177eeaa3db/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-26-kubernetes-pod-probe/56cb0147-073c-4f21-a609-08177eeaa3db.png)
 
 ## Liveness Probe
 
@@ -147,7 +147,7 @@ Liveness Probe는 컨테이너의 애플리케이션이 정상적으로 동작�
 
 만약 Liveness Probe를 실패한다면 해당 컨테이너를 재시작하게 된다. (그래서 데드락 등이 발생하여 컨테이너/파드 자체는 동작하나, 애플리케이션이 문제가 생겨 정상적으로 동작하지 않을 때 재시작할 수 있다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d47f20fb-c8d2-49ee-9ccc-eec1c1fdacba/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-09-26-kubernetes-pod-probe/d47f20fb-c8d2-49ee-9ccc-eec1c1fdacba.png)
 
 ## Health Check Target
 

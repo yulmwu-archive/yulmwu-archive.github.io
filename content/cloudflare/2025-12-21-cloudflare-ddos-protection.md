@@ -54,7 +54,7 @@ DDoS를 방어하기 위해선 여러 솔루션이 있겠지만, 크게 2가지�
 
 클라우드 기반의 DDoS 방어 서비스의 대명사인, 그리고 글로벌 CDN 서비스이기도 한 **Cloudflare**를 사용해볼 수 있는데, Cloudflare를 포함한 대부분의 클라우드 기반의 DDoS 방어 서비스는 아래와 같이 동작한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d18f94a9-a00a-4d64-8987-46708802fc19/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/d18f94a9-a00a-4d64-8987-46708802fc19.png)
 
 Cloudflare의 경우 전세계 여러 곳에 서비스를 운영하는데, 때문에 글로벌 CDN과 같은 것이 동작하기도 하고, 이렇게 각 위치에서 운영 중인 개별적인 Cloudflare 서버를 **엣지(Edge) 서버**라고 한다.
 
@@ -62,7 +62,7 @@ Cloudflare의 경우 전세계 여러 곳에 서비스를 운영하는데, 때�
 
 _(이러한 동작은 후술할 AWS도 비슷하게 있는데, AWS 백본망을 사용하는 많은 글로벌 서비스 중 CloudFront나 [Global Accelerator](https://velog.io/@yulmwu/aws-global-accelerator) 등이 이에 해당되며, AWS에선 엣지 로케이션이라 명칭한다.)_
 
-![](https://velog.velcdn.com/images/yulmwu/post/c54d12cd-cc5b-46c4-9959-0f2758db0d8d/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/c54d12cd-cc5b-46c4-9959-0f2758db0d8d.png)
 
 _[출처: Cloudflare | Global Network](https://www.cloudflare.com/network/)_
 
@@ -71,7 +71,7 @@ _[출처: Cloudflare | Global Network](https://www.cloudflare.com/network/)_
 Origin 서버를 어떻게 두느냐에 따라 다르겠지만, 보통은 클라이언트가 직접 Origin 서버에 접근할 수 없다.
 _(여기서 Origin 서버는 온프레미스가 될 수도 있고, 클라우드의 로드밸런서 등일 수 있다. Origin 서버를 어떻게 두느냐는 이 포스팅에서 자세히 다루진 않겠다.)_
 
-![](https://velog.velcdn.com/images/yulmwu/post/19b505c5-e14e-47e8-bb2a-32c2b8cc953b/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/19b505c5-e14e-47e8-bb2a-32c2b8cc953b.png)
 
 Cloudflare 엣지 서버에선 기본적으로 L3/L4 DDoS 공격을 방어한다. 이는 기본적으로 적용되어 있고, DDoS 방어가 트리거되는 임계값은 상대적(평균 트래픽 대비 이상치 등)으로 결정된다. _(세부적인 조정이 가능한 Magic Transit 등의 서비스는 엔터프라이즈 플랜에서만 제공한다.)_
 
@@ -114,7 +114,7 @@ Cloudflare에서도 엔터프라이즈 등급에서 L3/L4 및 L7 트래픽을 �
 
 글로벌 서비스인 CloudFront와 Route 53 DNS 등은 각 엣지 로케이션에서 동작하기 때문에 Cloudflare와 비슷하게 동작한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8140a7bd-26f9-422d-9064-4dd01d45ae1f/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/8140a7bd-26f9-422d-9064-4dd01d45ae1f.png)
 
 리전 서비스인 ELB(ALB, NLB) 및 EIP도 Shield Standard가 적용되는데, 엣지 로케이션 레벨에서 Shield + WAF로 방어하는 것이 ELB에 대해 보안상 더 유리할 수 있기 때문에 CloudFront를 CDN 서비스 뿐만 아니라 엣지 레벨에서 보호하는 수단으로도 자주 사용된다. (ELB까지 오기 전에 방어하는 최전방 부대라 생각하면 편하다.)
 
@@ -123,7 +123,7 @@ Shield의 경우 무료인 Standard 요금제와 **Advanced** 요금제로 나�
 Shield Standard에는 DDoS 공격에 대한 세부적인 Observability를 제공하지 않는 반면, Advanced는 공격 감지/유형/지속 시간 등을 실시간으로 제공하고 DRT(DDoS Response Team)을 지원하여 24시간 365일 AWS 보안팀의 지원을 받을 수 있다.
 _(추가적으로 Shield Advanced가 완화하지 못한 DDoS 공격에 대한 초과 비용을 환급해줄 수도 있다고는 하는데, 필자가 직접 사용해보진 못해서 잘 모른다는 점 양해 부탁드린다.)_
 
-![](https://velog.velcdn.com/images/yulmwu/post/ea669600-cebf-45b1-b97e-75ae77a472d0/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/ea669600-cebf-45b1-b97e-75ae77a472d0.png)
 
 다만 Shield Advanced의 경우 월 3,000달러 부터 시작하기 때문에 엔터프라이즈 급이 아닌 개인이나 작은 팀에서 사용하기엔 어려움이 있다.
 
@@ -143,19 +143,19 @@ https://developers.cloudflare.com/waf/rate-limiting-rules/best-practices
 
 Cloudflare를 실습하기 위해선 도메인을 가지고 있는 것이 편리하다. 필자는 가비아에서 테스트용도로 구매해둔 도메인이 있기 때문에 초반에선 가비아를 기준으로 설명하겠다. DNS 서버 설정의 경우 대부분의 도메인 제공 업체에서 비슷한 UI로 제공한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4d6a5112-8c41-49e2-a050-a7075ab23e47/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/4d6a5112-8c41-49e2-a050-a7075ab23e47.png)
 
 플랜의 경우 무료 플랜으로도 이 실습을 진행할 수 있다.
 
 _(필자가 취미로 있는 팀에선 프로 플랜을 사용하고 있어 계정을 빌려 Cloudflare OWASP CRS를 포함하는 WAF까지 실습해보려 했으나 실패하였다.)_
 
-![](https://velog.velcdn.com/images/yulmwu/post/e0b337e3-11e8-45fe-a1b0-c337c2b966bf/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/e0b337e3-11e8-45fe-a1b0-c337c2b966bf.png)
 
 다음으로 DNS 네임 서버를 설정해야 하는데, 도메인을 등록하고 나면 아래와 같이 네임 서버를 제공해준다. 도메인 설정에서 이 네임 서버로 바꿔주면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/adc0154d-8cfb-4808-8a04-af3e73953aa6/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/adc0154d-8cfb-4808-8a04-af3e73953aa6.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/df2794a7-bb84-4124-955a-060dd66dd669/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/df2794a7-bb84-4124-955a-060dd66dd669.png)
 
 수정 후 캐싱 때문에 적용되기 까지의 시간이 오래 걸릴 수 있다. 필자의 경우 하루 정도 여유롭게 기다렸다. 아래와 같이 Cloudflare DNS 서버와 Recursive Resolver 서버(1.1.1.1)가 설정되는지 확인한다.
 
@@ -182,11 +182,11 @@ rlawnsdud.shop.		1800	IN	SOA	matias.ns.cloudflare.com. dns.cloudflare.com. 23919
 ;; MSG SIZE  rcvd: 107
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/f46af3da-571a-4520-8978-d1721e2479f5/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/f46af3da-571a-4520-8978-d1721e2479f5.png)
 
 Cloudflare DNS 서버로 설정을 하였다면 Origin 서버의 레코드를 만들어줘야한다. 이는 DNS 레코드 설정에서 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0a7a34c1-1968-4a04-a1d8-cae1b86c3fe5/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/0a7a34c1-1968-4a04-a1d8-cae1b86c3fe5.png)
 
 > Origin 서버는 필자의 경우 간단히 AWS EC2를 프로비저닝하고 Nginx를 올린 뒤 EIP를 적용하였다.
 > 실제 운영 환경에선 ELB나 CloudFront 등의 서비스를 앞단에 붙이는 것이 좋고, 보안 그룹에서 [Cloudflare IP 대역](https://www.cloudflare.com/ko-kr/ips/)만 허용하는 등의 방법을 사용하자.
@@ -254,7 +254,7 @@ Cloudflare DNS 서버로 설정을 하였다면 Origin 서버의 레코드를 �
 >
 > Cloudflare Proxied를 사용할 경우 HTTPS(SSL/TLS 인증서)를 기본으로 사용한다. 때문에 SSL/TLS > Full (strict) 모드 변경 후 Origin Server에 대한 SSL/TLS 인증서를 발급받고 Nginx에서 사용해야 한다.
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/fdd3e707-b995-4b87-aa96-18a3f6240134/image.png)
+> ![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/fdd3e707-b995-4b87-aa96-18a3f6240134.png)
 >
 > ```shell
 > # Ubuntu 기준
@@ -274,13 +274,13 @@ Cloudflare DNS 서버로 설정을 하였다면 Origin 서버의 레코드를 �
 >
 > ```
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/e6271edd-54ef-4bba-9910-daf12373be59/image.png)
+> ![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/e6271edd-54ef-4bba-9910-daf12373be59.png)
 >
-> ![](https://velog.velcdn.com/images/yulmwu/post/70804b17-802f-4830-8c61-d4b4dfbd474d/image.png)
+> ![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/70804b17-802f-4830-8c61-d4b4dfbd474d.png)
 
 아래와 같이 EIP(또는 EC2)의 Public IP를 A 레코드로 등록해주고, Proxied 상태로 만든다. (그래야 엣지 서버를 프록시하여 Rate Limiting 및 WAF, UAM 등이 적용된다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/8033be74-5d96-4ef9-b509-1dabb234fe1d/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/8033be74-5d96-4ef9-b509-1dabb234fe1d.png)
 
 마찬가지로 DNS 레코드가 적용될 때 까지 기다려주고, 적용이 되었다면 브라우저에서 접속 후 Nginx의 엑세스 로그를 확인해보자.
 
@@ -294,11 +294,11 @@ Cloudflare DNS 서버로 설정을 하였다면 Origin 서버의 레코드를 �
 
 Cloudflare 웹 UI에서 Security > Security Rules에 접속해보면 아래와 같이 Custom Rules와 Rate Limiting Rules 및 Pro 플랜에서 사용할 수 있는 Managed Rules를 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/44f3b56d-7f97-49d9-b39c-177e01a9bda4/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/44f3b56d-7f97-49d9-b39c-177e01a9bda4.png)
 
 Create Rule > Rate Limiting Rule을 선택하고 아래와 같이 구성하자. Expression Builder를 사용해도 되지만 [RuleSet 엔진의 표현식(Expression)](https://developers.cloudflare.com/ruleset-engine/rules-language/expressions/)을 직접 작성해도 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8985d090-ae56-48cc-8a0f-cf4b81f6ecc5/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/8985d090-ae56-48cc-8a0f-cf4b81f6ecc5.png)
 
 ```shell
 http.host eq "rlawnsdud.shop" and
@@ -308,17 +308,17 @@ http.request.method eq "GET"
 
 무료 플랜에선 아래와 같이 IP Based로 제한된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cdffc6b6-2b9a-4d42-9636-497b6f4e1e36/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/cdffc6b6-2b9a-4d42-9636-497b6f4e1e36.png)
 
 마지막으로 PoC를 위해 10초 동안 5개의 요청을 임계값으로 지정하였고, 10초 동안 차단(Block) 한다는 정책으로 설정하였다. (더욱 세부적인 조정은 엔터프라이즈 플랜 이상에서 가능하다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/4552e60f-037d-4952-aa04-8327d0a7b5a5/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/4552e60f-037d-4952-aa04-8327d0a7b5a5.png)
 
 적용 후 아래와 같이 확인할 수 있다. 테스트로 셸 스크립트에서 루프를 돌려도 되지만, 10초 내에 브라우저에서 `/api/*` 경로에 대해 새로고침을 5번 이상 하면 Block 되는 모습을 확인해볼 수 있을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/c40cae34-cea9-4d18-ae5f-a4b1ba2bbf81/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/c40cae34-cea9-4d18-ae5f-a4b1ba2bbf81.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/5a00c82a-f49b-4ac9-b085-156f1a3a4b74/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/5a00c82a-f49b-4ac9-b085-156f1a3a4b74.png)
 
 ```shell
 > curl -i https://rlawnsdud.shop/api/test
@@ -343,27 +343,27 @@ error code: 1015%
 
 또한 Cloudflare의 Analytics에서도 아래와 같이 Block 여부 및 요청 수 등을 모니터링 해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/20bc8b18-d904-4738-9fe2-e54da7ab759b/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/20bc8b18-d904-4738-9fe2-e54da7ab759b.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/2bdaf096-96a7-43a0-8f3d-cb718948bcbe/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/2bdaf096-96a7-43a0-8f3d-cb718948bcbe.png)
 
 ## 3-2. Under Attack Mode
 
 다음으로 Cloudflare Under Attack Mode(UAM)을 실습해보겠다. 활성화 방법은 어렵지 않다. 대시보드 오른쪽 사이드바에서 "Under Attack Mode"를 활성화 해주면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e432f66e-848e-4e67-84fe-8860748cfd3c/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/e432f66e-848e-4e67-84fe-8860748cfd3c.png)
 
 활성화를 경고창을 띄우는데, 대충 최후의 수단으로 쓰라는 뜻이다. Enable을 클릭하여 활성화해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b14b6209-7e7e-478e-875e-b62797387a64/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/b14b6209-7e7e-478e-875e-b62797387a64.png)
 
 그럼 접속 시 아래와 같이 JS Challenge가 실행되는 모습을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4f81b7cb-da08-4d55-8719-9634e4c7b8aa/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/4f81b7cb-da08-4d55-8719-9634e4c7b8aa.png)
 
 JS Challenge를 통과했을 경우 `cf_clearance` 라는 쿠키가 생기는데, 그 쿠키 또한 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e541fce1-b8cc-4e03-832b-6872093400c5/image.png)
+![](https://mirror-cdn.swua.kr/images/cloudflare/2025-12-21-cloudflare-ddos-protection/e541fce1-b8cc-4e03-832b-6872093400c5.png)
 
 만약 curl 등으로 접속 시 403 Forbidden이 먼저 발생하는 것을 확인해볼 수 있다. 물론 이를 우회하는 방법이 계속해서 나오고 있긴 한데, 이를 굳이 우회해야 하는 이유를 잘 생각해보길 바란다.
 

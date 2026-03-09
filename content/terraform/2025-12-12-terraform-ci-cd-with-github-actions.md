@@ -39,7 +39,7 @@ PR이 Open 되었을 때 트리거(1)되는 CI 워크플로우는 포맷 체크 
 
 다음으로 CD는 Dispatch를 통해서 수동으로 트리거(2-2)할 수 있도록 하고, Artifacts에서 다운로드 받은 Plan을 Apply 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9a96a438-0602-400e-8027-cf99d645a632/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/9a96a438-0602-400e-8027-cf99d645a632.png)
 
 옵션이지만 필자의 팀 내부에선 Terraform 코드를 운영하는 원본 레포지토리에 직접 Push 하는 것을 막고, 오로지 PR을 통해서만 기여할 수 있도록 제한하는데, 이때 Github Branch Protection Rule을 설정할 수 있지만 이 포스팅에선 다루지 않겠다.
 
@@ -234,7 +234,7 @@ resource "aws_cloudfront_distribution" "this" {
 
 ## 2-1. PR CI Validation Workflow
 
-![](https://velog.velcdn.com/images/yulmwu/post/9183b6aa-5206-451f-aeaf-c945988d9602/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/9183b6aa-5206-451f-aeaf-c945988d9602.png)
 
 PR이 Open 되었을 때 포맷 체크와 Validate를 위한 CI를 구성해보자. 이는 간단하게 구성할 수 있다.
 
@@ -285,7 +285,7 @@ jobs:
 
 ## 2-2. Terraform Plan CI
 
-![](https://velog.velcdn.com/images/yulmwu/post/ee67cbdb-c76c-48de-9f26-914657cc2435/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/ee67cbdb-c76c-48de-9f26-914657cc2435.png)
 
 다음으로 PR이 Merge 되었을 때 Plan을 생성 및 Slack 알림, 그리고 TOCTOU를 방지하기 위해 Artifacts에 업로드 후, 수동(Dispatch)으로 Apply CD Job을 실행한다면 해당 Plan을 기준으로 Apply하는 워크플로우를 작성해보겠다.
 
@@ -503,7 +503,7 @@ Apply를 하기 전 까지의 순간에 Terraform 코드에 변동이 있어 동
 
 ## 2-3. Terraform Apply CD
 
-![](https://velog.velcdn.com/images/yulmwu/post/204b1646-7a3a-49ce-aece-302a2efb1b45/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/204b1646-7a3a-49ce-aece-302a2efb1b45.png)
 
 수동으로 워크플로우를 트리거할 수 있도록 아래와 같이 `workflow_dispatch`를 설정해주고, Plan CI 워크플로우의 Run ID를 입력 값으로 받도록 한다. 이는 해당 Run ID의 Artifacts를 가져오기 위함이다.
 
@@ -668,59 +668,59 @@ steps:
 
 원본 레포지토리(필자 기준 `yulmwu/terraform-ci-cd-example`)를 아래와 같이 만들고 커밋, Push 해주자. 이때 CD 워크플로우가 실행될 수 있는데 아직 Artifacts가 없어 에러가 날 것이다. 그 전에 워크플로우를 취소해도 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/64f6256c-fc91-43d6-8119-e34108eaa6ff/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/64f6256c-fc91-43d6-8119-e34108eaa6ff.png)
 
 그리고 이에 대한 Fork 레포지토리를 생성하자. 레포지토리 이름은 `eocndp/terraform-ci-cd-example-fork`이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a5787b7a-4da8-4c6e-b74c-d7f7f10b73fc/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/a5787b7a-4da8-4c6e-b74c-d7f7f10b73fc.png)
 
 기본적으로 Forked 레포지토리에선 Actions가 비활성화 되어있다. 만약 활성화를 해야한다면 워크플로우에 조건을 두는 등 적당한 조치를 하도록 하자.
 
 다음으로 원본 레포지토리의 Secrets에 `SLACK_WEBHOOK_URL`을 넣어줘야 하는데, Slack Webhook 발급 과정은 따로 설명하지 않겠다. 아래와 같이 `incoming-webhook` 앱을 찾으면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/cad5fc93-1950-413a-a5fa-cb2c7c48c65d/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/cad5fc93-1950-413a-a5fa-cb2c7c48c65d.png)
 
 이제 원본 레포지토리 설정에서 해당 Webhook URL을 넣어주면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/f2ad6494-6c51-4670-b7c3-c47068d8177e/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/f2ad6494-6c51-4670-b7c3-c47068d8177e.png)
 
 # 4. Demo — Testing
 
 이제 Fork 레포지토리의 소스코드를 살짝 수정하고 원본 레포지토리로 PR을 날려보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/822ca812-7f79-4341-9391-e555c56820c4/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/822ca812-7f79-4341-9391-e555c56820c4.png)
 
 살짝 기다리면 아래와 같이 PR Validation CI가 실행되고, 문제가 없다면 Pass되는 것을 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/54c40a4e-30ae-4925-b4a6-e6aaa034180a/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/54c40a4e-30ae-4925-b4a6-e6aaa034180a.png)
 
 만약 의도적으로 포맷팅에 문제를 발생시키고 PR을 날리면 어떻게 될까?
 
-![](https://velog.velcdn.com/images/yulmwu/post/9b18a86a-8e88-4eee-bdd2-b3ab78faf280/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/9b18a86a-8e88-4eee-bdd2-b3ab78faf280.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/002e0f99-7ade-49ab-9f52-51adf08224d7/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/002e0f99-7ade-49ab-9f52-51adf08224d7.png)
 
 그럼 위와 같이 CI가 실패되었다고 확인해볼 수 있다. 포맷팅을 정상적으로 완료했다고 치고, PR을 Merge 해보자. 그러면 아래와 같이 Plan CI가 실행되는 것을 확인해볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/4df8f56b-2738-40ec-b298-d0763d3a034c/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/4df8f56b-2738-40ec-b298-d0763d3a034c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/b3a7d016-4140-47b1-826f-434949d3a35f/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/b3a7d016-4140-47b1-826f-434949d3a35f.png)
 
 Artifacts 또한 정상적으로 생성되었고, 이제 해당 워크플로우의 Run ID를 복사하여 "Terraform Apply (Approved Plan)"에서 수동으로 Apply CD를 실행시켜보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e4f6fad3-76d7-4dc9-8d88-2532c25e99eb/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/e4f6fad3-76d7-4dc9-8d88-2532c25e99eb.png)
 
 성공적으로 실행이 되었다면 아래와 같이 표시될 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/907a96e2-3351-4fe3-b741-42e3d3769362/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/907a96e2-3351-4fe3-b741-42e3d3769362.png)
 
 여기서 "Terraform Apply (Approved Plan)" Job을 클릭해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/444dc1d0-98a1-4e0c-8957-2a413ae4ca86/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/444dc1d0-98a1-4e0c-8957-2a413ae4ca86.png)
 
 그럼 위와 같이 잘 Apply 된 것을 확인해볼 수 있다. 마찬가지로 Slack에서도 정상적으로 메시지가 온 것을 확인해볼 수 있다. (이전에 찍어둔 스크린샷이라 살짝 다를 수 있다.)
 
-![](https://velog.velcdn.com/images/yulmwu/post/346c281b-f9ef-46ce-8725-5f17414fb95c/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/346c281b-f9ef-46ce-8725-5f17414fb95c.png)
 
 아래의 명령어를 통해 S3 버킷에 `index.html`을 업로드하고 CloudFront 주소로 접속해보자.
 
@@ -729,7 +729,7 @@ echo "<h1>Testing</h1>" > ./index.html
 aws s3 cp ./index.html s3://$(terraform output -raw s3_bucket_name)/index.html
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/3cbe0fc0-2c94-4bad-96db-1c4a67c9149c/image.png)
+![](https://mirror-cdn.swua.kr/images/terraform/2025-12-12-terraform-ci-cd-with-github-actions/3cbe0fc0-2c94-4bad-96db-1c4a67c9149c.png)
 
 Terraform을 통해 S3 + CloudFront 및 OAC를 구성하였기 때문에 바로 접속이 되는 것을 확인해볼 수 있다.
 

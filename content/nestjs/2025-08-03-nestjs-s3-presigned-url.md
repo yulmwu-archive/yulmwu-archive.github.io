@@ -25,7 +25,7 @@ is_private: false
 
 이미지 등의 파일을 업로드하여 AWS S3 버킷에 업로드하려고 한다. 일반적인 방법으론 아래와 같이 업로드 기능을 구현할 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/a5dfdb0c-886a-4a09-816d-9a6233b0840d/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/a5dfdb0c-886a-4a09-816d-9a6233b0840d.png)
 
 예를 들어 `/upload` 엔드포인트로 페이로드에 파일(이미지 등)의 바이너리 데이터를 포함하여 보내면 서버는 그걸 받아서 S3에 업로드한다.
 
@@ -35,7 +35,7 @@ is_private: false
 
 그래서 AWS S3에선 **Presigned URL**(미리 서명된 URL)을 지원한다. 이것을 사용한다면 아래와 같이 업로드 기능을 구현할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8cc2e5da-cd85-450f-b3ed-8d42825165e3/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/8cc2e5da-cd85-450f-b3ed-8d42825165e3.png)
 
 먼저 클라이언트는 서버에 Presigned URL을 요청한다. 그러면 서버는 AWS S3에 해당 객체(키)와 만료 시간 등과 함께 Presigned URL 생성을 요청한다.
 
@@ -235,22 +235,22 @@ export * from './response.dto'
 
 API 테스트엔 간단하게 Postman을 사용하였다. 먼저 S3엔 아무것도 없는 모습을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0ece3e4c-1cf5-4c26-b834-3b1e82aa26b5/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/0ece3e4c-1cf5-4c26-b834-3b1e82aa26b5.png)
 
 그리고 `/upload/presigned-url` 엔드포인트를 호출하여 Presigned URL을 발급받는다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0fad3cd5-1fa5-4306-9228-9289de78b299/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/0fad3cd5-1fa5-4306-9228-9289de78b299.png)
 
 그리고 응답에서 Presigned URL을 복사한 뒤 PUT 요청을 통해 이미지를 업로드해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/dda7d406-cc98-4dbb-a056-8627c8403b66/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/dda7d406-cc98-4dbb-a056-8627c8403b66.png)
 
 Postman에선 Body에 바이너리로 체크해야 한다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/80a8d556-1956-49c6-86f1-084f92261867/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/80a8d556-1956-49c6-86f1-084f92261867.png)
 
 이제 S3 버킷을 확인해보면 사진과 같이 업로드가 된것을 볼 수 있다. 참고로 해당 Presigned URL은 Put Object에만 유효하기 때문에 GET 등으로 테스트해보면 안되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/efcb7f32-2721-48ea-ae53-23bc3d286b53/image.png)
+![](https://mirror-cdn.swua.kr/images/nestjs/2025-08-03-nestjs-s3-presigned-url/efcb7f32-2721-48ea-ae53-23bc3d286b53.png)
 
 끝.

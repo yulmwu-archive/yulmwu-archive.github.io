@@ -28,11 +28,11 @@ is_private: false
 
 먼저 첫번째 경우를 보자. 아래와 같이 동작할 수 있을 것이다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/9e1d7455-0554-4ff9-b740-e6d463b5ae2c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/9e1d7455-0554-4ff9-b740-e6d463b5ae2c.png)
 
 그런데 이러한 방식엔 몇가지 문제가 있다. 아래의 다이어그램을 보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/38913754-0425-45af-ac22-9c760935126f/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/38913754-0425-45af-ac22-9c760935126f.png)
 
 발생하는 문제는 아래와 같다.
 
@@ -50,7 +50,7 @@ is_private: false
 
 Git의 버전 관리와 협업, Diff 및 롤백 등의 기능을 그대로 사용한 채로 클러스터를 자동으로 동기화하기 때문에 간편한 유지보수가 가능해진다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/99dbbbd6-3e6d-422f-8e5a-20836a7fd736/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/99dbbbd6-3e6d-422f-8e5a-20836a7fd736.png)
 
 GitOps의 기본적인 원칙은 아래와 같다. (자료마다 다르게 작성되어 있을 순 있지만 기본적인 내용 자체는 비슷하다)
 
@@ -77,7 +77,7 @@ Helm을 통해 배포하면 여러 리소스를 패키지화 하여 배포 과�
 
 Kustomize는 쿠버네티스 매니페스트를 커스터마이징하는 도구로, Base 매니페스트를 바탕으로 여러 환경(예: Development, Production) 별로 오버레이를 선언하여 쉽게 리소스를 생성할 수 있게 해준다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/e1df7475-882a-4e48-9a72-47afde572499/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/e1df7475-882a-4e48-9a72-47afde572499.png)
 
 물론 ArgoCD나 FluxCD를 사용하는데 있어 반드시 Helm 차트 또는 Kustomize를 사용해야 하는 것은 아니다.
 
@@ -105,7 +105,7 @@ helm install argocd argo/argo-cd \
 
 여기서 서비스는 ArgoCD 웹 대시보드를 노출할 서비스를 지정하며, 상황에 맞게 설정하면 된다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/0d087b3f-3f41-4434-8655-a1199a429b38/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/0d087b3f-3f41-4434-8655-a1199a429b38.png)
 
 그리고 대시보드에 로그인하기 위한 패스워드를 확인해보자. 대시보드를 통해 애플리케이션을 만들건 아니지만 배포 토폴로지를 확인해보기 위해 사용할 예정이다.
 
@@ -120,11 +120,11 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 kubectl -n argocd port-forward svc/argocd-server 8080:80
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/517bcd7a-5ef5-427d-b0a6-a42ca592e4f0/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/517bcd7a-5ef5-427d-b0a6-a42ca592e4f0.png)
 
 여기서 Username엔 `admin`, 패스워드는 복사해둔 패스워드를 넣고 로그인해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/da578703-d2ca-4011-8916-4ca4d5042c8e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/da578703-d2ca-4011-8916-4ca4d5042c8e.png)
 
 그럼 대시보드가 나타나는데, 잠시 후 확인해보록 하고 아래의 ArgoCD CRD 중 하나인 AppProject 매니페스트를 하나 만들어주겠다.
 
@@ -156,7 +156,7 @@ AppProject를 만들지 않으면 default 프로젝트에 애플리케이션이 
 
 깃허브 레포지토리를 만들어주자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/fc7828f5-4555-4a35-a4e7-bdeafa4b832e/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/fc7828f5-4555-4a35-a4e7-bdeafa4b832e.png)
 
 그리고 Kustomize 매니페스트를 작성해주겠다. 디렉토리 구조는 아래와 같다.
 
@@ -267,7 +267,7 @@ patches:
 
 이렇게 Development 및 Production 환경에 대한 다른 설정을 적용해주었고, 이를 깃허브 레포지토리에 Push 하자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/b58a8a1f-efea-43d8-8e6e-ff1e9388a282/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/b58a8a1f-efea-43d8-8e6e-ff1e9388a282.png)
 
 ## (3) ArgoCD Application
 
@@ -325,34 +325,34 @@ spec:
             - timeout.reconcile=30s
 ```
 
-![](https://velog.velcdn.com/images/yulmwu/post/80a4bd42-196a-4ccd-ac69-e0305fd49ecb/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/80a4bd42-196a-4ccd-ac69-e0305fd49ecb.png)
 
 CLI로 확인하면 재미가 없으니 ArgoCD 대시보드를 확인해보자.
 
 ## (4) Testing
 
-![](https://velog.velcdn.com/images/yulmwu/post/818ec154-97a6-47fc-8575-0f4574b26ab7/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/818ec154-97a6-47fc-8575-0f4574b26ab7.png)
 
 그럼 방금 만들었던 두 애플리케이션이 나온 것을 볼 수 있고, 둘 다 동기화된 것을 확인할 수 있다. 특정 애플리케이션을 클릭하여 현재의 토폴로지 또한 확인할 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/8f3ae9bc-4461-43d9-817c-c8469001c772/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/8f3ae9bc-4461-43d9-817c-c8469001c772.png)
 
 만약 ArgoCD와 동기화된 Deployment가 Drift 되어 삭제된다고 하면 어떨까?
 
-![](https://velog.velcdn.com/images/yulmwu/post/6fdfc50c-2507-407b-98fb-331274a4152d/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/6fdfc50c-2507-407b-98fb-331274a4152d.png)
 
 그럼 위 사진과 같이 Drift Reconcile 되어 Deployment가 다시 만들어지는 것을 확인할 수 있다.
 
 이번엔 깃허브 레포지토리의 Kustomize 내용을 변경해보자.
 
-![](https://velog.velcdn.com/images/yulmwu/post/d9c3063a-2dc2-433b-80e9-3c9680bc6f71/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/d9c3063a-2dc2-433b-80e9-3c9680bc6f71.png)
 
 Reconcile(Pulling) 간격을 30초로 설정해두었기 때문에 30초 정도의 시간이 지난다면 아래와 같이 또다시 Reconcile 되는 것을 볼 수 있다.
 
-![](https://velog.velcdn.com/images/yulmwu/post/930de539-e407-4b88-94fe-22c3d397263c/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/930de539-e407-4b88-94fe-22c3d397263c.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/275dbf4f-2b97-4984-9353-8bc08c38cd55/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/275dbf4f-2b97-4984-9353-8bc08c38cd55.png)
 
-![](https://velog.velcdn.com/images/yulmwu/post/d2cfe17f-84fc-464a-a4e9-feb7c16d2831/image.png)
+![](https://mirror-cdn.swua.kr/images/kubernetes/2025-10-03-kubernetes-gitops-argocd/d2cfe17f-84fc-464a-a4e9-feb7c16d2831.png)
 
 이로써 간단하게 ArgoCD를 사용한 기초적인 GitOps 실습을 해보았다. 매우 편리한 방법론 중 하나이니 유용하게 사용할 수 있을 것이다.
