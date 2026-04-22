@@ -148,6 +148,21 @@ export DOCKER_HOST=tcp://10.10.0.1:2375
 
 ![](https://mirror-cdn.swua.kr/images/development/2026-04-21-development-remote-docker/4b61f599-c1a2-49b8-86d3-490a41b60bc6.png)
 
+> SSH 서버에 암호가 걸려 있을 경우 인증 키를 통해 암호 입력을 무시되도록 있도록 할 수 있다. 혹시라도 SSH 터널링을 사용할때 암호로 인해 진행이 불가능하다면(비밀번호 Interactive가 불가능한 경우) 이 방법을 사용하자. 
+> 
+> ![](https://mirror-cdn.swua.kr/images/development/2026-04-21-development-remote-docker/9c74dbdf-1421-47b3-9303-9ca95c3c8f10.png)
+> 
+> 클라이언트에서 `ssh-keygen` 명령어를 통해 인증 키(Ed25519)를 생성하고 `ssh-copy-id`를 통해 Copy 해주면 된다.
+> 
+> ```shell
+> ssh-keygen -t ed25519
+> ssh-copy-id user@10.10.0.1
+> ```
+> 
+> ![](https://mirror-cdn.swua.kr/images/development/2026-04-21-development-remote-docker/998e7302-afa8-41a7-9610-c5d59dc5a9f1.png)
+> 
+> 그럼 위 사진과 같이 암호를 입력하지 않아도 SSH 접속이 가능하다.
+
 # 2. Testcontainers in Go
 
 Testcontainers는 Docker 컨테이너를 사용하여 DB, 메시지 브로커 등 외부 컨테이너를 가볍게 통합 테스트할 수 있도록 하는 라이브러리이다. Java 뿐만 아니라 Python, NodeJS, Go 언어 등 다양한 언어를 지원하며 필자는 주로 테스트 코드 작성시 DB 컨테이너를 띄우기 위해 사용한다.
